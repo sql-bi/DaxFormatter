@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dax.Formatter", "Dax.Formatter\Dax.Formatter.csproj", "{3EC9E69B-8BBA-4F90-B6D8-F4FCCBCAB1D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dax.Formatter.Tests", "Dax.Formatter.Tests\Dax.Formatter.Tests.csproj", "{44162C15-9AC7-406F-B1A4-1A49E73F962B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3EC9E69B-8BBA-4F90-B6D8-F4FCCBCAB1D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EC9E69B-8BBA-4F90-B6D8-F4FCCBCAB1D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EC9E69B-8BBA-4F90-B6D8-F4FCCBCAB1D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EC9E69B-8BBA-4F90-B6D8-F4FCCBCAB1D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44162C15-9AC7-406F-B1A4-1A49E73F962B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44162C15-9AC7-406F-B1A4-1A49E73F962B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44162C15-9AC7-406F-B1A4-1A49E73F962B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44162C15-9AC7-406F-B1A4-1A49E73F962B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {117BBFF2-8745-4506-92ED-3312E88FAB97}
+	EndGlobalSection
+EndGlobal

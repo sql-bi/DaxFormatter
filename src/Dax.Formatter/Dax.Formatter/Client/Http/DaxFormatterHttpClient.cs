@@ -1,0 +1,135 @@
+﻿namespace Dax.Formatter.Client.Http
+{
+    using Dax.Formatter.Models;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Net;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Runtime.CompilerServices;
+    using System.Text;
+    using System.Text.Json;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    internal class DaxFormatterHttpClient : IDaxFormatterHttpClient, IDisposable
+    {
+        private const int DaxFormatterTimeoutSeconds = 60;
+        private const string DaxTextFormatUri = "https://www.daxformatter.com/api/daxformatter/daxtextformat";
+        //private const string DaxTextFormatMultiUri = "https://www.daxformatter.com/api/daxformatter/daxtextformatmulti";
+        private const string MediaTypeNamesApplicationJson = "application/json";
+
+        private readonly HashSet<HttpStatusCode> _locationChangedHttpStatusCodes;
+        private readonly JsonSerializerOptions _serializerOptions;
+        private readonly SemaphoreSlim _semaphore;
+        private readonly HttpClient _httpClient;
+        
+        //private static Uri _daxTextFormatMultiServiceUri;
+        private static Uri _daxTextFormatServiceUri;
+
+        private bool _disposed;
+
+        public DaxFormatterHttpClient()
+        {
+            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterHttpClient.ctr");
+
+            var handler = new DaxFormatterHttpClientMessageHandler();
+
+            _httpClient = new HttpClient(handler, disposeHandler: true);
+            _httpClient.Timeout = TimeSpan.FromSeconds(DaxFormatterTimeoutSeconds);
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNamesApplicationJson));
+            _httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(nameof(DecompressionMethods.GZip)));
+
+            _semaphore = new SemaphoreSlim(1);
+
+            _serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+            {
+                IgnoreNullValues = true
+            };
+
+            _locationChangedHttpStatusCodes = new HashSet<HttpStatusCode>
+            {
+                HttpStatusCode.Moved,
+                HttpStatusCode.MovedPermanently,
+                HttpStatusCode.Found,
+                HttpStatusCode.Redirect,
+                HttpStatusCode.RedirectMethod,
+                HttpStatusCode.SeeOther,
+                HttpStatusCode.RedirectKeepVerb,
+                HttpStatusCode.TemporaryRedirect
+            };
+        }
+
+        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterRequest request, CancellationToken cancellationToken)
+        {
+            if (_daxTextFormatServiceUri == default)
+                await InitializeUriAsync();
+
+            if (cancellationToken.IsCancellationRequested)
+                return default;
+
+            var json = JsonSerializer.Serialize(request, _serializerOptions);
+
+            using (var content = new StringContent(json, Encoding.UTF8, MediaTypeNamesApplicationJson))
+            using (var response = await _httpClient.PostAsync(_daxTextFormatServiceUri, content, cancellationToken))
+            using (var stream = await response.Content.ReadAsStreamAsync())
+            using (var reader = new StreamReader(stream))
+            {
+                var message = reader.ReadToEnd();
+                var result = JsonSerializer.Deserialize<DaxFormatterResponse>(message, _serializerOptions);
+
+                return result;
+            }
+
+            async Task InitializeUriAsync()
+            {
+                if (_daxTextFormatServiceUri == default)
+                {
+                    await _semaphore.WaitAsync();
+                    try
+                    {
+                        if (_daxTextFormatServiceUri == default)
+                        {
+                            using var response = await _httpClient.GetAsync(DaxTextFormatUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                            var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatUri);
+                            Interlocked.CompareExchange(ref _daxTextFormatServiceUri, uri, default);
+                        }
+                    }
+                    finally
+                    {
+                        _semaphore.Release();
+                    }
+                }
+            }
+        }
+
+        public async IAsyncEnumerable<DaxFormatterResponse> FormatAsync(IEnumerable<DaxFormatterRequest> requests, [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            foreach (var request in requests)
+                yield return await FormatAsync(request, cancellationToken);
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                _disposed = true;
+
+                if (disposing)
+                {
+                    System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterHttpClient.Dispose");
+                    _semaphore.Dispose();
+                    _httpClient.Dispose();
+                }
+            }
+        }
+    }
+}
