@@ -16,8 +16,7 @@
     internal class DaxFormatterHttpClient : IDaxFormatterHttpClient, IDisposable
     {
         private const int DaxFormatterTimeoutSeconds = 60;
-        private const string DaxTextFormatUri = "https://www.daxformatter.com/api/daxformatter/daxtextformat";
-        //private const string DaxTextFormatMultiUri = "https://www.daxformatter.com/api/daxformatter/daxtextformatmulti";
+        private const string DaxTextFormatUri = "https://www.daxformatter.com/api/daxformatter/daxtextformatmulti";
         private const string MediaTypeNamesApplicationJson = "application/json";
 
         private readonly HashSet<HttpStatusCode> _locationChangedHttpStatusCodes;
@@ -25,7 +24,6 @@
         private readonly SemaphoreSlim _semaphore;
         private readonly HttpClient _httpClient;
         
-        //private static Uri _daxTextFormatMultiServiceUri;
         private static Uri _daxTextFormatServiceUri;
 
         private bool _disposed;
@@ -78,6 +76,7 @@
             using (var reader = new StreamReader(stream))
             {
                 var message = reader.ReadToEnd();
+                System.Diagnostics.Debug.WriteLine($"DAX::DaxFormatterClient.FormatAsync({ message })");
                 var result = JsonSerializer.Deserialize<DaxFormatterResponse>(message, _serializerOptions);
 
                 return result;
@@ -92,6 +91,7 @@
                     {
                         if (_daxTextFormatServiceUri == default)
                         {
+                            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync.InitializeUriAsync");
                             using var response = await _httpClient.GetAsync(DaxTextFormatUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                             var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatUri);
                             Interlocked.CompareExchange(ref _daxTextFormatServiceUri, uri, default);

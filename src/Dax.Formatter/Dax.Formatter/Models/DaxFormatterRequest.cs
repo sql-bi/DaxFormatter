@@ -2,6 +2,8 @@
 {
     using Dax.Formatter.Security;
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
     public class DaxFormatterRequest
     {
@@ -10,9 +12,19 @@
 
         internal static DaxFormatterRequest GetFrom(string expression)
         {
+            var expressions = new List<string>
+            {
+                expression
+            };
+
+            return GetFrom(expressions);
+        }
+
+        internal static DaxFormatterRequest GetFrom(IEnumerable<string> expressions)
+        {
             var request = new DaxFormatterRequest
             {
-                Dax = expression
+                Dax = expressions.ToList()
             };
 
             return request;
@@ -46,7 +58,7 @@
 
         public string DatabaseCompatibilityLevel { get; set; }
 
-        public string Dax { get; set; }
+        public List<string> Dax { get; set; }
 
         public int? MaxLineLenght { get; set; } = (int)DaxFormatterLineStyle.LongLine;
 

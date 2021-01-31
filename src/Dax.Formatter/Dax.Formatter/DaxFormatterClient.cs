@@ -4,6 +4,7 @@
     using Dax.Formatter.Models;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -18,26 +19,29 @@
             _formatter = new DaxFormatterHttpClient();
         }
 
-        public static DaxFormatterResponse Format(DaxFormatterRequest request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
         public static async Task<DaxFormatterResponse> FormatAsync(string expression, CancellationToken cancellationToken = default)
         {
-            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync");
+            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync(string)");
 
-            var request = DaxFormatterRequest.GetFrom(expression);
+            var expressions = new List<string>
+            {
+                expression
+            };
 
-            return await _formatter.FormatAsync(request, cancellationToken);
+            var response = await FormatAsync(expressions, cancellationToken).ConfigureAwait(false);
+
+            return response;
         }
 
-        public static async Task<DaxFormatterResponse> FormatAsync(DaxFormatterRequest request, CancellationToken cancellationToken = default)
+        public static async Task<DaxFormatterResponse> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default)
         {
-            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync");
+            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync(List<string>)");
 
-            return await _formatter.FormatAsync(request, cancellationToken);
+            var request = DaxFormatterRequest.GetFrom(expressions);
+
+            var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
+
+            return response;
         }
-
-        public static async Task<IEnumerable<DaxFormatterResponse>> Format(IEnumerable<DaxFormatterRequest> expressions) => throw new NotImplementedException();
-        
-        public static async Task<IEnumerable<DaxFormatterResponse>> FormatAsync(IEnumerable<DaxFormatterRequest> expressions) => throw new NotImplementedException();
     }
 }
