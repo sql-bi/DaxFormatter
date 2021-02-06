@@ -6,7 +6,7 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public static class DaxFormatterClient
+    public class DaxFormatterClient : IDaxFormatterClient
     {
         private static readonly DaxFormatterHttpClient _formatter;
 
@@ -15,7 +15,7 @@
             _formatter = new DaxFormatterHttpClient();
         }
 
-        public static async Task<DaxFormatterResponse> FormatAsync(string expression, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterResponse> FormatAsync(string expression, CancellationToken cancellationToken = default)
         {
             var expressions = new List<string>
             {
@@ -27,10 +27,17 @@
             return response;
         }
 
-        public static async Task<DaxFormatterResponse> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterResponse> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default)
         {
             var request = DaxFormatterRequest.GetFrom(expressions);
 
+            var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
+
+            return response;
+        }
+
+        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterRequest request, CancellationToken cancellationToken = default)
+        {
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response;
