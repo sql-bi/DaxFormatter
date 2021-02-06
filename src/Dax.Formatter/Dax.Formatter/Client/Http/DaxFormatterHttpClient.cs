@@ -31,8 +31,6 @@
 
         public DaxFormatterHttpClient()
         {
-            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterHttpClient.ctr");
-
             var handler = new DaxFormatterHttpClientMessageHandler();
 
             _httpClient = new HttpClient(handler, disposeHandler: true);
@@ -131,7 +129,6 @@
 
                 if (disposing)
                 {
-                    System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterHttpClient.Dispose");
                     _semaphore.Dispose();
                     _httpClient.Dispose();
                 }
