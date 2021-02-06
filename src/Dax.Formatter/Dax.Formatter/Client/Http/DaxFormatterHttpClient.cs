@@ -4,6 +4,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Headers;
@@ -92,9 +93,12 @@
                         if (_daxTextFormatServiceUri == default)
                         {
                             System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync.InitializeUriAsync");
-                            using var response = await _httpClient.GetAsync(DaxTextFormatUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-                            var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatUri);
-                            Interlocked.CompareExchange(ref _daxTextFormatServiceUri, uri, default);
+
+                            using (var response = await _httpClient.GetAsync(DaxTextFormatUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
+                            {
+                                var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatUri);
+                                Interlocked.CompareExchange(ref _daxTextFormatServiceUri, uri, default);
+                            }
                         }
                     }
                     finally
@@ -105,10 +109,12 @@
             }
         }
 
-        public async IAsyncEnumerable<DaxFormatterResponse> FormatAsync(IEnumerable<DaxFormatterRequest> requests, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async Task<IEnumerable<DaxFormatterResponse>> FormatAsync(IEnumerable<DaxFormatterRequest> requests, CancellationToken cancellationToken)
         {
-            foreach (var request in requests)
-                yield return await FormatAsync(request, cancellationToken);
+            var tasks = requests.Select((r) => FormatAsync(r, cancellationToken));
+            var responses = await Task.WhenAll(tasks);
+
+            return responses;
         }
 
         public void Dispose()
