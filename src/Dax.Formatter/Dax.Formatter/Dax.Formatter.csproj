@@ -4,6 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <FileVersion>1.0.0.0</FileVersion>
+    <PackageId>Dax.Formatter</PackageId>
+    <Version>1.0.0-preview</Version>
   </PropertyGroup>
 
   <ItemGroup>
