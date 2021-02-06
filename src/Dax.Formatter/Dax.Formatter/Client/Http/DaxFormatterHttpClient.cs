@@ -23,10 +23,8 @@
         private readonly HashSet<HttpStatusCode> _locationChangedHttpStatusCodes;
         private readonly JsonSerializerOptions _serializerOptions;
         private readonly SemaphoreSlim _semaphore;
-        private readonly HttpClient _httpClient;
-        
-        private static Uri _daxTextFormatServiceUri;
-
+        private readonly HttpClient _httpClient;        
+        private Uri _daxTextFormatServiceUri;
         private bool _disposed;
 
         public DaxFormatterHttpClient()
