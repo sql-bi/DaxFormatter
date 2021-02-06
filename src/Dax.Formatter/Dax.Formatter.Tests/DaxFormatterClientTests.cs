@@ -64,5 +64,25 @@ namespace Dax.Formatter.Tests
             var actualExpression = formattedDistinct.Single();
             Assert.Equal(expectedExpression, actualExpression);
         }
+
+        [Theory]
+        [InlineData("EVALUATE( Ta ble )", 0, 13)]
+        [InlineData("EVALUATE( Table ) ORDER Table[Column]", 0, 24)]
+        public async Task DaxFormatterClient_FormatAsync_SingleExpressionWithErrors(string expression, int expectedErrorLine, int expectedErrorColumn)
+        {
+            var responses = await DaxFormatterClient.FormatAsync(expression);
+
+            Assert.Single(responses);
+
+            var response = responses.Single();
+
+            Assert.Equal(string.Empty, response.Formatted);
+            Assert.Single(response.Errors);
+
+            var error = response.Errors.Single();
+
+            Assert.Equal(expectedErrorColumn, error.Column);
+            Assert.Equal(expectedErrorLine, error.Line);
+        }
     }
 }
