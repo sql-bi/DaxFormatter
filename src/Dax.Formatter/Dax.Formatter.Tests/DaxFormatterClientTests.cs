@@ -1,9 +1,9 @@
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
-
 namespace Dax.Formatter.Tests
 {
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Xunit;
+
     public class DaxFormatterClientTests
     {
         [Theory]
