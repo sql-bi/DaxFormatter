@@ -58,7 +58,7 @@
 
         public string DatabaseCompatibilityLevel { get; set; }
 
-        public List<string> Dax { get; set; }
+        public List<string> Dax { get; set; } = new List<string>();
 
         public int? MaxLineLenght { get; set; } = (int)DaxFormatterLineStyle.LongLine;
 
