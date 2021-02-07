@@ -4,6 +4,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.Json.Serialization;
 
     public abstract class DaxFormatterRequestBase
     {
@@ -38,14 +39,29 @@
             set => _serverName = value.ToHashSHA256();
         }
 
+        /// <summary>
+        /// Values: null, "Enterprise64", "Developer64", "Standard64"
+        /// In DISCOVER_XML_METADATA it is in /d:Edition node
+        /// </summary>
         public string ServerEdition { get; set; }
 
-        public string ServerType { get; set; }
+        public ServerType? ServerType { get; set; }
 
+        /// <summary>
+        /// Values: null, "SharePoint", "Tabular"
+        /// In DISCOVER_XML_METADATA it is in ServerMode item
+        /// /// </summary>
         public string ServerMode { get; set; }
 
+        /// <summary>
+        /// Values: null, "OnPremise", "Azure"
+        /// In DISCOVER_XML_METADATA it is in /ddl400:ServerLocation node
+        /// </summary>
         public string ServerLocation { get; set; }
 
+        /// <summary>
+        /// Example: "14.0.800.192"
+        /// </summary>
         public string ServerVersion { get; set; }
         
         public string DatabaseName

@@ -1,6 +1,7 @@
 ﻿namespace Dax.Formatter.Tests.Models
 {
     using Dax.Formatter.Models;
+    using System.Text.Json;
     using Xunit;
 
     public class DaxFormatterRequestTests
@@ -37,6 +38,23 @@
             };
 
             Assert.Equal(expected, request.DatabaseName);
+        }
+
+        [Fact]
+        public void DaxFormatterRequest_ServerTypeSerialization()
+        {
+            var expected = "PBI Report Server";
+            var request = new DaxFormatterSingleRequest()
+            {
+                ServerType = ServerType.PowerBIReportServer
+            };
+            var _serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+            {
+                Converters = { new CustomJsonStringEnumConverter(allowIntegerValues:false) },
+                IgnoreNullValues = true
+            };
+            var serialized = JsonSerializer.Serialize(request, _serializerOptions);
+            Assert.Contains(expected, serialized);
         }
     }
 }
