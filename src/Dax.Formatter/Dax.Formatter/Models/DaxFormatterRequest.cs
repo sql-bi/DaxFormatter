@@ -5,24 +5,22 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public class DaxFormatterRequest
+    public abstract class DaxFormatterRequestBase
     {
         private string _serverName;
         private string _databaseName;
 
-        internal static DaxFormatterRequest GetFrom(string expression)
+        internal static DaxFormatterSingleRequest GetFrom(string expression)
         {
-            var expressions = new List<string>
+            return new DaxFormatterSingleRequest
             {
-                expression
+                Dax = expression
             };
-
-            return GetFrom(expressions);
         }
 
-        internal static DaxFormatterRequest GetFrom(IEnumerable<string> expressions)
+        internal static DaxFormatterMultipleRequests GetFrom(IEnumerable<string> expressions)
         {
-            var request = new DaxFormatterRequest
+            var request = new DaxFormatterMultipleRequests
             {
                 Dax = expressions.ToList()
             };
@@ -30,7 +28,7 @@
             return request;
         }
 
-        public DaxFormatterRequest()
+        public DaxFormatterRequestBase()
         {
         }
         
@@ -58,8 +56,6 @@
 
         public string DatabaseCompatibilityLevel { get; set; }
 
-        public List<string> Dax { get; set; } = new List<string>();
-
         public int? MaxLineLenght { get; set; } = (int)DaxFormatterLineStyle.LongLine;
 
         public bool? SkipSpaceAfterFunctionName { get; set; } = Convert.ToBoolean((int)DaxFormatterSpacingStyle.BestPractice);
@@ -73,5 +69,21 @@
 
         // TODO add default value for CallerVersion
         public string CallerVersion { get; set; }
+    }
+
+    public class DaxFormatterSingleRequest : DaxFormatterRequestBase
+    {
+        public DaxFormatterSingleRequest()
+        {
+        }
+        public string Dax { get; set; }
+    }
+
+    public class DaxFormatterMultipleRequests : DaxFormatterRequestBase
+    {
+        public DaxFormatterMultipleRequests()
+        {
+        }
+        public List<string> Dax { get; set; } = new List<string>();
     }
 }

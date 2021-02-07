@@ -49,8 +49,8 @@ namespace Dax.Formatter.Tests
         [InlineData("[X] := CALCULATE(SUM(Sales[Sales Amount]), USERELATIONSHIP(Sales[DueDateKey],'Date'[DateKey]))", "[X] :=\r\nCALCULATE (\r\n    SUM ( Sales[Sales Amount] ),\r\n    USERELATIONSHIP ( Sales[DueDateKey], 'Date'[DateKey] )\r\n)\r\n")]
         public async Task DaxFormatterClient_FormatAsync_SingleRequestSucceded(string expression, string expectedExpression)
         {
-            var request = new DaxFormatterRequest();
-            request.Dax.Add(expression);
+            var request = new DaxFormatterSingleRequest();
+            request.Dax = expression;
 
             var response = await _formatter.Client.FormatAsync(request);
 
@@ -58,12 +58,27 @@ namespace Dax.Formatter.Tests
         }
 
         [Theory]
+        [InlineData("evaluate('Table')", "EVALUATE\r\n( 'Table' )\r\n", 10)]
+        [InlineData("evaluate('Table') order by 'Table'[Column]", "EVALUATE\r\n( 'Table' )\r\nORDER BY 'Table'[Column]\r\n", 10)]
+        [InlineData("[X] := CALCULATE(SUM(Sales[Sales Amount]), USERELATIONSHIP(Sales[DueDateKey],'Date'[DateKey]))", "[X] :=\r\nCALCULATE (\r\n    SUM ( Sales[Sales Amount] ),\r\n    USERELATIONSHIP ( Sales[DueDateKey], 'Date'[DateKey] )\r\n)\r\n", 10)]
+        public async Task DaxFormatterClient_FormatAsync_MultipleRequestSucceded(string expression, string expectedExpression, int repeat)
+        {
+            var expressions = Enumerable.Repeat(expression, repeat);
+            var request = new DaxFormatterMultipleRequests();
+            request.Dax.AddRange(expressions);
+
+            var response = await _formatter.Client.FormatAsync(request);
+
+            AssertSingleBatchSucceded(response, expectedExpression, repeat);
+        }
+        
+        [Theory]
         [InlineData("EVALUATE( Ta ble )", 0, 13)]
         [InlineData("EVALUATE( Table ) ORDER Table[Column]", 0, 24)]
         public async Task DaxFormatterClient_FormatAsync_SingleRequestFailsWithError(string expression, int expectedErrorLine, int expectedErrorColumn)
         {
-            var request = new DaxFormatterRequest();
-            request.Dax.Add(expression);
+            var request = new DaxFormatterSingleRequest();
+            request.Dax = expression;
 
             var response = await _formatter.Client.FormatAsync(request);
 
@@ -89,7 +104,7 @@ namespace Dax.Formatter.Tests
         public async Task DaxFormatterClient_FormatAsync_SingleBatchRequestSucceded(string expression, string expectedExpression, int repeat)
         {
             var expressions = Enumerable.Repeat(expression, repeat);
-            var request = new DaxFormatterRequest();
+            var request = new DaxFormatterMultipleRequests();
             request.Dax.AddRange(expressions);
 
             var response = await _formatter.Client.FormatAsync(request);
@@ -108,11 +123,11 @@ namespace Dax.Formatter.Tests
         }
 
         [Theory]
-        [InlineData("evaluate('Table')", "EVALUATE\r\n( 'Table' )\r\n", 10)]
+        [InlineData("evaluate('Table')", "EVALUATE\r\n( 'Table' )\r\n", 1)]
         public async Task DaxFormatterClient_FormatAsync_MultipleParallelRequestSucceded(string expression, string expectedExpression, int repeat)
         {
-            var request = new DaxFormatterRequest();
-            request.Dax.Add(expression);
+            var request = new DaxFormatterSingleRequest();
+            request.Dax = expression;
 
             var tasks = Enumerable.Repeat(request, repeat).AsParallel().Select((r) => _formatter.Client.FormatAsync(r));
             var responses = await Task.WhenAll(tasks);
@@ -131,6 +146,29 @@ namespace Dax.Formatter.Tests
 
             var actualExpression = result.Formatted;
             Assert.Equal(expectedExpression, actualExpression);
+        }
+
+        private static void AssertSucceded(DaxFormatterResult result, string expectedExpression)
+        {
+            Assert.NotNull(result);
+
+            Assert.NotEmpty(result.Formatted);
+            Assert.Empty(result.Errors);
+
+            var actualExpression = result.Formatted;
+            Assert.Equal(expectedExpression, actualExpression);
+        }
+
+        private static void AssertFailsWithError(DaxFormatterResult result, int expectedErrorLine, int expectedErrorColumn)
+        {
+            Assert.NotNull(result);
+            
+            Assert.Empty(result.Formatted);
+            Assert.Single(result.Errors);
+
+            var actualError = result.Errors.Single();
+            Assert.Equal(expectedErrorLine, actualError.Line);
+            Assert.Equal(expectedErrorColumn, actualError.Column);
         }
 
         private static void AssertFailsWithError(DaxFormatterResponse response, int expectedErrorLine, int expectedErrorColumn)
@@ -152,6 +190,22 @@ namespace Dax.Formatter.Tests
             Assert.NotNull(response);
 
             var results = response.Select((r) => r).ToList();
+            Assert.Equal(repeat, results.Count);
+
+            var errors = results.SelectMany((r) => r.Errors);
+            Assert.Empty(errors);
+
+            var formattedResults = results.Select((r) => r.Formatted).Distinct();
+            Assert.Single(formattedResults);
+
+            var actualExpression = formattedResults.Single();
+            Assert.Equal(expectedExpression, actualExpression);
+        }
+
+        private static void AssertMultipleParallelSucceded(IEnumerable<DaxFormatterResult> responses, string expectedExpression, int repeat)
+        {
+            var results = responses.ToList();
+            Assert.NotEmpty(results);
             Assert.Equal(repeat, results.Count);
 
             var errors = results.SelectMany((r) => r.Errors);

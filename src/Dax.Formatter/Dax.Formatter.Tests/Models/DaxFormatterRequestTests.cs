@@ -8,7 +8,7 @@
         [Fact]
         public void DaxFormatterRequest_DaxIsNotNull()
         {
-            var request = new DaxFormatterRequest();
+            var request = new DaxFormatterMultipleRequests();
 
             Assert.NotNull(request.Dax);
         }
@@ -18,7 +18,7 @@
         {
             var expected = "f4139cb312e198bedebf0d71198c27db761f5c4cab73da7dd2faea2672d082af";
 
-            var request = new DaxFormatterRequest()
+            var request = new DaxFormatterSingleRequest()
             {
                 ServerName = "MyServerName1"
             };
@@ -31,7 +31,7 @@
         {
             var expected = "6341a49658aeebdfbcc648aea92b6005b393d3f89205cf56166c5626c80b9863";
 
-            var request = new DaxFormatterRequest()
+            var request = new DaxFormatterSingleRequest()
             {
                 DatabaseName = "MyDatabaseName1"
             };
