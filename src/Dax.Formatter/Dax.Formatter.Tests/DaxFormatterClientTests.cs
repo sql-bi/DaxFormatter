@@ -135,7 +135,7 @@ namespace Dax.Formatter.Tests
             AssertMultipleParallelSucceded(responses, expectedExpression, repeat);
         }
 
-        private static void AssertSucceded(DaxFormatterResponse response, string expectedExpression)
+        private static void AssertSucceded(DaxFormatterMultipleResponse response, string expectedExpression)
         {
             Assert.NotNull(response);
             Assert.Single(response);
@@ -171,7 +171,7 @@ namespace Dax.Formatter.Tests
             Assert.Equal(expectedErrorColumn, actualError.Column);
         }
 
-        private static void AssertFailsWithError(DaxFormatterResponse response, int expectedErrorLine, int expectedErrorColumn)
+        private static void AssertFailsWithError(DaxFormatterMultipleResponse response, int expectedErrorLine, int expectedErrorColumn)
         {
             Assert.NotNull(response);
             Assert.Single(response);
@@ -185,7 +185,7 @@ namespace Dax.Formatter.Tests
             Assert.Equal(expectedErrorColumn, actualError.Column);
         }
 
-        private static void AssertSingleBatchSucceded(DaxFormatterResponse response, string expectedExpression, int repeat)
+        private static void AssertSingleBatchSucceded(DaxFormatterMultipleResponse response, string expectedExpression, int repeat)
         {
             Assert.NotNull(response);
 
@@ -218,7 +218,7 @@ namespace Dax.Formatter.Tests
             Assert.Equal(expectedExpression, actualExpression);
         }
 
-        private static void AssertMultipleParallelSucceded(IEnumerable<DaxFormatterResponse> responses, string expectedExpression, int repeat)
+        private static void AssertMultipleParallelSucceded(IEnumerable<DaxFormatterMultipleResponse> responses, string expectedExpression, int repeat)
         {
             var results = responses.SelectMany((r) => r).ToList();
             Assert.NotEmpty(results);

@@ -137,10 +137,10 @@
             return result;
         }
 
-        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken)
+        public async Task<DaxFormatterMultipleResponse> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken)
         {
             string message = await FormatAsyncInternal(request, cancellationToken);
-            var result = JsonSerializer.Deserialize<DaxFormatterResponse>(message, _serializerOptions);
+            var result = JsonSerializer.Deserialize<DaxFormatterMultipleResponse>(message, _serializerOptions);
             return result;
         }
 
@@ -163,7 +163,7 @@
             }
         }
 
-        public async Task<IEnumerable<DaxFormatterResponse>> FormatAsync(IEnumerable<DaxFormatterMultipleRequest> requests, CancellationToken cancellationToken)
+        public async Task<IEnumerable<DaxFormatterMultipleResponse>> FormatAsync(IEnumerable<DaxFormatterMultipleRequest> requests, CancellationToken cancellationToken)
         {
             var tasks = requests.Select((r) => FormatAsync(r, cancellationToken));
             var responses = await Task.WhenAll(tasks);

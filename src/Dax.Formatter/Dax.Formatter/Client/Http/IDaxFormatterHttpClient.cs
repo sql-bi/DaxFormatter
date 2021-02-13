@@ -11,8 +11,8 @@
 
         Task<DaxFormatterResult> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken);
 
-        Task<DaxFormatterResponse> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken);
+        Task<DaxFormatterMultipleResponse> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken);
 
-        Task<IEnumerable<DaxFormatterResponse>> FormatAsync(IEnumerable<DaxFormatterMultipleRequest> requests, CancellationToken cancellationToken);
+        Task<IEnumerable<DaxFormatterMultipleResponse>> FormatAsync(IEnumerable<DaxFormatterMultipleRequest> requests, CancellationToken cancellationToken);
     }
 }

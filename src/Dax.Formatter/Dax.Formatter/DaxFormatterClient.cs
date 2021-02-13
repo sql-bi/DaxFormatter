@@ -24,7 +24,7 @@
             return response;
         }
 
-        public async Task<DaxFormatterResponse> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterMultipleResponse> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default)
         {
             var request = DaxFormatterRequest.GetFrom(expressions);
 
@@ -39,7 +39,7 @@
             return response;
         }
 
-        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterMultipleResponse> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken = default)
         {
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
             return response;
