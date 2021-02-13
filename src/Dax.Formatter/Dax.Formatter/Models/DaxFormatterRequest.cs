@@ -4,7 +4,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text.Json.Serialization;
 
     public abstract class DaxFormatterRequestBase
     {
@@ -85,21 +84,5 @@
 
         // TODO add default value for CallerVersion
         public string CallerVersion { get; set; }
-    }
-
-    public class DaxFormatterSingleRequest : DaxFormatterRequestBase
-    {
-        public DaxFormatterSingleRequest()
-        {
-        }
-        public string Dax { get; set; }
-    }
-
-    public class DaxFormatterMultipleRequests : DaxFormatterRequestBase
-    {
-        public DaxFormatterMultipleRequests()
-        {
-        }
-        public List<string> Dax { get; set; } = new List<string>();
     }
 }
