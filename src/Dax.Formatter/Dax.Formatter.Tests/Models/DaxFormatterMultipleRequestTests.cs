@@ -4,10 +4,10 @@
     using System.Text.Json;
     using Xunit;
 
-    public class DaxFormatterRequestTests
+    public class DaxFormatterMultipleRequestTests
     {
         [Fact]
-        public void DaxFormatterRequest_DaxIsNotNull()
+        public void DaxFormatterMultipleRequest_DaxIsNotNull()
         {
             var request = new DaxFormatterMultipleRequest();
 
@@ -15,11 +15,11 @@
         }
 
         [Fact]
-        public void DaxFormatterRequest_SensitiveServerNameIsProtected()
+        public void DaxFormatterMultipleRequest_SensitiveServerNameIsProtected()
         {
             var expected = "f4139cb312e198bedebf0d71198c27db761f5c4cab73da7dd2faea2672d082af";
 
-            var request = new DaxFormatterSingleRequest()
+            var request = new DaxFormatterMultipleRequest()
             {
                 ServerName = "MyServerName1"
             };
@@ -28,11 +28,11 @@
         }
 
         [Fact]
-        public void DaxFormatterRequest_SensitiveDatabaseNameIsProtected()
+        public void DaxFormatterMultipleRequest_SensitiveDatabaseNameIsProtected()
         {
             var expected = "6341a49658aeebdfbcc648aea92b6005b393d3f89205cf56166c5626c80b9863";
 
-            var request = new DaxFormatterSingleRequest()
+            var request = new DaxFormatterMultipleRequest()
             {
                 DatabaseName = "MyDatabaseName1"
             };
@@ -41,19 +41,23 @@
         }
 
         [Fact]
-        public void DaxFormatterRequest_ServerTypeSerialization()
+        public void DaxFormatterMultipleRequest_ServerTypeSerialization()
         {
             var expected = "PBI Report Server";
-            var request = new DaxFormatterSingleRequest()
+
+            var request = new DaxFormatterMultipleRequest()
             {
                 ServerType = ServerType.PowerBIReportServer
             };
-            var _serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+
+            var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
             {
                 Converters = { new CustomJsonStringEnumConverter(allowIntegerValues:false) },
                 IgnoreNullValues = true
             };
-            var serialized = JsonSerializer.Serialize(request, _serializerOptions);
+
+            var serialized = JsonSerializer.Serialize(request, options);
+
             Assert.Contains(expected, serialized);
         }
     }

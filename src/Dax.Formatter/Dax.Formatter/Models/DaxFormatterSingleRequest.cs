@@ -5,6 +5,7 @@
         public DaxFormatterSingleRequest()
         {
         }
+
         public string Dax { get; set; }
     }
 }
