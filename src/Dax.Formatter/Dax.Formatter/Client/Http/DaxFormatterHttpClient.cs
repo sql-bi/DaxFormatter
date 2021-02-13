@@ -81,15 +81,14 @@
                 return default;
 
             var json = JsonSerializer.Serialize(request, _serializerOptions);
-            var serviceUri = await GetServiceUri(request, cancellationToken);
+            var uri = await GetServiceUri(request, cancellationToken);
             
             using (var content = new StringContent(json, Encoding.UTF8, MediaTypeNamesApplicationJson))
-            using (var response = await _httpClient.PostAsync(serviceUri, content, cancellationToken))
+            using (var response = await _httpClient.PostAsync(uri, content, cancellationToken))
             using (var stream = await response.Content.ReadAsStreamAsync())
             using (var reader = new StreamReader(stream))
             {
                 var message = reader.ReadToEnd();
-                System.Diagnostics.Debug.WriteLine($"DAX::DaxFormatterClient.FormatAsync({ message })");
                 return message;
             }
         }
@@ -112,7 +111,7 @@
             }
             else
             {
-                throw new NotSupportedException($"Uri not supported for {request.GetType().Name} request");
+                throw new NotSupportedException($"Uri not supported for { request.GetType().Name } request");
             }
 
             async Task InitializeSingleServiceUriAsync()
@@ -124,8 +123,6 @@
                     {
                         if (_daxTextFormatSingleServiceUri == default)
                         {
-                            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync.InitializeSingleServiceUriAsync");
-
                             using (var response = await _httpClient.GetAsync(DaxTextFormatSingleUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
                             {
                                 var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatSingleUri);
@@ -148,9 +145,7 @@
                     try
                     {
                         if (_daxTextFormatMultiServiceUri == default)
-                        {
-                            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync.InitializeMultiServiceUriAsync");
-
+                        { 
                             using (var response = await _httpClient.GetAsync(DaxTextFormatMultiUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
                             {
                                 var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatMultiUri);
