@@ -4,7 +4,6 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Headers;
@@ -28,76 +27,6 @@
         private Uri _daxTextFormatSingleServiceUri;
         private Uri _daxTextFormatMultiServiceUri;
         private bool _disposed;
-
-        protected async Task<Uri> GetServiceUri( DaxFormatterRequest request, CancellationToken cancellationToken )
-        {
-            if (request is DaxFormatterMultipleRequest)
-            {
-                if (_daxTextFormatMultiServiceUri == default)
-                    await InitializeMultiServiceUriAsync();
-                return _daxTextFormatMultiServiceUri;
-            }
-            else if (request is DaxFormatterSingleRequest)
-            {
-                if (_daxTextFormatSingleServiceUri == default)
-                    await InitializeSingleServiceUriAsync();
-                return _daxTextFormatSingleServiceUri;
-            }
-            else
-            {
-                throw new NotSupportedException($"Uri not supported for {request.GetType().Name} request");
-            }
-
-            async Task InitializeSingleServiceUriAsync()
-            {
-                if (_daxTextFormatSingleServiceUri == default)
-                {
-                    await _semaphoreSingle.WaitAsync();
-                    try
-                    {
-                        if (_daxTextFormatSingleServiceUri == default)
-                        {
-                            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync.InitializeSingleServiceUriAsync");
-
-                            using (var response = await _httpClient.GetAsync(DaxTextFormatSingleUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
-                            {
-                                var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatSingleUri);
-                                Interlocked.CompareExchange(ref _daxTextFormatSingleServiceUri, uri, default);
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        _semaphoreSingle.Release();
-                    }
-                }
-            }
-
-            async Task InitializeMultiServiceUriAsync()
-            {
-                if (_daxTextFormatMultiServiceUri == default)
-                {
-                    await _semaphoreMulti.WaitAsync();
-                    try
-                    {
-                        if (_daxTextFormatMultiServiceUri == default)
-                        {
-                            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync.InitializeMultiServiceUriAsync");
-
-                            using (var response = await _httpClient.GetAsync(DaxTextFormatMultiUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
-                            {
-                                var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatMultiUri);
-                                Interlocked.CompareExchange(ref _daxTextFormatMultiServiceUri, uri, default);
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        _semaphoreMulti.Release();
-                    }
-                }
-            }
-        }
 
         public DaxFormatterHttpClient()
         {
@@ -162,6 +91,78 @@
                 var message = reader.ReadToEnd();
                 System.Diagnostics.Debug.WriteLine($"DAX::DaxFormatterClient.FormatAsync({ message })");
                 return message;
+            }
+        }
+
+        private async Task<Uri> GetServiceUri(DaxFormatterRequest request, CancellationToken cancellationToken)
+        {
+            if (request is DaxFormatterMultipleRequest)
+            {
+                if (_daxTextFormatMultiServiceUri == default)
+                    await InitializeMultiServiceUriAsync();
+
+                return _daxTextFormatMultiServiceUri;
+            }
+            else if (request is DaxFormatterSingleRequest)
+            {
+                if (_daxTextFormatSingleServiceUri == default)
+                    await InitializeSingleServiceUriAsync();
+
+                return _daxTextFormatSingleServiceUri;
+            }
+            else
+            {
+                throw new NotSupportedException($"Uri not supported for {request.GetType().Name} request");
+            }
+
+            async Task InitializeSingleServiceUriAsync()
+            {
+                if (_daxTextFormatSingleServiceUri == default)
+                {
+                    await _semaphoreSingle.WaitAsync();
+                    try
+                    {
+                        if (_daxTextFormatSingleServiceUri == default)
+                        {
+                            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync.InitializeSingleServiceUriAsync");
+
+                            using (var response = await _httpClient.GetAsync(DaxTextFormatSingleUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
+                            {
+                                var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatSingleUri);
+                                Interlocked.CompareExchange(ref _daxTextFormatSingleServiceUri, uri, default);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        _semaphoreSingle.Release();
+                    }
+                }
+            }
+
+            async Task InitializeMultiServiceUriAsync()
+            {
+                if (_daxTextFormatMultiServiceUri == default)
+                {
+                    await _semaphoreMulti.WaitAsync();
+                    try
+                    {
+                        if (_daxTextFormatMultiServiceUri == default)
+                        {
+                            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync.InitializeMultiServiceUriAsync");
+
+                            using (var response = await _httpClient.GetAsync(DaxTextFormatMultiUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
+                            {
+                                var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatMultiUri);
+                                Interlocked.CompareExchange(ref _daxTextFormatMultiServiceUri, uri, default);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        _semaphoreMulti.Release();
+                    }
+                }
             }
         }
 
