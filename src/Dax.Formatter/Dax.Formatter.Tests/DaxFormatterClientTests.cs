@@ -148,25 +148,25 @@ namespace Dax.Formatter.Tests
             Assert.Equal(expectedExpression, actualExpression);
         }
 
-        private static void AssertSucceded(DaxFormatterResult result, string expectedExpression)
+        private static void AssertSucceded(DaxFormatterSingleResponse response, string expectedExpression)
         {
-            Assert.NotNull(result);
+            Assert.NotNull(response);
 
-            Assert.NotEmpty(result.Formatted);
-            Assert.Empty(result.Errors);
+            Assert.NotEmpty(response.Formatted);
+            Assert.Empty(response.Errors);
 
-            var actualExpression = result.Formatted;
+            var actualExpression = response.Formatted;
             Assert.Equal(expectedExpression, actualExpression);
         }
 
-        private static void AssertFailsWithError(DaxFormatterResult result, int expectedErrorLine, int expectedErrorColumn)
+        private static void AssertFailsWithError(DaxFormatterSingleResponse response, int expectedErrorLine, int expectedErrorColumn)
         {
-            Assert.NotNull(result);
+            Assert.NotNull(response);
             
-            Assert.Empty(result.Formatted);
-            Assert.Single(result.Errors);
+            Assert.Empty(response.Formatted);
+            Assert.Single(response.Errors);
 
-            var actualError = result.Errors.Single();
+            var actualError = response.Errors.Single();
             Assert.Equal(expectedErrorLine, actualError.Line);
             Assert.Equal(expectedErrorColumn, actualError.Column);
         }
@@ -202,7 +202,7 @@ namespace Dax.Formatter.Tests
             Assert.Equal(expectedExpression, actualExpression);
         }
 
-        private static void AssertMultipleParallelSucceded(IEnumerable<DaxFormatterResult> responses, string expectedExpression, int repeat)
+        private static void AssertMultipleParallelSucceded(IEnumerable<DaxFormatterSingleResponse> responses, string expectedExpression, int repeat)
         {
             var results = responses.ToList();
             Assert.NotEmpty(results);

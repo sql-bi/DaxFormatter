@@ -15,10 +15,9 @@
             _formatter = new DaxFormatterHttpClient();
         }
 
-        public async Task<DaxFormatterResult> FormatAsync(string expression, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterSingleResponse> FormatAsync(string expression, CancellationToken cancellationToken = default)
         {
             var request = DaxFormatterRequest.GetFrom(expression);
-
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response;
@@ -27,21 +26,22 @@
         public async Task<DaxFormatterMultipleResponse> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default)
         {
             var request = DaxFormatterRequest.GetFrom(expressions);
-
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response;
         }
 
-        public async Task<DaxFormatterResult> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterSingleResponse> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken = default)
         {
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
+
             return response;
         }
 
         public async Task<DaxFormatterMultipleResponse> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken = default)
         {
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
+
             return response;
         }
     }

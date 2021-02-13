@@ -130,17 +130,19 @@
             };
         }
 
-        public async Task<DaxFormatterResult> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken)
+        public async Task<DaxFormatterSingleResponse> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken)
         {
-            string message = await FormatAsyncInternal(request, cancellationToken);
-            var result = JsonSerializer.Deserialize<DaxFormatterResult>(message, _serializerOptions);
+            var message = await FormatAsyncInternal(request, cancellationToken);
+            var result = JsonSerializer.Deserialize<DaxFormatterSingleResponse>(message, _serializerOptions);
+
             return result;
         }
 
         public async Task<DaxFormatterMultipleResponse> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken)
         {
-            string message = await FormatAsyncInternal(request, cancellationToken);
+            var message = await FormatAsyncInternal(request, cancellationToken);
             var result = JsonSerializer.Deserialize<DaxFormatterMultipleResponse>(message, _serializerOptions);
+            
             return result;
         }
 
