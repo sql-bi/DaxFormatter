@@ -1,6 +1,6 @@
 ﻿namespace Dax.Formatter.Models
 {
-    public class DaxFormatterSingleRequest : DaxFormatterRequestBase
+    public class DaxFormatterSingleRequest : DaxFormatterRequest
     {
         public DaxFormatterSingleRequest()
         {

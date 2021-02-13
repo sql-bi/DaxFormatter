@@ -5,7 +5,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public abstract class DaxFormatterRequestBase
+    public abstract class DaxFormatterRequest
     {
         private string _serverName;
         private string _databaseName;
@@ -28,7 +28,7 @@
             return request;
         }
 
-        public DaxFormatterRequestBase()
+        public DaxFormatterRequest()
         {
         }
         

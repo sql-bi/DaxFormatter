@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    public class DaxFormatterMultipleRequests : DaxFormatterRequestBase
+    public class DaxFormatterMultipleRequests : DaxFormatterRequest
     {
         public DaxFormatterMultipleRequests()
         {

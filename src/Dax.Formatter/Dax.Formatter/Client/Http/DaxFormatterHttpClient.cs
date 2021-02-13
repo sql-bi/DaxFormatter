@@ -29,7 +29,7 @@
         private Uri _daxTextFormatMultiServiceUri;
         private bool _disposed;
 
-        protected async Task<Uri> GetServiceUri( DaxFormatterRequestBase request, CancellationToken cancellationToken )
+        protected async Task<Uri> GetServiceUri( DaxFormatterRequest request, CancellationToken cancellationToken )
         {
             if (request is DaxFormatterMultipleRequests)
             {
@@ -144,7 +144,7 @@
             return result;
         }
 
-        private async Task<string> FormatAsyncInternal<T>(T request, CancellationToken cancellationToken) where T : DaxFormatterRequestBase
+        private async Task<string> FormatAsyncInternal<T>(T request, CancellationToken cancellationToken) where T : DaxFormatterRequest
         {
             if (cancellationToken.IsCancellationRequested)
                 return default;
