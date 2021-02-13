@@ -1,7 +1,6 @@
 ﻿namespace Dax.Formatter.Tests.Security
 {
     using Dax.Formatter.Security;
-    using System.Net;
     using Xunit;
 
     public class SecurityHelpersTests
@@ -15,21 +14,6 @@
         public void SecurityHelpers_ToHashSHA256_ComputeCorrectResult(string value, string expected)
         {
             var actual = value.ToHashSHA256();
-            Assert.Equal(expected, actual);
-        }
-
-        [Theory]
-        [InlineData("MySecret^ìfd56486-+{6 ♠ ⌂¿EFE==")]
-        [InlineData("AsDfJkIl123456")]
-        [InlineData("123==")]
-        [InlineData("")]
-        public void SecurityHelpers_ToProtectedStringToSecureString_ComputeCorrectResult(string expected)
-        {
-            var secureString = new NetworkCredential(string.Empty, expected).SecurePassword;
-            var protectedString = secureString.ToProtectedString();
-            var secureStringActual = protectedString.ToSecureString();
-            var actual = new NetworkCredential(string.Empty, secureStringActual).Password;
-
             Assert.Equal(expected, actual);
         }
     }
