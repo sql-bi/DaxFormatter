@@ -39,7 +39,7 @@
             return response;
         }
 
-        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterMultipleRequests request, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken = default)
         {
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
             return response;

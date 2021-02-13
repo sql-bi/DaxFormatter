@@ -9,7 +9,7 @@
         [Fact]
         public void DaxFormatterRequest_DaxIsNotNull()
         {
-            var request = new DaxFormatterMultipleRequests();
+            var request = new DaxFormatterMultipleRequest();
 
             Assert.NotNull(request.Dax);
         }

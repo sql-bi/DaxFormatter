@@ -64,7 +64,7 @@ namespace Dax.Formatter.Tests
         public async Task DaxFormatterClient_FormatAsync_MultipleRequestSucceded(string expression, string expectedExpression, int repeat)
         {
             var expressions = Enumerable.Repeat(expression, repeat);
-            var request = new DaxFormatterMultipleRequests();
+            var request = new DaxFormatterMultipleRequest();
             request.Dax.AddRange(expressions);
 
             var response = await _formatter.Client.FormatAsync(request);
@@ -104,7 +104,7 @@ namespace Dax.Formatter.Tests
         public async Task DaxFormatterClient_FormatAsync_SingleBatchRequestSucceded(string expression, string expectedExpression, int repeat)
         {
             var expressions = Enumerable.Repeat(expression, repeat);
-            var request = new DaxFormatterMultipleRequests();
+            var request = new DaxFormatterMultipleRequest();
             request.Dax.AddRange(expressions);
 
             var response = await _formatter.Client.FormatAsync(request);

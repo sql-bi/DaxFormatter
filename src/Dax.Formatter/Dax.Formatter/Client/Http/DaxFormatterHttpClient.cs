@@ -31,7 +31,7 @@
 
         protected async Task<Uri> GetServiceUri( DaxFormatterRequest request, CancellationToken cancellationToken )
         {
-            if (request is DaxFormatterMultipleRequests)
+            if (request is DaxFormatterMultipleRequest)
             {
                 if (_daxTextFormatMultiServiceUri == default)
                     await InitializeMultiServiceUriAsync();
@@ -137,7 +137,7 @@
             return result;
         }
 
-        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterMultipleRequests request, CancellationToken cancellationToken)
+        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken)
         {
             string message = await FormatAsyncInternal(request, cancellationToken);
             var result = JsonSerializer.Deserialize<DaxFormatterResponse>(message, _serializerOptions);
@@ -163,7 +163,7 @@
             }
         }
 
-        public async Task<IEnumerable<DaxFormatterResponse>> FormatAsync(IEnumerable<DaxFormatterMultipleRequests> requests, CancellationToken cancellationToken)
+        public async Task<IEnumerable<DaxFormatterResponse>> FormatAsync(IEnumerable<DaxFormatterMultipleRequest> requests, CancellationToken cancellationToken)
         {
             var tasks = requests.Select((r) => FormatAsync(r, cancellationToken));
             var responses = await Task.WhenAll(tasks);

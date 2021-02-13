@@ -18,9 +18,9 @@
             };
         }
 
-        internal static DaxFormatterMultipleRequests GetFrom(IEnumerable<string> expressions)
+        internal static DaxFormatterMultipleRequest GetFrom(IEnumerable<string> expressions)
         {
-            var request = new DaxFormatterMultipleRequests
+            var request = new DaxFormatterMultipleRequest
             {
                 Dax = expressions.ToList()
             };

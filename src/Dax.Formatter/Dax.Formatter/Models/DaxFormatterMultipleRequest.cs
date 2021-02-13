@@ -2,11 +2,12 @@
 {
     using System.Collections.Generic;
 
-    public class DaxFormatterMultipleRequests : DaxFormatterRequest
+    public class DaxFormatterMultipleRequest : DaxFormatterRequest
     {
-        public DaxFormatterMultipleRequests()
+        public DaxFormatterMultipleRequest()
         {
         }
+
         public List<string> Dax { get; set; } = new List<string>();
     }
 }
