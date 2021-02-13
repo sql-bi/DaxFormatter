@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    public class DaxFormatterResult
+    public class DaxFormatterResponse
     {
         public string Formatted { get; set; }
 

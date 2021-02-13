@@ -149,16 +149,16 @@ namespace Dax.Formatter.Tests
         {
             Assert.NotNull(response);
 
-            var results = response.Select((r) => r).ToList();
-            Assert.Equal(repeat, results.Count);
+            var responses = response.Select((r) => r).ToList();
+            Assert.Equal(repeat, responses.Count);
 
-            var errors = results.SelectMany((r) => r.Errors);
+            var errors = responses.SelectMany((r) => r.Errors);
             Assert.Empty(errors);
 
-            var formattedResults = results.Select((r) => r.Formatted).Distinct();
-            Assert.Single(formattedResults);
+            var formattedExpressions = responses.Select((r) => r.Formatted).Distinct();
+            Assert.Single(formattedExpressions);
 
-            var actualExpression = formattedResults.Single();
+            var actualExpression = formattedExpressions.Single();
             Assert.Equal(expectedExpression, actualExpression);
         }
 
@@ -166,10 +166,10 @@ namespace Dax.Formatter.Tests
         {
             Assert.NotNull(response);
 
-            var results = response.Select((r) => r).ToList();
-            Assert.Equal(repeat, results.Count);
+            var responses = response.Select((r) => r).ToList();
+            Assert.Equal(repeat, responses.Count);
 
-            var errors = results.SelectMany((r) => r.Errors).ToList();
+            var errors = responses.SelectMany((r) => r.Errors).ToList();
             Assert.Equal(repeat, errors.Count);
 
             var errorLines = errors.Select((e) => e.Line).Distinct();
@@ -184,10 +184,10 @@ namespace Dax.Formatter.Tests
             var actualErrorColumn = errorColumns.Single();
             Assert.Equal(expectedErrorColumn, actualErrorColumn);
 
-            var formattedResults = results.Select((r) => r.Formatted).Distinct();
-            Assert.Single(formattedResults);
+            var formattedExpressions = responses.Select((r) => r.Formatted).Distinct();
+            Assert.Single(formattedExpressions);
 
-            var actualExpression = formattedResults.Single();
+            var actualExpression = formattedExpressions.Single();
             Assert.Equal(string.Empty, actualExpression);
         }
 

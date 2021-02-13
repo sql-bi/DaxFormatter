@@ -1,6 +1,6 @@
 ﻿namespace Dax.Formatter.Models
 {
-    public class DaxFormatterSingleResponse : DaxFormatterResult
+    public class DaxFormatterSingleResponse : DaxFormatterResponse
     {
     }
 }

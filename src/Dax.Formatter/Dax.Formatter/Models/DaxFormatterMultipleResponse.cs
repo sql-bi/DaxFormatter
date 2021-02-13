@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    public class DaxFormatterMultipleResponse : List<DaxFormatterResult>
+    public class DaxFormatterMultipleResponse : List<DaxFormatterResponse>
     {
     }
 }
