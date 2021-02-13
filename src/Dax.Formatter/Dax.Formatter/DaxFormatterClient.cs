@@ -17,7 +17,7 @@
 
         public async Task<DaxFormatterSingleResponse> FormatAsync(string expression, CancellationToken cancellationToken = default)
         {
-            var request = DaxFormatterRequest.GetFrom(expression);
+            var request = DaxFormatterSingleRequest.GetFrom(expression);
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response;
@@ -25,7 +25,7 @@
 
         public async Task<DaxFormatterMultipleResponse> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default)
         {
-            var request = DaxFormatterRequest.GetFrom(expressions);
+            var request = DaxFormatterMultipleRequest.GetFrom(expressions);
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response;

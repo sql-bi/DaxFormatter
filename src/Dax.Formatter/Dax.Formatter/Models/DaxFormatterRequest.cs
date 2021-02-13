@@ -2,31 +2,11 @@
 {
     using Dax.Formatter.Security;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
 
     public abstract class DaxFormatterRequest
     {
         private string _serverName;
         private string _databaseName;
-
-        internal static DaxFormatterSingleRequest GetFrom(string expression)
-        {
-            return new DaxFormatterSingleRequest
-            {
-                Dax = expression
-            };
-        }
-
-        internal static DaxFormatterMultipleRequest GetFrom(IEnumerable<string> expressions)
-        {
-            var request = new DaxFormatterMultipleRequest
-            {
-                Dax = expressions.ToList()
-            };
-
-            return request;
-        }
 
         public DaxFormatterRequest()
         {

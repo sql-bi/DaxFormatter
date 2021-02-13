@@ -4,6 +4,14 @@
 
     public class DaxFormatterMultipleRequest : DaxFormatterRequest
     {
+        internal static DaxFormatterMultipleRequest GetFrom(IEnumerable<string> expressions)
+        {
+            var request = new DaxFormatterMultipleRequest();
+            request.Dax.AddRange(expressions);
+
+            return request;
+        }
+
         public DaxFormatterMultipleRequest()
         {
         }
