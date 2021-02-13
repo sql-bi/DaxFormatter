@@ -165,14 +165,6 @@
             }
         }
 
-        public async Task<IEnumerable<DaxFormatterMultipleResponse>> FormatAsync(IEnumerable<DaxFormatterMultipleRequest> requests, CancellationToken cancellationToken)
-        {
-            var tasks = requests.Select((r) => FormatAsync(r, cancellationToken));
-            var responses = await Task.WhenAll(tasks);
-
-            return responses;
-        }
-
         public void Dispose()
         {
             Dispose(disposing: true);
