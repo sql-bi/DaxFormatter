@@ -2,6 +2,7 @@
 {
     using Dax.Formatter.AnalysisServices;
     using Dax.Formatter.Models;
+    using Dax.Formatter.Tests.Serialization;
     using System.Text.Json;
     using Xunit;
 
@@ -53,7 +54,7 @@
 
             var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
             {
-                Converters = { new CustomJsonStringEnumConverter(allowIntegerValues:false) },
+                Converters = { new CustomJsonStringEnumConverter(allowIntegerValues: false) },
                 IgnoreNullValues = true
             };
 
