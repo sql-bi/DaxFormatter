@@ -8,6 +8,8 @@
         private string _serverName;
         private string _databaseName;
 
+        internal abstract Uri DaxTextFormatUri { get; }
+
         public DaxFormatterRequest()
         {
         }

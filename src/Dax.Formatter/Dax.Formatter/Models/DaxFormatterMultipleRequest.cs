@@ -1,5 +1,6 @@
 ﻿namespace Dax.Formatter.Models
 {
+    using System;
     using System.Collections.Generic;
 
     public class DaxFormatterMultipleRequest : DaxFormatterRequest
@@ -12,10 +13,8 @@
             return request;
         }
 
-        public DaxFormatterMultipleRequest()
-        {
-        }
-
+        internal override Uri DaxTextFormatUri { get; } = new Uri("https://www.daxformatter.com/api/daxformatter/daxtextformatmulti"); 
+ 
         public List<string> Dax { get; set; } = new List<string>();
     }
 }

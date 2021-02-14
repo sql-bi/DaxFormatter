@@ -14,16 +14,15 @@
 
     internal class DaxFormatterHttpClient : IDaxFormatterHttpClient, IDisposable
     {
-        private const int DaxFormatterTimeoutSeconds = 60;
-        private const string DaxTextFormatSingleUri = "https://www.daxformatter.com/api/daxformatter/daxtextformat";
-        private const string DaxTextFormatMultiUri = "https://www.daxformatter.com/api/daxformatter/daxtextformatmulti";
         private const string MediaTypeNamesApplicationJson = "application/json";
+        private const int DaxFormatterTimeoutSeconds = 60;
 
-        private readonly HashSet<HttpStatusCode> _locationChangedHttpStatusCodes;
+        private readonly HashSet<HttpStatusCode> _locationChangedStatusCodes;
         private readonly JsonSerializerOptions _serializerOptions;
+        private readonly SemaphoreSlim _initializeServiceUriSemaphore;
+        private readonly SemaphoreSlim _formatSemaphore;
         private readonly HttpClient _httpClient;
-        private readonly SemaphoreSlim _semaphoreSingle;
-        private readonly SemaphoreSlim _semaphoreMulti;
+
         private Uri _daxTextFormatSingleServiceUri;
         private Uri _daxTextFormatMultiServiceUri;
         private bool _disposed;
@@ -37,16 +36,16 @@
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNamesApplicationJson));
             _httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(nameof(DecompressionMethods.GZip)));
-
-            _semaphoreSingle = new SemaphoreSlim(1);
-            _semaphoreMulti = new SemaphoreSlim(1);
-
+            
+            _initializeServiceUriSemaphore = new SemaphoreSlim(1);
+            _formatSemaphore = new SemaphoreSlim(1);
+            
             _serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
             {
                 IgnoreNullValues = true
             };
-
-            _locationChangedHttpStatusCodes = new HashSet<HttpStatusCode>
+            
+            _locationChangedStatusCodes = new HashSet<HttpStatusCode>
             {
                 HttpStatusCode.Moved,
                 HttpStatusCode.MovedPermanently,
@@ -61,10 +60,18 @@
 
         public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken)
         {
-            var message = await FormatAsyncInternal(request, cancellationToken);
-            var result = JsonSerializer.Deserialize<DaxFormatterResponse>(message, _serializerOptions);
+            await _formatSemaphore.WaitAsync();
+            try
+            {
+                var message = await FormatAsyncInternal(request, cancellationToken);
+                var result = JsonSerializer.Deserialize<DaxFormatterResponse>(message, _serializerOptions);
 
-            return result;
+                return result;
+            }
+            finally
+            {
+                _formatSemaphore.Release();
+            }
         }
 
         public async Task<IReadOnlyList<DaxFormatterResponse>> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken)
@@ -118,21 +125,21 @@
             {
                 if (_daxTextFormatSingleServiceUri == default)
                 {
-                    await _semaphoreSingle.WaitAsync();
+                    await _initializeServiceUriSemaphore.WaitAsync();
                     try
                     {
                         if (_daxTextFormatSingleServiceUri == default)
                         {
-                            using (var response = await _httpClient.GetAsync(DaxTextFormatSingleUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
+                            using (var response = await _httpClient.GetAsync(request.DaxTextFormatUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
                             {
-                                var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatSingleUri);
+                                var uri = _locationChangedStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : request.DaxTextFormatUri;
                                 Interlocked.CompareExchange(ref _daxTextFormatSingleServiceUri, uri, default);
                             }
                         }
                     }
                     finally
                     {
-                        _semaphoreSingle.Release();
+                        _initializeServiceUriSemaphore.Release();
                     }
                 }
             }
@@ -141,21 +148,21 @@
             {
                 if (_daxTextFormatMultiServiceUri == default)
                 {
-                    await _semaphoreMulti.WaitAsync();
+                    await _initializeServiceUriSemaphore.WaitAsync();
                     try
                     {
                         if (_daxTextFormatMultiServiceUri == default)
-                        { 
-                            using (var response = await _httpClient.GetAsync(DaxTextFormatMultiUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
+                        {
+                            using (var response = await _httpClient.GetAsync(request.DaxTextFormatUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
                             {
-                                var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatMultiUri);
+                                var uri = _locationChangedStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : request.DaxTextFormatUri;
                                 Interlocked.CompareExchange(ref _daxTextFormatMultiServiceUri, uri, default);
                             }
                         }
                     }
                     finally
                     {
-                        _semaphoreMulti.Release();
+                        _initializeServiceUriSemaphore.Release();
                     }
                 }
             }
@@ -175,8 +182,8 @@
 
                 if (disposing)
                 {
-                    _semaphoreSingle.Dispose();
-                    _semaphoreMulti.Dispose();
+                    _initializeServiceUriSemaphore.Dispose();
+                    _formatSemaphore.Dispose();
                     _httpClient.Dispose();
                 }
             }
