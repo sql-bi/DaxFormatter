@@ -1,4 +1,4 @@
-﻿namespace Dax.Formatter.Models
+﻿namespace Dax.Formatter.AnalysisServices
 {
     using System.Runtime.Serialization;
 
@@ -7,15 +7,17 @@
     {
         [EnumMember(Value = "SSAS")]
         AnalysisServices,
+
         [EnumMember(Value = "PBI Desktop")]
         PowerBIDesktop,
+
         [EnumMember(Value = "PBI Report Server")]
         PowerBIReportServer,
+
         [EnumMember(Value = "PowerPivot")]
         PowerPivot,
+
         [EnumMember(Value = "SSDT")]
         SSDT
-    }
-
-    
+    }    
 }

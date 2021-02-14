@@ -1,5 +1,6 @@
 ﻿namespace Dax.Formatter.Models
 {
+    using Dax.Formatter.AnalysisServices;
     using Dax.Formatter.Security;
     using System;
 
@@ -24,21 +25,21 @@
         /// Values: null, "Enterprise64", "Developer64", "Standard64"
         /// In DISCOVER_XML_METADATA it is in /d:Edition node
         /// </summary>
-        public string ServerEdition { get; set; }
+        public ServerEdition? ServerEdition { get; set; }
 
         public ServerType? ServerType { get; set; }
 
         /// <summary>
         /// Values: null, "SharePoint", "Tabular"
         /// In DISCOVER_XML_METADATA it is in ServerMode item
-        /// /// </summary>
-        public string ServerMode { get; set; }
+        /// </summary>
+        public ServerMode? ServerMode { get; set; }
 
         /// <summary>
         /// Values: null, "OnPremise", "Azure"
         /// In DISCOVER_XML_METADATA it is in /ddl400:ServerLocation node
         /// </summary>
-        public string ServerLocation { get; set; }
+        public ServerLocation? ServerLocation { get; set; }
 
         /// <summary>
         /// Example: "14.0.800.192"

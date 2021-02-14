@@ -1,5 +1,6 @@
 ﻿namespace Dax.Formatter.Tests.Models
 {
+    using Dax.Formatter.AnalysisServices;
     using Dax.Formatter.Models;
     using System.Text.Json;
     using Xunit;
