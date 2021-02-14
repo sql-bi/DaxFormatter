@@ -122,7 +122,7 @@ namespace Dax.Formatter.Tests
             AssertParallelSingleSucceded(responses, expectedExpression, repeat);
         }
 
-        private static void AssertSingleSucceded(DaxFormatterSingleResponse response, string expectedExpression)
+        private static void AssertSingleSucceded(DaxFormatterResponse response, string expectedExpression)
         {
             Assert.NotNull(response);
 
@@ -133,7 +133,7 @@ namespace Dax.Formatter.Tests
             Assert.Equal(expectedExpression, actualExpression);
         }
 
-        private static void AssertSingleFails(DaxFormatterSingleResponse response, int expectedErrorLine, int expectedErrorColumn)
+        private static void AssertSingleFails(DaxFormatterResponse response, int expectedErrorLine, int expectedErrorColumn)
         {
             Assert.NotNull(response);
 
@@ -145,11 +145,9 @@ namespace Dax.Formatter.Tests
             Assert.Equal(expectedErrorColumn, actualError.Column);
         }
 
-        private static void AssertMultipleSucceded(DaxFormatterMultipleResponse response, string expectedExpression, int repeat)
+        private static void AssertMultipleSucceded(IReadOnlyList<DaxFormatterResponse> responses, string expectedExpression, int repeat)
         {
-            Assert.NotNull(response);
-
-            var responses = response.Select((r) => r).ToList();
+            Assert.NotNull(responses);            
             Assert.Equal(repeat, responses.Count);
 
             var errors = responses.SelectMany((r) => r.Errors);
@@ -162,11 +160,9 @@ namespace Dax.Formatter.Tests
             Assert.Equal(expectedExpression, actualExpression);
         }
 
-        private static void AssertMultipleFails(DaxFormatterMultipleResponse response, int repeat, int expectedErrorLine, int expectedErrorColumn)
+        private static void AssertMultipleFails(IReadOnlyList<DaxFormatterResponse> responses, int repeat, int expectedErrorLine, int expectedErrorColumn)
         {
-            Assert.NotNull(response);
-
-            var responses = response.Select((r) => r).ToList();
+            Assert.NotNull(responses);
             Assert.Equal(repeat, responses.Count);
 
             var errors = responses.SelectMany((r) => r.Errors).ToList();
@@ -191,7 +187,7 @@ namespace Dax.Formatter.Tests
             Assert.Equal(string.Empty, actualExpression);
         }
 
-        private static void AssertParallelSingleSucceded(DaxFormatterSingleResponse[] responses, string expectedExpression, int repeat)
+        private static void AssertParallelSingleSucceded(DaxFormatterResponse[] responses, string expectedExpression, int repeat)
         {
             Assert.Equal(repeat, responses.Length);
             Assert.Empty(responses.SelectMany((r) => r.Errors));

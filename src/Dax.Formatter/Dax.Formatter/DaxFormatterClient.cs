@@ -15,7 +15,7 @@
             _formatter = new DaxFormatterHttpClient();
         }
 
-        public async Task<DaxFormatterSingleResponse> FormatAsync(string expression, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterResponse> FormatAsync(string expression, CancellationToken cancellationToken = default)
         {
             var request = DaxFormatterSingleRequest.GetFrom(expression);
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
@@ -23,7 +23,7 @@
             return response;
         }
 
-        public async Task<DaxFormatterMultipleResponse> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<DaxFormatterResponse>> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default)
         {
             var request = DaxFormatterMultipleRequest.GetFrom(expressions);
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
@@ -31,14 +31,14 @@
             return response;
         }
 
-        public async Task<DaxFormatterSingleResponse> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken = default)
         {
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response;
         }
 
-        public async Task<DaxFormatterMultipleResponse> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<DaxFormatterResponse>> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken = default)
         {
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
 
