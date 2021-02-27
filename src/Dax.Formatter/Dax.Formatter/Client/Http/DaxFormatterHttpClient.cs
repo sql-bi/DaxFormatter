@@ -76,10 +76,18 @@
 
         public async Task<IReadOnlyList<DaxFormatterResponse>> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken)
         {
-            var message = await FormatAsyncInternal(request, cancellationToken);
-            var result = JsonSerializer.Deserialize<IReadOnlyList<DaxFormatterResponse>>(message, _serializerOptions);
-            
-            return result;
+            await _formatSemaphore.WaitAsync();
+            try
+            {
+                var message = await FormatAsyncInternal(request, cancellationToken);
+                var result = JsonSerializer.Deserialize<IReadOnlyList<DaxFormatterResponse>>(message, _serializerOptions);
+
+                return result;
+            }
+            finally
+            {
+                _formatSemaphore.Release();
+            }
         }
 
         private async Task<string> FormatAsyncInternal<T>(T request, CancellationToken cancellationToken) where T : DaxFormatterRequest
