@@ -62,5 +62,24 @@
 
             Assert.Equal(expectedServerType, currentServerType);
         }
+
+        [Theory]
+        [InlineData(DaxFormatterLineStyle.LongLine, 0)]
+        [InlineData(DaxFormatterLineStyle.ShortLine, 1)]
+        public void DaxFormatterMultipleRequest_MaxLineLenghtSerialization(DaxFormatterLineStyle lineStyle, int expectedLineStyle)
+        {
+            var request = new DaxFormatterMultipleRequest
+            {
+                MaxLineLenght = lineStyle
+            };
+
+            var json = JsonSerializer.Serialize(request);
+            var document = JsonDocument.Parse(json);
+            var property = document.RootElement.GetProperty(nameof(DaxFormatterMultipleRequest.MaxLineLenght));
+
+            var currentLineStyle = property.GetInt32();
+
+            Assert.Equal(expectedLineStyle, currentLineStyle);
+        }
     }
 }

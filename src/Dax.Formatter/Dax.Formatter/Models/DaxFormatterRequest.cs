@@ -57,7 +57,7 @@
 
         public string DatabaseCompatibilityLevel { get; set; }
 
-        public int? MaxLineLenght { get; set; } = (int)DaxFormatterLineStyle.LongLine;
+        public DaxFormatterLineStyle? MaxLineLenght { get; set; } = DaxFormatterLineStyle.LongLine;
 
         public bool? SkipSpaceAfterFunctionName { get; set; } = Convert.ToBoolean((int)DaxFormatterSpacingStyle.BestPractice);
 
