@@ -23,6 +23,42 @@ namespace Dax.Formatter.Tests
         }
 
         [Theory]
+        [InlineData(DaxFormatterSpacingStyle.SpaceAfterFunction, "[X]=IF(1=1,TRUE(),FALSE())", "[X] =\r\nIF ( 1 = 1, TRUE (), FALSE () )\r\n")]
+        [InlineData(DaxFormatterSpacingStyle.NoNpaceAfterFunction, "[X]=IF(1=1,TRUE(),FALSE())", "[X] =\r\nIF( 1 = 1, TRUE(), FALSE() )\r\n")]
+        public async Task DaxFormatterClient_FormatAsync_SpacingStyleIsHonored(DaxFormatterSpacingStyle spacingStyle, string expression, string expectedExpression)
+        {
+            var request = new DaxFormatterSingleRequest
+            {
+                Dax = expression,
+                SkipSpaceAfterFunctionName = spacingStyle
+            };
+
+            var response = await _fixture.Client.FormatAsync(request);
+            Assert.NotNull(response);
+
+            var actualExpression = response.Formatted;
+            Assert.Equal(expectedExpression, actualExpression);
+        }
+
+        [Theory]
+        [InlineData(DaxFormatterLineStyle.LongLine, "[X]:=IF(1=1,1,0)", "[X] :=\r\nIF ( 1 = 1, 1, 0 )\r\n")]
+        [InlineData(DaxFormatterLineStyle.ShortLine, "[X]:=IF(1=1,1,0)", "[X] :=\r\nIF (\r\n    1 = 1,\r\n    1,\r\n    0\r\n)\r\n")]
+        public async Task DaxFormatterClient_FormatAsync_LineStyleIsHonored(DaxFormatterLineStyle lineStyle, string expression, string expectedExpression)
+        {
+            var request = new DaxFormatterSingleRequest
+            {
+                Dax = expression,
+                MaxLineLenght = lineStyle
+            };
+
+            var response = await _fixture.Client.FormatAsync(request);
+            Assert.NotNull(response);
+
+            var actualExpression = response.Formatted;
+            Assert.Equal(expectedExpression, actualExpression);
+        }
+
+        [Theory]
         [InlineData("evaluate('Table')", "EVALUATE\r\n( 'Table' )\r\n")]
         [InlineData("evaluate('Table') order by 'Table'[Column]", "EVALUATE\r\n( 'Table' )\r\nORDER BY 'Table'[Column]\r\n")]
         [InlineData("[X] := CALCULATE(SUM(Sales[Sales Amount]), USERELATIONSHIP(Sales[DueDateKey],'Date'[DateKey]))", "[X] :=\r\nCALCULATE (\r\n    SUM ( Sales[Sales Amount] ),\r\n    USERELATIONSHIP ( Sales[DueDateKey], 'Date'[DateKey] )\r\n)\r\n")]
