@@ -66,10 +66,8 @@
 
         public char DecimalSeparator { get; set; } = '.';
 
-        // TODO add default value for CallerApp
         public string CallerApp { get; set; }
 
-        // TODO add default value for CallerVersion
         public string CallerVersion { get; set; }
     }
 }

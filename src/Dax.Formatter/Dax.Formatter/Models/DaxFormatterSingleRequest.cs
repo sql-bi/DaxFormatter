@@ -4,10 +4,12 @@
 
     public class DaxFormatterSingleRequest : DaxFormatterRequest
     {
-        internal static DaxFormatterSingleRequest GetFrom(string expression)
+        internal static DaxFormatterSingleRequest GetFrom(string application, string version, string expression)
         {
             return new DaxFormatterSingleRequest
             {
+                CallerApp = application,
+                CallerVersion = version,
                 Dax = expression
             };
         }
