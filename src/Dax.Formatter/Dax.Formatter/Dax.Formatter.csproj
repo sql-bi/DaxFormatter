@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <FileVersion>1.0.0.0</FileVersion>
     <PackageId>Dax.Formatter</PackageId>
-    <Version>1.0.0-preview</Version>
+    <Version>1.0.0-preview3</Version>
   </PropertyGroup>
 
   <ItemGroup>

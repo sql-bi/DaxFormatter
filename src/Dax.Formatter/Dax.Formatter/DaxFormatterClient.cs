@@ -15,33 +15,33 @@
             _formatter = new DaxFormatterHttpClient();
         }
 
-        public async Task<DaxFormatterResult> FormatAsync(string expression, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterResponse> FormatAsync(string expression, CancellationToken cancellationToken = default)
         {
-            var request = DaxFormatterRequestBase.GetFrom(expression);
-
+            var request = DaxFormatterSingleRequest.GetFrom(expression);
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response;
         }
 
-        public async Task<DaxFormatterResponse> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<DaxFormatterResponse>> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default)
         {
-            var request = DaxFormatterRequestBase.GetFrom(expressions);
-
+            var request = DaxFormatterMultipleRequest.GetFrom(expressions);
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response;
         }
 
-        public async Task<DaxFormatterResult> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken = default)
         {
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
+
             return response;
         }
 
-        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterMultipleRequests request, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<DaxFormatterResponse>> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken = default)
         {
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
+
             return response;
         }
     }

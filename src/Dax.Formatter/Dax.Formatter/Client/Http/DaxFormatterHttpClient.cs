@@ -4,7 +4,6 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Headers;
@@ -15,89 +14,18 @@
 
     internal class DaxFormatterHttpClient : IDaxFormatterHttpClient, IDisposable
     {
-        private const int DaxFormatterTimeoutSeconds = 60;
-        private const string DaxTextFormatSingleUri = "https://www.daxformatter.com/api/daxformatter/daxtextformat";
-        private const string DaxTextFormatMultiUri = "https://www.daxformatter.com/api/daxformatter/daxtextformatmulti";
         private const string MediaTypeNamesApplicationJson = "application/json";
+        private const int DaxFormatterTimeoutSeconds = 60;
 
-        private readonly HashSet<HttpStatusCode> _locationChangedHttpStatusCodes;
+        private readonly HashSet<HttpStatusCode> _locationChangedStatusCodes;
         private readonly JsonSerializerOptions _serializerOptions;
+        private readonly SemaphoreSlim _initializeServiceUriSemaphore;
+        private readonly SemaphoreSlim _formatSemaphore;
         private readonly HttpClient _httpClient;
-        private readonly SemaphoreSlim _semaphoreSingle;
-        private readonly SemaphoreSlim _semaphoreMulti;
+
         private Uri _daxTextFormatSingleServiceUri;
         private Uri _daxTextFormatMultiServiceUri;
         private bool _disposed;
-
-        protected async Task<Uri> GetServiceUri( DaxFormatterRequestBase request, CancellationToken cancellationToken )
-        {
-            if (request is DaxFormatterMultipleRequests)
-            {
-                if (_daxTextFormatMultiServiceUri == default)
-                    await InitializeMultiServiceUriAsync();
-                return _daxTextFormatMultiServiceUri;
-            }
-            else if (request is DaxFormatterSingleRequest)
-            {
-                if (_daxTextFormatSingleServiceUri == default)
-                    await InitializeSingleServiceUriAsync();
-                return _daxTextFormatSingleServiceUri;
-            }
-            else
-            {
-                throw new NotSupportedException($"Uri not supported for {request.GetType().Name} request");
-            }
-
-            async Task InitializeSingleServiceUriAsync()
-            {
-                if (_daxTextFormatSingleServiceUri == default)
-                {
-                    await _semaphoreSingle.WaitAsync();
-                    try
-                    {
-                        if (_daxTextFormatSingleServiceUri == default)
-                        {
-                            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync.InitializeSingleServiceUriAsync");
-
-                            using (var response = await _httpClient.GetAsync(DaxTextFormatSingleUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
-                            {
-                                var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatSingleUri);
-                                Interlocked.CompareExchange(ref _daxTextFormatSingleServiceUri, uri, default);
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        _semaphoreSingle.Release();
-                    }
-                }
-            }
-
-            async Task InitializeMultiServiceUriAsync()
-            {
-                if (_daxTextFormatMultiServiceUri == default)
-                {
-                    await _semaphoreMulti.WaitAsync();
-                    try
-                    {
-                        if (_daxTextFormatMultiServiceUri == default)
-                        {
-                            System.Diagnostics.Debug.WriteLine("DAX::DaxFormatterClient.FormatAsync.InitializeMultiServiceUriAsync");
-
-                            using (var response = await _httpClient.GetAsync(DaxTextFormatMultiUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
-                            {
-                                var uri = _locationChangedHttpStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : new Uri(DaxTextFormatMultiUri);
-                                Interlocked.CompareExchange(ref _daxTextFormatMultiServiceUri, uri, default);
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        _semaphoreMulti.Release();
-                    }
-                }
-            }
-        }
 
         public DaxFormatterHttpClient()
         {
@@ -108,16 +36,16 @@
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNamesApplicationJson));
             _httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(nameof(DecompressionMethods.GZip)));
-
-            _semaphoreSingle = new SemaphoreSlim(1);
-            _semaphoreMulti = new SemaphoreSlim(1);
-
+            
+            _initializeServiceUriSemaphore = new SemaphoreSlim(1);
+            _formatSemaphore = new SemaphoreSlim(1);
+            
             _serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
             {
                 IgnoreNullValues = true
             };
-
-            _locationChangedHttpStatusCodes = new HashSet<HttpStatusCode>
+            
+            _locationChangedStatusCodes = new HashSet<HttpStatusCode>
             {
                 HttpStatusCode.Moved,
                 HttpStatusCode.MovedPermanently,
@@ -130,45 +58,122 @@
             };
         }
 
-        public async Task<DaxFormatterResult> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken)
+        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken)
         {
-            string message = await FormatAsyncInternal(request, cancellationToken);
-            var result = JsonSerializer.Deserialize<DaxFormatterResult>(message, _serializerOptions);
-            return result;
+            await _formatSemaphore.WaitAsync();
+            try
+            {
+                var message = await FormatAsyncInternal(request, cancellationToken);
+                var result = JsonSerializer.Deserialize<DaxFormatterResponse>(message, _serializerOptions);
+
+                return result;
+            }
+            finally
+            {
+                _formatSemaphore.Release();
+            }
         }
 
-        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterMultipleRequests request, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<DaxFormatterResponse>> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken)
         {
-            string message = await FormatAsyncInternal(request, cancellationToken);
-            var result = JsonSerializer.Deserialize<DaxFormatterResponse>(message, _serializerOptions);
-            return result;
+            await _formatSemaphore.WaitAsync();
+            try
+            {
+                var message = await FormatAsyncInternal(request, cancellationToken);
+                var result = JsonSerializer.Deserialize<IReadOnlyList<DaxFormatterResponse>>(message, _serializerOptions);
+
+                return result;
+            }
+            finally
+            {
+                _formatSemaphore.Release();
+            }
         }
 
-        private async Task<string> FormatAsyncInternal<T>(T request, CancellationToken cancellationToken) where T : DaxFormatterRequestBase
+        private async Task<string> FormatAsyncInternal<T>(T request, CancellationToken cancellationToken) where T : DaxFormatterRequest
         {
             if (cancellationToken.IsCancellationRequested)
                 return default;
 
             var json = JsonSerializer.Serialize(request, _serializerOptions);
-            var serviceUri = await GetServiceUri(request, cancellationToken);
+            var uri = await GetServiceUri(request, cancellationToken);
             
             using (var content = new StringContent(json, Encoding.UTF8, MediaTypeNamesApplicationJson))
-            using (var response = await _httpClient.PostAsync(serviceUri, content, cancellationToken))
+            using (var response = await _httpClient.PostAsync(uri, content, cancellationToken))
             using (var stream = await response.Content.ReadAsStreamAsync())
             using (var reader = new StreamReader(stream))
             {
                 var message = reader.ReadToEnd();
-                System.Diagnostics.Debug.WriteLine($"DAX::DaxFormatterClient.FormatAsync({ message })");
                 return message;
             }
         }
 
-        public async Task<IEnumerable<DaxFormatterResponse>> FormatAsync(IEnumerable<DaxFormatterMultipleRequests> requests, CancellationToken cancellationToken)
+        private async Task<Uri> GetServiceUri(DaxFormatterRequest request, CancellationToken cancellationToken)
         {
-            var tasks = requests.Select((r) => FormatAsync(r, cancellationToken));
-            var responses = await Task.WhenAll(tasks);
+            if (request is DaxFormatterMultipleRequest)
+            {
+                if (_daxTextFormatMultiServiceUri == default)
+                    await InitializeMultiServiceUriAsync();
 
-            return responses;
+                return _daxTextFormatMultiServiceUri;
+            }
+            else if (request is DaxFormatterSingleRequest)
+            {
+                if (_daxTextFormatSingleServiceUri == default)
+                    await InitializeSingleServiceUriAsync();
+
+                return _daxTextFormatSingleServiceUri;
+            }
+            else
+            {
+                throw new NotSupportedException($"Uri not supported for { request.GetType().Name } request");
+            }
+
+            async Task InitializeSingleServiceUriAsync()
+            {
+                if (_daxTextFormatSingleServiceUri == default)
+                {
+                    await _initializeServiceUriSemaphore.WaitAsync();
+                    try
+                    {
+                        if (_daxTextFormatSingleServiceUri == default)
+                        {
+                            using (var response = await _httpClient.GetAsync(request.DaxTextFormatUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
+                            {
+                                var uri = _locationChangedStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : request.DaxTextFormatUri;
+                                Interlocked.CompareExchange(ref _daxTextFormatSingleServiceUri, uri, default);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        _initializeServiceUriSemaphore.Release();
+                    }
+                }
+            }
+
+            async Task InitializeMultiServiceUriAsync()
+            {
+                if (_daxTextFormatMultiServiceUri == default)
+                {
+                    await _initializeServiceUriSemaphore.WaitAsync();
+                    try
+                    {
+                        if (_daxTextFormatMultiServiceUri == default)
+                        {
+                            using (var response = await _httpClient.GetAsync(request.DaxTextFormatUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
+                            {
+                                var uri = _locationChangedStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : request.DaxTextFormatUri;
+                                Interlocked.CompareExchange(ref _daxTextFormatMultiServiceUri, uri, default);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        _initializeServiceUriSemaphore.Release();
+                    }
+                }
+            }
         }
 
         public void Dispose()
@@ -185,8 +190,8 @@
 
                 if (disposing)
                 {
-                    _semaphoreSingle.Dispose();
-                    _semaphoreMulti.Dispose();
+                    _initializeServiceUriSemaphore.Dispose();
+                    _formatSemaphore.Dispose();
                     _httpClient.Dispose();
                 }
             }

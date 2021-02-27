@@ -7,12 +7,12 @@
 
     public interface IDaxFormatterClient
     {
-        Task<DaxFormatterResult> FormatAsync(string expression, CancellationToken cancellationToken = default);
+        Task<DaxFormatterResponse> FormatAsync(string expression, CancellationToken cancellationToken = default);
 
-        Task<DaxFormatterResponse> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<DaxFormatterResponse>> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default);
 
-        Task<DaxFormatterResult> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken = default);
+        Task<DaxFormatterResponse> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken = default);
 
-        Task<DaxFormatterResponse> FormatAsync(DaxFormatterMultipleRequests request, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<DaxFormatterResponse>> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken = default);
     }
 }
