@@ -41,19 +41,26 @@
             Assert.Equal(expected, request.DatabaseName);
         }
 
-        [Fact]
-        public void DaxFormatterMultipleRequest_ServerTypeSerialization()
+        [Theory]
+        [InlineData(ServerType.AnalysisServices, "SSAS")]
+        [InlineData(ServerType.PowerBIDesktop, "PBI Desktop")]
+        [InlineData(ServerType.PowerBIReportServer, "PBI Report Server")]
+        [InlineData(ServerType.PowerPivot, "PowerPivot")]
+        [InlineData(ServerType.SSDT, "SSDT")]
+        public void DaxFormatterMultipleRequest_ServerTypeSerialization(ServerType serverType, string expectedServerType)
         {
-            var expected = "PBI Report Server";
-
-            var request = new DaxFormatterMultipleRequest()
+            var request = new DaxFormatterMultipleRequest
             {
-                ServerType = ServerType.PowerBIReportServer
+                ServerType = serverType
             };
 
-            var serialized = JsonSerializer.Serialize(request);
+            var json = JsonSerializer.Serialize(request);
+            var document = JsonDocument.Parse(json);
+            var property = document.RootElement.GetProperty(nameof(DaxFormatterMultipleRequest.ServerType));
 
-            Assert.Contains(expected, serialized);
+            var currentServerType = property.GetString();
+
+            Assert.Equal(expectedServerType, currentServerType);
         }
     }
 }
