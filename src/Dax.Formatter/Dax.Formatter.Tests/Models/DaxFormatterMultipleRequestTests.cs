@@ -2,7 +2,6 @@
 {
     using Dax.Formatter.AnalysisServices;
     using Dax.Formatter.Models;
-    using Dax.Formatter.Tests.Serialization;
     using System.Text.Json;
     using Xunit;
 
@@ -52,13 +51,7 @@
                 ServerType = ServerType.PowerBIReportServer
             };
 
-            var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
-            {
-                Converters = { new CustomJsonStringEnumConverter(allowIntegerValues: false) },
-                IgnoreNullValues = true
-            };
-
-            var serialized = JsonSerializer.Serialize(request, options);
+            var serialized = JsonSerializer.Serialize(request);
 
             Assert.Contains(expected, serialized);
         }

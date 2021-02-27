@@ -2,7 +2,9 @@
 {
     using Dax.Formatter.AnalysisServices;
     using Dax.Formatter.Security;
+    using Dax.Formatter.Serialization;
     using System;
+    using System.Text.Json.Serialization;
 
     public abstract class DaxFormatterRequest
     {
@@ -27,6 +29,7 @@
         /// </summary>
         public ServerEdition? ServerEdition { get; set; }
 
+        [JsonConverter(typeof(JsonEnumMemberConverter))]
         public ServerType? ServerType { get; set; }
 
         /// <summary>

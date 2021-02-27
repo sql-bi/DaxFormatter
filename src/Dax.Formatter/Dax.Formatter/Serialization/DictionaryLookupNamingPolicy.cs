@@ -1,4 +1,4 @@
-﻿namespace Dax.Formatter.Tests.Serialization
+﻿namespace Dax.Formatter.Serialization
 {
     using System;
     using System.Collections.Generic;

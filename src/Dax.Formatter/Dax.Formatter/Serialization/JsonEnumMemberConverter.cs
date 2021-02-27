@@ -1,4 +1,4 @@
-﻿namespace Dax.Formatter.Tests.Serialization
+﻿namespace Dax.Formatter.Serialization
 {
     using System;
     using System.Linq;
@@ -7,18 +7,18 @@
     using System.Text.Json;
     using System.Text.Json.Serialization;
 
-    public class CustomJsonStringEnumConverter : JsonConverterFactory
+    public class JsonEnumMemberConverter : JsonConverterFactory
     {
         private readonly bool _allowIntegerValues;
         private readonly JsonNamingPolicy _namingPolicy;
         private readonly JsonStringEnumConverter _baseConverter;
 
-        public CustomJsonStringEnumConverter() 
+        public JsonEnumMemberConverter() 
             : this(namingPolicy: null, allowIntegerValues: true) 
         { 
         }
 
-        public CustomJsonStringEnumConverter(JsonNamingPolicy namingPolicy = null, bool allowIntegerValues = true)
+        public JsonEnumMemberConverter(JsonNamingPolicy namingPolicy = null, bool allowIntegerValues = true)
         {
             _namingPolicy = namingPolicy;
             _allowIntegerValues = allowIntegerValues;
@@ -37,12 +37,13 @@
             var dictionary = query.ToDictionary((p) => p.Name, (p) => p.Value);
             if (dictionary.Count > 0)
             {
-                return new JsonStringEnumConverter(new DictionaryLookupNamingPolicy(dictionary, _namingPolicy), _allowIntegerValues).CreateConverter(typeToConvert, options);
+                var namingPolicy = new DictionaryLookupNamingPolicy(dictionary, _namingPolicy);
+                var converter = new JsonStringEnumConverter(namingPolicy, _allowIntegerValues).CreateConverter(typeToConvert, options);
+
+                return converter;
             }
-            else
-            {
-                return _baseConverter.CreateConverter(typeToConvert, options);
-            }
+
+            return _baseConverter.CreateConverter(typeToConvert, options);            
         }
     }
 }
