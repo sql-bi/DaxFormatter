@@ -73,5 +73,25 @@
 
             Assert.Equal(expectedLineStyle, currentLineStyle);
         }
+
+
+        [Theory]
+        [InlineData(DaxFormatterSpacingStyle.NoNpaceAfterFunction, true)]
+        [InlineData(DaxFormatterSpacingStyle.SpaceAfterFunction, false)]
+        public void DaxFormatterSingleRequest_SkipSpaceAfterFunctionNameSerialization(DaxFormatterSpacingStyle spacingStyle, bool expectedSpacingStyle)
+        {
+            var request = new DaxFormatterSingleRequest
+            {
+                SkipSpaceAfterFunctionName = spacingStyle
+            };
+
+            var json = JsonSerializer.Serialize(request);
+            var document = JsonDocument.Parse(json);
+            var property = document.RootElement.GetProperty(nameof(DaxFormatterSingleRequest.SkipSpaceAfterFunctionName));
+
+            var currentSpacingStyle = property.GetBoolean();
+
+            Assert.Equal(expectedSpacingStyle, currentSpacingStyle);
+        }        
     }
 }

@@ -59,7 +59,8 @@
 
         public DaxFormatterLineStyle? MaxLineLenght { get; set; } = DaxFormatterLineStyle.LongLine;
 
-        public bool? SkipSpaceAfterFunctionName { get; set; } = Convert.ToBoolean((int)DaxFormatterSpacingStyle.BestPractice);
+        [JsonConverter(typeof(JsonDaxFormatterSpacingStyleConverter))]
+        public DaxFormatterSpacingStyle? SkipSpaceAfterFunctionName { get; set; } = DaxFormatterSpacingStyle.BestPractice;
 
         public char ListSeparator { get; set; }  = ',';
 
