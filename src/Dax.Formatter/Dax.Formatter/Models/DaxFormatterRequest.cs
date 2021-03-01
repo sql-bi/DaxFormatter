@@ -57,7 +57,7 @@
 
         public string DatabaseCompatibilityLevel { get; set; }
 
-        public DaxFormatterLineStyle? MaxLineLenght { get; set; } = DaxFormatterLineStyle.LongLine;
+        public DaxFormatterLineStyle? MaxLineLength { get; set; } = DaxFormatterLineStyle.LongLine;
 
         [JsonConverter(typeof(JsonDaxFormatterSpacingStyleConverter))]
         public DaxFormatterSpacingStyle? SkipSpaceAfterFunctionName { get; set; } = DaxFormatterSpacingStyle.BestPractice;

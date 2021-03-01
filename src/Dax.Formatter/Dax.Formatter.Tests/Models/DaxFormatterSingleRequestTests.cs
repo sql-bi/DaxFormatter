@@ -58,16 +58,16 @@
         [Theory]
         [InlineData(DaxFormatterLineStyle.LongLine, 0)]
         [InlineData(DaxFormatterLineStyle.ShortLine, 1)]
-        public void DaxFormatterSingleRequest_MaxLineLenghtSerialization(DaxFormatterLineStyle lineStyle, int expectedLineStyle)
+        public void DaxFormatterSingleRequest_MaxLineLengthSerialization(DaxFormatterLineStyle lineStyle, int expectedLineStyle)
         {
             var request = new DaxFormatterSingleRequest
             {
-                MaxLineLenght = lineStyle
+                MaxLineLength = lineStyle
             };
 
             var json = JsonSerializer.Serialize(request);
             var document = JsonDocument.Parse(json);
-            var property = document.RootElement.GetProperty(nameof(DaxFormatterSingleRequest.MaxLineLenght));
+            var property = document.RootElement.GetProperty(nameof(DaxFormatterSingleRequest.MaxLineLength));
 
             var currentLineStyle = property.GetInt32();
 

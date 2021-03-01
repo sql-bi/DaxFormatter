@@ -48,7 +48,7 @@ namespace Dax.Formatter.Tests
             var request = new DaxFormatterSingleRequest
             {
                 Dax = expression,
-                MaxLineLenght = lineStyle
+                MaxLineLength = lineStyle
             };
 
             var response = await _fixture.Client.FormatAsync(request);
