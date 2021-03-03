@@ -4,6 +4,7 @@
     using Dax.Formatter.Models;
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -18,11 +19,14 @@
             _formatter = new DaxFormatterHttpClient();
         }
 
-        /// <summary>
-        /// Creates an instance of a Dax.Formatter.DaxFormatterClient class.
-        /// </summary>
-        /// <param name="application">Caller application name</param>
-        /// <param name="version">Caller application version</param>
+        public DaxFormatterClient()
+        {
+            var assembly = Assembly.GetEntryAssembly();
+
+            _version = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
+            _application = assembly.GetName().Name;
+        }
+
         public DaxFormatterClient(string application, string version)
         {
             _application = application ?? throw new ArgumentNullException(nameof(application));
