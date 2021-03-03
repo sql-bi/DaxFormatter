@@ -29,7 +29,7 @@ namespace BasicFormatter
             await FormatInvalidExpression();
         }
 
-        static async Task FormatSingleExpression()
+        private static async Task FormatSingleExpression()
         {
             var formatter = new DaxFormatterClient("", "");
 
@@ -38,7 +38,7 @@ namespace BasicFormatter
             Console.WriteLine(response.Formatted);
         }
 
-        static async Task FormatSingleRequest()
+        private static async Task FormatSingleRequest()
         {
             var formatter = new DaxFormatterClient("", "");
 
@@ -65,7 +65,7 @@ namespace BasicFormatter
             Console.WriteLine(response.Formatted);
         }
 
-        static async Task FormatMultipleExpressions()
+        private static async Task FormatMultipleExpressions()
         {
             var formatter = new DaxFormatterClient("", "");
 
@@ -77,7 +77,7 @@ namespace BasicFormatter
             }
         }
 
-        static async Task FormatMultipleRequests()
+        private static async Task FormatMultipleRequests()
         {
             var formatter = new DaxFormatterClient("", "");
 
@@ -107,7 +107,7 @@ namespace BasicFormatter
             }
         }
 
-        static async Task FormatInvalidExpression()
+        private static async Task FormatInvalidExpression()
         {
             var formatter = new DaxFormatterClient("", "");
 

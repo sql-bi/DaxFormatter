@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <RestoreSources>$(RestoreSources);./nupkgs;https://api.nuget.org/v3/index.json</RestoreSources>
+    <RestoreSources>$(RestoreSources);./nupkg;https://api.nuget.org/v3/index.json</RestoreSources>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <PackageReference Include="Dax.Formatter" Version="1.0.0-preview3" />
+    <PackageReference Include="Dax.Formatter" Version="1.0.0-preview4" />
   </ItemGroup>
   
 </Project>
