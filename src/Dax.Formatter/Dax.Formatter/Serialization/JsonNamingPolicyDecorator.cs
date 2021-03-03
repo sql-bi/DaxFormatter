@@ -2,7 +2,7 @@
 {
     using System.Text.Json;
 
-    public class JsonNamingPolicyDecorator : JsonNamingPolicy
+    internal class JsonNamingPolicyDecorator : JsonNamingPolicy
     {
         readonly JsonNamingPolicy _policy;
 
