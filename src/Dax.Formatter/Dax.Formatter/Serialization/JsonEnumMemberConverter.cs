@@ -7,7 +7,7 @@
     using System.Text.Json;
     using System.Text.Json.Serialization;
 
-    public class JsonEnumMemberConverter : JsonConverterFactory
+    internal class JsonEnumMemberConverter : JsonConverterFactory
     {
         private readonly bool _allowIntegerValues;
         private readonly JsonNamingPolicy _namingPolicy;

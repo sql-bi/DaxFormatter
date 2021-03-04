@@ -10,7 +10,7 @@ namespace Dax.Formatter.Tests
     {
         public DaxFormatterClient Client { get; private set; }
 
-        public DaxFormatterClientFixture() => Client = new DaxFormatterClient(application: "Dax.Formatter.NuGet", version: "dev");
+        public DaxFormatterClientFixture() => Client = new DaxFormatterClient();
     }
 
     public class DaxFormatterClientTests : IClassFixture<DaxFormatterClientFixture>
