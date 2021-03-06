@@ -31,7 +31,7 @@ namespace BasicFormatter
 
         private static async Task FormatSingleExpression()
         {
-            var formatter = new DaxFormatterClient("", "");
+            var formatter = new DaxFormatterClient();
 
             var response = await formatter.FormatAsync(DaxSingleExpression);
 
@@ -40,7 +40,7 @@ namespace BasicFormatter
 
         private static async Task FormatSingleRequest()
         {
-            var formatter = new DaxFormatterClient("", "");
+            var formatter = new DaxFormatterClient();
 
             var request = new DaxFormatterSingleRequest
             {
@@ -67,7 +67,7 @@ namespace BasicFormatter
 
         private static async Task FormatMultipleExpressions()
         {
-            var formatter = new DaxFormatterClient("", "");
+            var formatter = new DaxFormatterClient();
 
             var responses = await formatter.FormatAsync(DaxMultipleExpressions);
 
@@ -79,7 +79,7 @@ namespace BasicFormatter
 
         private static async Task FormatMultipleRequests()
         {
-            var formatter = new DaxFormatterClient("", "");
+            var formatter = new DaxFormatterClient();
 
             var request = new DaxFormatterMultipleRequest
             {
@@ -109,7 +109,7 @@ namespace BasicFormatter
 
         private static async Task FormatInvalidExpression()
         {
-            var formatter = new DaxFormatterClient("", "");
+            var formatter = new DaxFormatterClient();
 
             var invalidExpression = "[X] := SUMX ( Sales[Amount] ), )";
 
