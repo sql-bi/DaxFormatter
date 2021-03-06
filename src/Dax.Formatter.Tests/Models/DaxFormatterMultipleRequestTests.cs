@@ -54,10 +54,7 @@
                 ServerType = serverType
             };
 
-            var json = JsonSerializer.Serialize(request);
-            var document = JsonDocument.Parse(json);
-            var property = document.RootElement.GetProperty(nameof(DaxFormatterMultipleRequest.ServerType));
-
+            var property = GetJsonProperty(request, nameof(DaxFormatterMultipleRequest.ServerType));
             var currentServerType = property.GetString();
 
             Assert.Equal(expectedServerType, currentServerType);
@@ -73,10 +70,7 @@
                 MaxLineLength = lineStyle
             };
 
-            var json = JsonSerializer.Serialize(request);
-            var document = JsonDocument.Parse(json);
-            var property = document.RootElement.GetProperty(nameof(DaxFormatterMultipleRequest.MaxLineLength));
-
+            var property = GetJsonProperty(request, nameof(DaxFormatterMultipleRequest.MaxLineLength));
             var currentLineStyle = property.GetInt32();
 
             Assert.Equal(expectedLineStyle, currentLineStyle);
@@ -92,13 +86,19 @@
                 SkipSpaceAfterFunctionName = spacingStyle
             };
 
-            var json = JsonSerializer.Serialize(request);
-            var document = JsonDocument.Parse(json);
-            var property = document.RootElement.GetProperty(nameof(DaxFormatterMultipleRequest.SkipSpaceAfterFunctionName));
-
+            var property = GetJsonProperty(request, nameof(DaxFormatterMultipleRequest.SkipSpaceAfterFunctionName));
             var currentSpacingStyle = property.GetBoolean();
 
             Assert.Equal(expectedSpacingStyle, currentSpacingStyle);
+        }
+
+        private static JsonElement GetJsonProperty(DaxFormatterMultipleRequest request, string propertyName)
+        {
+            var json = JsonSerializer.Serialize(request);
+            var document = JsonDocument.Parse(json);
+            var property = document.RootElement.GetProperty(propertyName);
+
+            return property;
         }
     }
 }
