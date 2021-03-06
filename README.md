@@ -1,7 +1,7 @@
 
 # Dax Formatter [![NuGet](https://github.com/sql-bi/DaxFormatter/actions/workflows/dotnet.yml/badge.svg)](https://github.com/sql-bi/DaxFormatter/actions/workflows/dotnet.yml)
 
-DAX Formatter is a service available at https://www.daxformatter.com
+DAX Formatter is a service available at https://www.daxformatter.com.
 The service receives DAX expressions and format them according to rules for [DAX code formatting](https://www.sqlbi.com/articles/rules-for-dax-code-formatting/).
 The NuGet package contains a client library to invoke the serivce from your .NET application.
 All the requests are designed to be asynchronous.
@@ -13,13 +13,12 @@ Invoke the `FormatAsync` method for each request.
 Possibly, use the `DaxFormatterMultipleRequest` structure to provide more statistical details about the database and the server (all the names are anonymized and used only to count the number of unique servers/databases serviced).
 
 # DaxFormatterClient
-
 The default constructor creates an instance of the client using the current assembly name and version to identify the client. You can specify an application name and version in the constructor arguments.
 The client instance resolve the server endpoint just once and reuse it in following requests.
 It is suggested to reuse the same instance in multiple requests to minimize the latency.
 ```csharp
 var formatter = new DaxFormatterClient();
-var response1 = await formatter.FormatAsync( "evaluate('Table') order by 'Table'[Column]" );
+var response = await formatter.FormatAsync( "evaluate('Table') order by 'Table'[Column]" );
 ```
 # DaxFormatterMultipleRequest
 Use the `DaxFormatterMultipleRequest` class to send multiple DAX expressions in a single API call.
@@ -33,7 +32,7 @@ var request = new DaxFormatterMultipleRequest
     // Format arguments (you can skip all of them to keep the default values)
     ListSeparator = ',',
     DecimalSeparator = '.',
-    MaxLineLenght = DaxFormatterLineStyle.LongLine,
+    MaxLineLength = DaxFormatterLineStyle.LongLine,
     SkipSpaceAfterFunctionName = DaxFormatterSpacingStyle.BestPractice,
 
     // Identify the server type using the corresponding enum values
@@ -70,7 +69,7 @@ var request = new DaxFormatterSingleRequest
     // Format arguments (you can skip all of them to keep the default values)
     ListSeparator = ',',
     DecimalSeparator = '.',
-    MaxLineLenght = DaxFormatterLineStyle.LongLine,
+    MaxLineLength = DaxFormatterLineStyle.LongLine,
     SkipSpaceAfterFunctionName = DaxFormatterSpacingStyle.BestPractice,
 
     // Identify the server type using the corresponding enum values

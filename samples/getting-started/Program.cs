@@ -51,7 +51,7 @@ namespace BasicFormatter
 
                 ListSeparator = ',',
                 DecimalSeparator = '.',
-                MaxLineLenght = DaxFormatterLineStyle.LongLine,
+                MaxLineLength = DaxFormatterLineStyle.LongLine,
                 SkipSpaceAfterFunctionName = DaxFormatterSpacingStyle.BestPractice,
 
                 ServerMode = Dax.Formatter.AnalysisServices.ServerMode.Tabular,
@@ -88,7 +88,7 @@ namespace BasicFormatter
 
                 ListSeparator = ',',
                 DecimalSeparator = '.',
-                MaxLineLenght = DaxFormatterLineStyle.LongLine,
+                MaxLineLength = DaxFormatterLineStyle.LongLine,
                 SkipSpaceAfterFunctionName = DaxFormatterSpacingStyle.BestPractice,
 
                 ServerMode = Dax.Formatter.AnalysisServices.ServerMode.Tabular,

@@ -5,12 +5,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <RestoreSources>$(RestoreSources);./nupkg;https://api.nuget.org/v3/index.json</RestoreSources>
-  </PropertyGroup>
-  
   <ItemGroup>
-    <PackageReference Include="Dax.Formatter" Version="1.0.0-preview4" />
+    <PackageReference Include="Dax.Formatter" Version="1.0.0" />
   </ItemGroup>
   
 </Project>
