@@ -1,3 +1,3 @@
-# Dax Formatter [![NuGet](https://github.com/albertospelta/dax-formatter/actions/workflows/dotnet.yml/badge.svg)](https://github.com/albertospelta/dax-formatter/actions/workflows/dotnet.yml)
+# Dax Formatter [![NuGet](https://github.com/sql-bi/DaxFormatter/actions/workflows/dotnet.yml/badge.svg)](https://github.com/sql-bi/DaxFormatter/actions/workflows/dotnet.yml)
 
 NuGet package for Dax Formatter
