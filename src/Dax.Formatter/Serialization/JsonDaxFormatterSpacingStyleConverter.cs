@@ -12,7 +12,7 @@
             switch (reader.TokenType)
             {
                 case JsonTokenType.True:
-                    return DaxFormatterSpacingStyle.NoNpaceAfterFunction;
+                    return DaxFormatterSpacingStyle.NoSpaceAfterFunction;
                 case JsonTokenType.False:
                     return DaxFormatterSpacingStyle.SpaceAfterFunction;
             }
@@ -27,12 +27,12 @@
                 case DaxFormatterSpacingStyle.SpaceAfterFunction:
                     writer.WriteBooleanValue(false);
                     break;
-                case DaxFormatterSpacingStyle.NoNpaceAfterFunction:
+                case DaxFormatterSpacingStyle.NoSpaceAfterFunction:
                     writer.WriteBooleanValue(true);
                     break;
                 default:
                     throw new JsonException($"Unsupperted DaxFormatterSpacingStyle [{ value }]");
-            }            
+            }
         }
     }
 }

@@ -70,7 +70,7 @@
 
 
         [Theory]
-        [InlineData(DaxFormatterSpacingStyle.NoNpaceAfterFunction, true)]
+        [InlineData(DaxFormatterSpacingStyle.NoSpaceAfterFunction, true)]
         [InlineData(DaxFormatterSpacingStyle.SpaceAfterFunction, false)]
         public void DaxFormatterSingleRequest_SkipSpaceAfterFunctionNameSerialization(DaxFormatterSpacingStyle spacingStyle, bool expectedSpacingStyle)
         {

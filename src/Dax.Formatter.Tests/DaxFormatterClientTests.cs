@@ -24,7 +24,7 @@ namespace Dax.Formatter.Tests
 
         [Theory]
         [InlineData(DaxFormatterSpacingStyle.SpaceAfterFunction, "[X]=IF(1=1,TRUE(),FALSE())", "[X] =\r\nIF ( 1 = 1, TRUE (), FALSE () )\r\n")]
-        [InlineData(DaxFormatterSpacingStyle.NoNpaceAfterFunction, "[X]=IF(1=1,TRUE(),FALSE())", "[X] =\r\nIF( 1 = 1, TRUE(), FALSE() )\r\n")]
+        [InlineData(DaxFormatterSpacingStyle.NoSpaceAfterFunction, "[X]=IF(1=1,TRUE(),FALSE())", "[X] =\r\nIF( 1 = 1, TRUE(), FALSE() )\r\n")]
         public async Task DaxFormatterClient_FormatAsync_SpacingStyleIsHonored(DaxFormatterSpacingStyle spacingStyle, string expression, string expectedExpression)
         {
             var request = new DaxFormatterSingleRequest
