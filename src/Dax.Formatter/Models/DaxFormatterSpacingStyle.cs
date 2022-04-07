@@ -6,6 +6,6 @@
 
         SpaceAfterFunction = 0,
 
-        NoNpaceAfterFunction = 1
+        NoSpaceAfterFunction = 1
     }
 }
