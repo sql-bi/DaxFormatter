@@ -97,14 +97,18 @@
 
             var json = JsonSerializer.Serialize(request, _serializerOptions);
             var uri = await GetServiceUri(request, cancellationToken);
-            
+
             using (var content = new StringContent(json, Encoding.UTF8, MediaTypeNamesApplicationJson))
             using (var response = await _httpClient.PostAsync(uri, content, cancellationToken))
-            using (var stream = await response.Content.ReadAsStreamAsync())
-            using (var reader = new StreamReader(stream))
             {
-                var message = reader.ReadToEnd();
-                return message;
+                response.EnsureSuccessStatusCode();
+
+                using (var stream = await response.Content.ReadAsStreamAsync())
+                using (var reader = new StreamReader(stream))
+                {
+                    var message = reader.ReadToEnd();
+                    return message;
+                }
             }
         }
 
@@ -140,7 +144,17 @@
                         {
                             using (var response = await _httpClient.GetAsync(request.DaxTextFormatUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
                             {
-                                var uri = _locationChangedStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : request.DaxTextFormatUri;
+                                var uri = request.DaxTextFormatUri;
+
+                                if (_locationChangedStatusCodes.Contains(response.StatusCode))
+                                {
+                                    uri = response.Headers.Location;
+                                }
+                                else
+                                {
+                                    response.EnsureSuccessStatusCode();
+                                }
+
                                 Interlocked.CompareExchange(ref _daxTextFormatSingleServiceUri, uri, default);
                             }
                         }
@@ -163,7 +177,17 @@
                         {
                             using (var response = await _httpClient.GetAsync(request.DaxTextFormatUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
                             {
-                                var uri = _locationChangedStatusCodes.Contains(response.StatusCode) ? response.Headers.Location : request.DaxTextFormatUri;
+                                var uri = request.DaxTextFormatUri;
+
+                                if (_locationChangedStatusCodes.Contains(response.StatusCode))
+                                {
+                                    uri = response.Headers.Location;
+                                }
+                                else
+                                {
+                                    response.EnsureSuccessStatusCode();
+                                }
+
                                 Interlocked.CompareExchange(ref _daxTextFormatMultiServiceUri, uri, default);
                             }
                         }
