@@ -158,6 +158,23 @@ namespace Dax.Formatter.Tests
             AssertParallelSingleSucceded(responses, expectedExpression, repeat);
         }
 
+        [Theory]
+        [InlineData("[X]:=IF(1=1,1,0)", "[X] :=\r\nIF ( 1 = 1, 1, 0 )\r\n")]
+        [InlineData("[X] :=\r\nIF ( 1 = 1, 1, 0 )\r\n", "[X] :=\r\nIF ( 1 = 1, 1, 0 )\r\n")]
+        [InlineData("[X] :=\nIF ( 1 = 1, 1, 0 )\n", "[X] :=\nIF ( 1 = 1, 1, 0 )\n")]
+        public async Task DaxFormatterClient_FormatAsync_NewLineIsRespected(string expression, string expectedExpression)
+        {
+            var request = new DaxFormatterSingleRequest
+            {
+                Dax = expression,
+                MaxLineLength = DaxFormatterLineStyle.LongLine
+            };
+
+            var response = await _fixture.Client.FormatAsync(request);
+
+            AssertSingleSucceded(response, expectedExpression);
+        }
+
         private static void AssertSingleSucceded(DaxFormatterResponse response, string expectedExpression)
         {
             Assert.NotNull(response);
@@ -166,7 +183,7 @@ namespace Dax.Formatter.Tests
             Assert.Empty(response.Errors);
 
             var actualExpression = response.Formatted;
-            Assert.Equal(expectedExpression, actualExpression);
+            Assert.Equal(expectedExpression, actualExpression, ignoreCase: true, ignoreLineEndingDifferences: false, ignoreWhiteSpaceDifferences: true);
         }
 
         private static void AssertSingleFails(DaxFormatterResponse response, int expectedErrorLine, int expectedErrorColumn)
@@ -183,7 +200,7 @@ namespace Dax.Formatter.Tests
 
         private static void AssertMultipleSucceded(IReadOnlyList<DaxFormatterResponse> responses, string expectedExpression, int repeat)
         {
-            Assert.NotNull(responses);            
+            Assert.NotNull(responses);
             Assert.Equal(repeat, responses.Count);
 
             var errors = responses.SelectMany((r) => r.Errors);
@@ -193,7 +210,7 @@ namespace Dax.Formatter.Tests
             Assert.Single(formattedExpressions);
 
             var actualExpression = formattedExpressions.Single();
-            Assert.Equal(expectedExpression, actualExpression);
+            Assert.Equal(expectedExpression, actualExpression, ignoreCase: true, ignoreLineEndingDifferences: false, ignoreWhiteSpaceDifferences: true);
         }
 
         private static void AssertMultipleFails(IReadOnlyList<DaxFormatterResponse> responses, int repeat, int expectedErrorLine, int expectedErrorColumn)
