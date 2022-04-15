@@ -1,33 +1,54 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <FileVersion>1.0.0.0</FileVersion>
-    <PackageId>Dax.Formatter</PackageId>
-    <Version>1.0.0</Version>
+    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <IsPackable>true</IsPackable>
+    
+    <!-- version numbers will be updated by build -->
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix>dev</VersionSuffix>
+    
+    <Title>Dax Formatter</Title>
     <Company>SQLBI</Company>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <!--Copyright>Copyright ©</Copyright-->
+    <Authors>Alberto Spelta, Marco Russo</Authors>
     <Product>Dax Formatter client libraries</Product>
     <Description>This client library connects to daxformatter.com service to format DAX expressions.</Description>
-    <Authors>Alberto Spelta, Marco Russo</Authors>
+    <!--Summary>...</Summary-->
+    <PackageId>Dax.Formatter</PackageId>
+    <PackageTags>DAX;FORMATTER;SQLBI;TABULAR;SSAS</PackageTags>
+    <PackageIcon>package-icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIconUrl>https://raw.githubusercontent.com/sql-bi/DaxFormatter/master/src/package-icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/sql-bi/DaxFormatter</PackageProjectUrl>
     <RepositoryUrl>https://github.com/sql-bi/DaxFormatter</RepositoryUrl>
-    <PackageTags>Dax Formatter</PackageTags>
-    <PackageIcon>daxformatter-256.png</PackageIcon>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="5.0.0" />
-    <PackageReference Include="System.Text.Json" Version="5.0.1" />
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\package-icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="images\daxformatter-256.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="5.0.0" />
+    <PackageReference Include="System.Text.Json" Version="5.0.1" />
   </ItemGroup>
 
 </Project>
