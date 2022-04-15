@@ -8,8 +8,8 @@
 
     public abstract class DaxFormatterRequest
     {
-        private string _serverName;
-        private string _databaseName;
+        private string? _serverName;
+        private string? _databaseName;
 
         internal abstract Uri DaxTextFormatUri { get; }
 
@@ -17,7 +17,7 @@
         {
         }
         
-        public string ServerName
+        public string? ServerName
         {
             get => _serverName;
             set => _serverName = value.ToHashSHA256();
@@ -47,15 +47,15 @@
         /// <summary>
         /// Example: "14.0.800.192"
         /// </summary>
-        public string ServerVersion { get; set; }
+        public string? ServerVersion { get; set; }
         
-        public string DatabaseName
+        public string? DatabaseName
         {
             get => _databaseName;
             set => _databaseName = value.ToHashSHA256();
         }
 
-        public string DatabaseCompatibilityLevel { get; set; }
+        public string? DatabaseCompatibilityLevel { get; set; }
 
         public DaxFormatterLineStyle? MaxLineLength { get; set; } = DaxFormatterLineStyle.LongLine;
 
@@ -66,8 +66,8 @@
 
         public char DecimalSeparator { get; set; } = '.';
 
-        public string CallerApp { get; set; }
+        public string? CallerApp { get; set; }
 
-        public string CallerVersion { get; set; }
+        public string? CallerVersion { get; set; }
     }
 }

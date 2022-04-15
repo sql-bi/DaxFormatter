@@ -2,7 +2,6 @@
 {
     using Dax.Formatter.Client.Http;
     using Dax.Formatter.Models;
-    using System;
     using System.Collections.Generic;
     using System.Reflection;
     using System.Threading;
@@ -10,30 +9,31 @@
 
     public class DaxFormatterClient : IDaxFormatterClient
     {
-        private static readonly DaxFormatterHttpClient _formatter;
-        private readonly string _application;
-        private readonly string _version;
+        private readonly DaxFormatterHttpClient _formatter;
+        private readonly string? _application;
+        private readonly string? _version;
 
-        static DaxFormatterClient()
+        public DaxFormatterClient(string? application = null, string? version = null)
         {
+            if (application == null || version == null)
+            {
+                var assembly = Assembly.GetEntryAssembly();
+                if (assembly != null)
+                {
+                    var assemblyName = assembly.GetName();
+                    var assemblyAttribute = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>();
+
+                    version = assemblyAttribute.Version;
+                    application = assemblyName.Name;
+                }
+            }
+
+            _application = application;
+            _version = version;
             _formatter = new DaxFormatterHttpClient();
         }
 
-        public DaxFormatterClient()
-        {
-            var assembly = Assembly.GetEntryAssembly();
-
-            _version = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
-            _application = assembly.GetName().Name;
-        }
-
-        public DaxFormatterClient(string application, string version)
-        {
-            _application = application ?? throw new ArgumentNullException(nameof(application));
-            _version = version ?? throw new ArgumentNullException(nameof(version));
-        }
-
-        public async Task<DaxFormatterResponse> FormatAsync(string expression, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterResponse?> FormatAsync(string expression, CancellationToken cancellationToken = default)
         {
             var request = DaxFormatterSingleRequest.GetFrom(_application, _version, expression);
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
@@ -49,7 +49,7 @@
             return response;
         }
 
-        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterResponse?> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken = default)
         {
             request.CallerApp = _application;
             request.CallerVersion = _version;

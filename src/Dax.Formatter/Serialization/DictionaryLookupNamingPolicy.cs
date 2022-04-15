@@ -8,7 +8,7 @@
     {
         private readonly Dictionary<string, string> _dictionary;
 
-        public DictionaryLookupNamingPolicy(Dictionary<string, string> dictionary, JsonNamingPolicy policy) : base(policy) => _dictionary = dictionary ?? throw new ArgumentNullException();
+        public DictionaryLookupNamingPolicy(Dictionary<string, string> dictionary, JsonNamingPolicy? policy) : base(policy) => _dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
 
         public override string ConvertName(string name) => _dictionary.TryGetValue(name, out var value) ? value : base.ConvertName(name);
     }

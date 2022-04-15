@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30907.101
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dax.Formatter", "Dax.Formatter\Dax.Formatter.csproj", "{3EC9E69B-8BBA-4F90-B6D8-F4FCCBCAB1D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dax.Formatter", "Dax.Formatter\Dax.Formatter.csproj", "{3EC9E69B-8BBA-4F90-B6D8-F4FCCBCAB1D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dax.Formatter.Tests", "Dax.Formatter.Tests\Dax.Formatter.Tests.csproj", "{44162C15-9AC7-406F-B1A4-1A49E73F962B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dax.Formatter.Tests", "Dax.Formatter.Tests\Dax.Formatter.Tests.csproj", "{44162C15-9AC7-406F-B1A4-1A49E73F962B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

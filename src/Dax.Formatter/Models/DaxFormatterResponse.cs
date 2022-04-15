@@ -4,8 +4,8 @@
 
     public class DaxFormatterResponse
     {
-        public string Formatted { get; set; }
+        public string? Formatted { get; set; }
 
-        public List<DaxFormatterError> Errors { get; set; }
+        public List<DaxFormatterError>? Errors { get; set; }
     }
 }

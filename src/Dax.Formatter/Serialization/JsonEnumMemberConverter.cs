@@ -10,7 +10,7 @@
     internal class JsonEnumMemberConverter : JsonConverterFactory
     {
         private readonly bool _allowIntegerValues;
-        private readonly JsonNamingPolicy _namingPolicy;
+        private readonly JsonNamingPolicy? _namingPolicy;
         private readonly JsonStringEnumConverter _baseConverter;
 
         public JsonEnumMemberConverter() 
@@ -18,7 +18,7 @@
         { 
         }
 
-        public JsonEnumMemberConverter(JsonNamingPolicy namingPolicy = null, bool allowIntegerValues = true)
+        public JsonEnumMemberConverter(JsonNamingPolicy? namingPolicy = null, bool allowIntegerValues = true)
         {
             _namingPolicy = namingPolicy;
             _allowIntegerValues = allowIntegerValues;
@@ -43,7 +43,7 @@
                 return converter;
             }
 
-            return _baseConverter.CreateConverter(typeToConvert, options);            
+            return _baseConverter.CreateConverter(typeToConvert, options);
         }
     }
 }
