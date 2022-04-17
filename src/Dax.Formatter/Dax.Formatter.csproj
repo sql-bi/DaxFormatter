@@ -35,7 +35,7 @@
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <None Include="..\..\LICENSE.md" Pack="true" PackagePath="\" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
@@ -50,5 +50,16 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="6.0.0" />
     <PackageReference Include="System.Text.Json" Version="6.0.3" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <DefineConstants>$(AdditionalConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <AssemblyTitle>Dax.Formatter .NET Standard 2.0</AssemblyTitle>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <AssemblyTitle>Dax.Formatter .NET 6.0</AssemblyTitle>
+  </PropertyGroup>
 
 </Project>

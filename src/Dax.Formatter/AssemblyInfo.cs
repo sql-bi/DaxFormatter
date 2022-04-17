@@ -1,1 +1,10 @@
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Dax.Formatter.Tests")]
+using System;
+using System.Runtime.CompilerServices;
+
+#if SIGNED
+[assembly: InternalsVisibleTo("Dax.Formatter.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100d1aa2171c79e736b0fbb1638d667e2a4d04e72f2817328e9d31e211d2f7291cef9cbf0321ed2af5c73d6d7fcf375c5641232285b15b9cf3a42e98f9c5f0e2e4726ea0a60d458892f48b395909997fa92a4fa9f8c4da3c056cddecff7e627dc3eb63187c92912a6fb43783e672d9552c0dc05ca446e6c0bd5b0dcd4b47973fbbc")]
+#else
+[assembly: InternalsVisibleTo("Dax.Formatter.Tests")]
+#endif
+
+[assembly: CLSCompliant(true)]
