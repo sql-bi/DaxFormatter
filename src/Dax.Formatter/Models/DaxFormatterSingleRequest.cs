@@ -4,7 +4,7 @@
 
     public class DaxFormatterSingleRequest : DaxFormatterRequest
     {
-        internal static DaxFormatterSingleRequest GetFrom(string? application, string? version, string expression)
+        internal static DaxFormatterSingleRequest CreateFrom(string? application, string? version, string expression)
         {
             return new DaxFormatterSingleRequest
             {

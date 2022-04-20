@@ -151,7 +151,7 @@
                             using var response = await _httpClient.GetAsync(request.DaxTextFormatUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                             var uri = request.DaxTextFormatUri;
 
-                            if (_locationChangedStatusCodes.Contains(response.StatusCode))
+                            if (_locationChangedStatusCodes.Contains(response.StatusCode) && response.Headers.Location != null)
                             {
                                 uri = response.Headers.Location;
                             }
@@ -184,7 +184,7 @@
                             using var response = await _httpClient.GetAsync(request.DaxTextFormatUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                             var uri = request.DaxTextFormatUri;
 
-                            if (_locationChangedStatusCodes.Contains(response.StatusCode))
+                            if (_locationChangedStatusCodes.Contains(response.StatusCode) && response.Headers.Location != null)
                             {
                                 uri = response.Headers.Location;
                             }

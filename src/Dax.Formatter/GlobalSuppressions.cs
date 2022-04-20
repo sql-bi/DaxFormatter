@@ -6,4 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Style", "IDE0017:Simplify object initialization", Justification = "<Pending>", Scope = "member", Target = "~M:Dax.Formatter.Client.Http.DaxFormatterHttpClient.#ctor")]
-[assembly: SuppressMessage("Style", "IDE0017:Simplify object initialization", Justification = "<Pending>", Scope = "member", Target = "~M:Dax.Formatter.Models.DaxFormatterMultipleRequest.GetFrom(System.String,System.String,System.Collections.Generic.IEnumerable{System.String})~Dax.Formatter.Models.DaxFormatterMultipleRequest")]
+[assembly: SuppressMessage("Style", "IDE0017:Simplify object initialization", Justification = "<Pending>", Scope = "member", Target = "~M:Dax.Formatter.Models.DaxFormatterMultipleRequest.CreateFrom(System.String,System.String,System.Collections.Generic.IEnumerable{System.String})~Dax.Formatter.Models.DaxFormatterMultipleRequest")]

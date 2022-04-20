@@ -23,8 +23,11 @@
                     var assemblyName = assembly.GetName();
                     var assemblyAttribute = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>();
 
-                    version = assemblyAttribute.Version;
-                    application = assemblyName.Name;
+                    if (version == null)
+                        version = assemblyAttribute?.Version;
+
+                    if (application == null)
+                        application = assemblyName.Name;
                 }
             }
 
@@ -35,7 +38,7 @@
 
         public async Task<DaxFormatterResponse?> FormatAsync(string expression, CancellationToken cancellationToken = default)
         {
-            var request = DaxFormatterSingleRequest.GetFrom(_application, _version, expression);
+            var request = DaxFormatterSingleRequest.CreateFrom(_application, _version, expression);
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response;
@@ -43,7 +46,7 @@
 
         public async Task<IReadOnlyList<DaxFormatterResponse>> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default)
         {
-            var request = DaxFormatterMultipleRequest.GetFrom(_application, _version, expressions);
+            var request = DaxFormatterMultipleRequest.CreateFrom(_application, _version, expressions);
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response;

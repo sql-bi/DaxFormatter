@@ -5,7 +5,7 @@
 
     public class DaxFormatterMultipleRequest : DaxFormatterRequest
     {
-        internal static DaxFormatterMultipleRequest GetFrom(string? application, string? version, IEnumerable<string> expressions)
+        internal static DaxFormatterMultipleRequest CreateFrom(string? application, string? version, IEnumerable<string> expressions)
         {
             var request = new DaxFormatterMultipleRequest();
 
