@@ -13,7 +13,7 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    internal class DaxFormatterHttpClient : IDaxFormatterHttpClient, IDisposable
+    internal sealed class DaxFormatterHttpClient : IDaxFormatterHttpClient, IDisposable
     {
         private const string MediaTypeNamesApplicationJson = "application/json";
         private const int DaxFormatterTimeoutSeconds = 60;
@@ -23,13 +23,17 @@
         private readonly SemaphoreSlim _initializeServiceUriSemaphore;
         private readonly SemaphoreSlim _formatSemaphore;
         private readonly HttpClient _httpClient;
+        private readonly string? _application;
+        private readonly string? _version;
 
         private Uri? _daxTextFormatSingleServiceUri;
         private Uri? _daxTextFormatMultiServiceUri;
-        private bool _disposed;
 
-        public DaxFormatterHttpClient()
+        public DaxFormatterHttpClient(string? application, string? version)
         {
+            _application = application;
+            _version = version;
+
             var handler = new DaxFormatterHttpClientMessageHandler();
 
             _httpClient = new HttpClient(handler, disposeHandler: true);
@@ -66,6 +70,9 @@
 #endif
             try
             {
+                request.CallerApp = _application;
+                request.CallerVersion = _version;
+
                 var message = await FormatImplAsync(request, cancellationToken).ConfigureAwait(false);
                 var result = JsonSerializer.Deserialize<DaxFormatterResponse>(message, _serializerOptions);
 
@@ -86,6 +93,9 @@
 #endif
             try
             {
+                request.CallerApp = _application;
+                request.CallerVersion = _version;
+
                 var message = await FormatImplAsync(request, cancellationToken).ConfigureAwait(false);
                 var result = JsonSerializer.Deserialize<IReadOnlyList<DaxFormatterResponse>>(message, _serializerOptions);
 
@@ -208,23 +218,9 @@
 
         public void Dispose()
         {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                _disposed = true;
-
-                if (disposing)
-                {
-                    _initializeServiceUriSemaphore.Dispose();
-                    _formatSemaphore.Dispose();
-                    _httpClient.Dispose();
-                }
-            }
+            _initializeServiceUriSemaphore.Dispose();
+            _formatSemaphore.Dispose();
+            _httpClient.Dispose();
         }
     }
 }
