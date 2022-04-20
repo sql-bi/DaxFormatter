@@ -8,34 +8,34 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class DaxFormatterClient : IDaxFormatterClient
+    public sealed class DaxFormatterClient : IDaxFormatterClient, IDisposable
     {
-        private static readonly DaxFormatterHttpClient _formatter;
-        private readonly string _application;
-        private readonly string _version;
+        private readonly DaxFormatterHttpClient _formatter;
 
-        static DaxFormatterClient()
+        public DaxFormatterClient(string? application = null, string? version = null)
         {
-            _formatter = new DaxFormatterHttpClient();
+            if (application == null || version == null)
+            {
+                var assembly = Assembly.GetEntryAssembly();
+                if (assembly != null)
+                {
+                    var assemblyName = assembly.GetName();
+                    var assemblyAttribute = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>();
+
+                    if (version == null)
+                        version = assemblyAttribute?.Version;
+
+                    if (application == null)
+                        application = assemblyName.Name;
+                }
+            }
+
+            _formatter = new DaxFormatterHttpClient(application, version);
         }
 
-        public DaxFormatterClient()
+        public async Task<DaxFormatterResponse?> FormatAsync(string expression, CancellationToken cancellationToken = default)
         {
-            var assembly = Assembly.GetEntryAssembly();
-
-            _version = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
-            _application = assembly.GetName().Name;
-        }
-
-        public DaxFormatterClient(string application, string version)
-        {
-            _application = application ?? throw new ArgumentNullException(nameof(application));
-            _version = version ?? throw new ArgumentNullException(nameof(version));
-        }
-
-        public async Task<DaxFormatterResponse> FormatAsync(string expression, CancellationToken cancellationToken = default)
-        {
-            var request = DaxFormatterSingleRequest.GetFrom(_application, _version, expression);
+            var request = DaxFormatterSingleRequest.CreateFrom(expression);
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response;
@@ -43,30 +43,31 @@
 
         public async Task<IReadOnlyList<DaxFormatterResponse>> FormatAsync(IEnumerable<string> expressions, CancellationToken cancellationToken = default)
         {
-            var request = DaxFormatterMultipleRequest.GetFrom(_application, _version, expressions);
+            var request = DaxFormatterMultipleRequest.CreateFrom(expressions);
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response;
         }
 
-        public async Task<DaxFormatterResponse> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken = default)
+        public async Task<DaxFormatterResponse?> FormatAsync(DaxFormatterSingleRequest request, CancellationToken cancellationToken = default)
         {
-            request.CallerApp = _application;
-            request.CallerVersion = _version;
-
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
-
             return response;
         }
 
         public async Task<IReadOnlyList<DaxFormatterResponse>> FormatAsync(DaxFormatterMultipleRequest request, CancellationToken cancellationToken = default)
         {
-            request.CallerApp = _application;
-            request.CallerVersion = _version;
-
             var response = await _formatter.FormatAsync(request, cancellationToken).ConfigureAwait(false);
-
             return response;
         }
+
+        #region IDisposable
+
+        public void Dispose()
+        {
+            _formatter.Dispose();
+        }
+
+        #endregion
     }
 }

@@ -9,15 +9,12 @@
     {
         public override DaxFormatterSpacingStyle Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
         {
-            switch (reader.TokenType)
+            return reader.TokenType switch
             {
-                case JsonTokenType.True:
-                    return DaxFormatterSpacingStyle.NoSpaceAfterFunction;
-                case JsonTokenType.False:
-                    return DaxFormatterSpacingStyle.SpaceAfterFunction;
-            }
-
-            throw new JsonException($"Unsupperted DaxFormatterSpacingStyle token type [{ reader.TokenType }]");
+                JsonTokenType.True => DaxFormatterSpacingStyle.NoSpaceAfterFunction,
+                JsonTokenType.False => DaxFormatterSpacingStyle.SpaceAfterFunction,
+                _ => throw new JsonException($"Unsupperted { nameof(DaxFormatterSpacingStyle) } token type [{ reader.TokenType }]"),
+            };
         }
 
         public override void Write(Utf8JsonWriter writer, DaxFormatterSpacingStyle value, JsonSerializerOptions options)

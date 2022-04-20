@@ -2,10 +2,10 @@
 {
     public enum DaxFormatterSpacingStyle
     {
-        BestPractice = SpaceAfterFunction,
-
         SpaceAfterFunction = 0,
 
-        NoSpaceAfterFunction = 1
+        NoSpaceAfterFunction = 1,
+
+        BestPractice = SpaceAfterFunction,
     }
 }

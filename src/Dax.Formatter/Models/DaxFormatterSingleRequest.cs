@@ -4,18 +4,17 @@
 
     public class DaxFormatterSingleRequest : DaxFormatterRequest
     {
-        internal static DaxFormatterSingleRequest GetFrom(string application, string version, string expression)
+        internal static DaxFormatterSingleRequest CreateFrom(string expression)
         {
-            return new DaxFormatterSingleRequest
+            var request =  new DaxFormatterSingleRequest
             {
-                CallerApp = application,
-                CallerVersion = version,
                 Dax = expression
             };
+            return request;
         }
 
         internal override Uri DaxTextFormatUri { get; } = new Uri("https://www.daxformatter.com/api/daxformatter/daxtextformat");
 
-        public string Dax { get; set; }
+        public string? Dax { get; set; }
     }
 }

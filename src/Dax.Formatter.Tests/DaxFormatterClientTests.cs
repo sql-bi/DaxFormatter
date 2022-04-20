@@ -10,7 +10,7 @@ namespace Dax.Formatter.Tests
     {
         public DaxFormatterClient Client { get; private set; }
 
-        public DaxFormatterClientFixture() => Client = new DaxFormatterClient();
+        public DaxFormatterClientFixture() => Client = new DaxFormatterClient(application: "Dax.Formatter.Tests", version: "develop");
     }
 
     public class DaxFormatterClientTests : IClassFixture<DaxFormatterClientFixture>
@@ -27,11 +27,8 @@ namespace Dax.Formatter.Tests
         [InlineData(DaxFormatterSpacingStyle.NoSpaceAfterFunction, "[X]=IF(1=1,TRUE(),FALSE())", "[X] =\r\nIF( 1 = 1, TRUE(), FALSE() )\r\n")]
         public async Task DaxFormatterClient_FormatAsync_SpacingStyleIsHonored(DaxFormatterSpacingStyle spacingStyle, string expression, string expectedExpression)
         {
-            var request = new DaxFormatterSingleRequest
-            {
-                Dax = expression,
-                SkipSpaceAfterFunctionName = spacingStyle
-            };
+            var request = DaxFormatterSingleRequest.CreateFrom(expression);
+            request.SkipSpaceAfterFunctionName = spacingStyle;
 
             var response = await _fixture.Client.FormatAsync(request);
             Assert.NotNull(response);
@@ -45,11 +42,8 @@ namespace Dax.Formatter.Tests
         [InlineData(DaxFormatterLineStyle.ShortLine, "[X]:=IF(1=1,1,0)", "[X] :=\r\nIF (\r\n    1 = 1,\r\n    1,\r\n    0\r\n)\r\n")]
         public async Task DaxFormatterClient_FormatAsync_LineStyleIsHonored(DaxFormatterLineStyle lineStyle, string expression, string expectedExpression)
         {
-            var request = new DaxFormatterSingleRequest
-            {
-                Dax = expression,
-                MaxLineLength = lineStyle
-            };
+            var request = DaxFormatterSingleRequest.CreateFrom(expression);
+            request.MaxLineLength = lineStyle;
 
             var response = await _fixture.Client.FormatAsync(request);
             Assert.NotNull(response);
@@ -85,9 +79,7 @@ namespace Dax.Formatter.Tests
         [InlineData("[X] := CALCULATE(SUM(Sales[Sales Amount]), USERELATIONSHIP(Sales[DueDateKey],'Date'[DateKey]))", "[X] :=\r\nCALCULATE (\r\n    SUM ( Sales[Sales Amount] ),\r\n    USERELATIONSHIP ( Sales[DueDateKey], 'Date'[DateKey] )\r\n)\r\n")]
         public async Task DaxFormatterClient_FormatAsync_SingleRequestSucceded(string expression, string expectedExpression)
         {
-            var request = new DaxFormatterSingleRequest();
-            request.Dax = expression;
-
+            var request = DaxFormatterSingleRequest.CreateFrom(expression);
             var response = await _fixture.Client.FormatAsync(request);
 
             AssertSingleSucceded(response, expectedExpression);
@@ -98,9 +90,7 @@ namespace Dax.Formatter.Tests
         [InlineData("EVALUATE( Table ) ORDER Table[Column]", 0, 24)]
         public async Task DaxFormatterClient_FormatAsync_SingleRequestFails(string expression, int expectedErrorLine, int expectedErrorColumn)
         {
-            var request = new DaxFormatterSingleRequest();
-            request.Dax = expression;
-
+            var request = DaxFormatterSingleRequest.CreateFrom(expression);
             var response = await _fixture.Client.FormatAsync(request);
 
             AssertSingleFails(response, expectedErrorLine, expectedErrorColumn);
@@ -113,9 +103,7 @@ namespace Dax.Formatter.Tests
         public async Task DaxFormatterClient_FormatAsync_MultipleRequestSucceded(string expression, string expectedExpression, int repeat)
         {
             var expressions = Enumerable.Repeat(expression, repeat);
-            var request = new DaxFormatterMultipleRequest();
-            request.Dax.AddRange(expressions);
-
+            var request = DaxFormatterMultipleRequest.CreateFrom(expressions);
             var response = await _fixture.Client.FormatAsync(request);
 
             AssertMultipleSucceded(response, expectedExpression, repeat);
@@ -127,9 +115,7 @@ namespace Dax.Formatter.Tests
         public async Task DaxFormatterClient_FormatAsync_MultipleRequestFails(string expression, int repeat, int expectedErrorLine, int expectedErrorColumn)
         {
             var expressions = Enumerable.Repeat(expression, repeat);
-            var request = new DaxFormatterMultipleRequest();
-            request.Dax.AddRange(expressions);
-
+            var request = DaxFormatterMultipleRequest.CreateFrom(expressions);
             var response = await _fixture.Client.FormatAsync(request);
 
             AssertMultipleFails(response, repeat, expectedErrorLine, expectedErrorColumn);
@@ -149,19 +135,18 @@ namespace Dax.Formatter.Tests
         [InlineData("evaluate('Table')", "EVALUATE\r\n( 'Table' )\r\n", 10)]
         public async Task DaxFormatterClient_FormatAsync_ParallelSingleRequestSucceded(string expression, string expectedExpression, int repeat)
         {
-            var request = new DaxFormatterSingleRequest();
-            request.Dax = expression;
-
+            var request = DaxFormatterSingleRequest.CreateFrom(expression);
             var tasks = Enumerable.Repeat(request, repeat).AsParallel().Select((r) => _fixture.Client.FormatAsync(r));
             var responses = await Task.WhenAll(tasks);
 
             AssertParallelSingleSucceded(responses, expectedExpression, repeat);
         }
 
-        private static void AssertSingleSucceded(DaxFormatterResponse response, string expectedExpression)
+        private static void AssertSingleSucceded(DaxFormatterResponse? response, string expectedExpression)
         {
             Assert.NotNull(response);
-
+            Assert.NotNull(response.Formatted);
+            Assert.NotNull(response.Errors);
             Assert.NotEmpty(response.Formatted);
             Assert.Empty(response.Errors);
 
@@ -169,10 +154,11 @@ namespace Dax.Formatter.Tests
             Assert.Equal(expectedExpression, actualExpression);
         }
 
-        private static void AssertSingleFails(DaxFormatterResponse response, int expectedErrorLine, int expectedErrorColumn)
+        private static void AssertSingleFails(DaxFormatterResponse? response, int expectedErrorLine, int expectedErrorColumn)
         {
             Assert.NotNull(response);
-
+            Assert.NotNull(response.Formatted);
+            Assert.NotNull(response.Errors);
             Assert.Empty(response.Formatted);
             Assert.Single(response.Errors);
 
@@ -183,10 +169,11 @@ namespace Dax.Formatter.Tests
 
         private static void AssertMultipleSucceded(IReadOnlyList<DaxFormatterResponse> responses, string expectedExpression, int repeat)
         {
-            Assert.NotNull(responses);            
+            Assert.NotNull(responses);
             Assert.Equal(repeat, responses.Count);
+            Assert.DoesNotContain(responses, (r) => r.Errors is null);
 
-            var errors = responses.SelectMany((r) => r.Errors);
+            var errors = responses.SelectMany((r) => r.Errors!);
             Assert.Empty(errors);
 
             var formattedExpressions = responses.Select((r) => r.Formatted).Distinct();
@@ -200,8 +187,9 @@ namespace Dax.Formatter.Tests
         {
             Assert.NotNull(responses);
             Assert.Equal(repeat, responses.Count);
+            Assert.DoesNotContain(responses, (r) => r.Errors is null);
 
-            var errors = responses.SelectMany((r) => r.Errors).ToList();
+            var errors = responses.SelectMany((r) => r.Errors!).ToList();
             Assert.Equal(repeat, errors.Count);
 
             var errorLines = errors.Select((e) => e.Line).Distinct();
@@ -223,11 +211,10 @@ namespace Dax.Formatter.Tests
             Assert.Equal(string.Empty, actualExpression);
         }
 
-        private static void AssertParallelSingleSucceded(DaxFormatterResponse[] responses, string expectedExpression, int repeat)
+        private static void AssertParallelSingleSucceded(DaxFormatterResponse?[] responses, string expectedExpression, int repeat)
         {
+            Assert.NotNull(responses);
             Assert.Equal(repeat, responses.Length);
-            Assert.Empty(responses.SelectMany((r) => r.Errors));
-            Assert.Single(responses.Select((r) => r.Formatted).Distinct());
 
             foreach (var response in responses)
                 AssertSingleSucceded(response, expectedExpression);

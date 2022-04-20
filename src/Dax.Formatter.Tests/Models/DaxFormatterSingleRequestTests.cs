@@ -68,7 +68,6 @@
             Assert.Equal(expectedLineStyle, currentLineStyle);
         }
 
-
         [Theory]
         [InlineData(DaxFormatterSpacingStyle.NoSpaceAfterFunction, true)]
         [InlineData(DaxFormatterSpacingStyle.SpaceAfterFunction, false)]

@@ -5,12 +5,9 @@
 
     public class DaxFormatterMultipleRequest : DaxFormatterRequest
     {
-        internal static DaxFormatterMultipleRequest GetFrom(string application, string version, IEnumerable<string> expressions)
+        internal static DaxFormatterMultipleRequest CreateFrom(IEnumerable<string> expressions)
         {
             var request = new DaxFormatterMultipleRequest();
-
-            request.CallerApp = application;
-            request.CallerVersion = version;
             request.Dax.AddRange(expressions);
 
             return request;
