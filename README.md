@@ -3,7 +3,7 @@
 
 DAX Formatter is a service available at https://www.daxformatter.com.
 The service receives DAX expressions and format them according to rules for [DAX code formatting](https://www.sqlbi.com/articles/rules-for-dax-code-formatting/).
-The NuGet package contains a client library to invoke the serivce from your .NET application.
+The NuGet package contains a client library to invoke the service from your .NET application.
 All the requests are designed to be asynchronous.
 You should minimize the requests made to the service: to format multiple expressions, use a single API call providing the `DaxFormatterMultipleRequest` structure.
 
