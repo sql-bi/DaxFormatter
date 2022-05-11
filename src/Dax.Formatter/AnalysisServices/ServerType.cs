@@ -18,6 +18,16 @@
         PowerPivot,
 
         [EnumMember(Value = "SSDT")]
-        SSDT
-    }    
+        SSDT,
+
+        [EnumMember(Value = "AzureAS")]
+        AzureAnalysisServices,
+
+        [EnumMember(Value = "PBI Service")]
+        PowerBIService,
+
+        [EnumMember(Value = "Offline")]
+        Offline
+
+    }
 }
