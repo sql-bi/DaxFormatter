@@ -39,6 +39,9 @@
         [InlineData(ServerType.PowerBIReportServer, "PBI Report Server")]
         [InlineData(ServerType.PowerPivot, "PowerPivot")]
         [InlineData(ServerType.SSDT, "SSDT")]
+        [InlineData(ServerType.AzureAnalysisServices, "AzureAS")]
+        [InlineData(ServerType.PowerBIService, "PBI Service")]
+        [InlineData(ServerType.Offline, "Offline")]
         public void DaxFormatterSingleRequest_ServerTypeSerialization(ServerType serverType, string expectedServerType)
         {
             var request = new DaxFormatterSingleRequest
