@@ -13,7 +13,7 @@
             return request;
         }
 
-        internal override Uri DaxTextFormatUri { get; } = new Uri("https://www.daxformatter.com/api/daxformatter/daxtextformatmulti"); 
+        internal override Uri DaxTextFormatUri { get; } = new Uri("https://daxformatter.azurewebsites.net/api/daxformatter/daxtextformatmulti"); 
  
         public List<string> Dax { get; set; } = new List<string>();
     }

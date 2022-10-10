@@ -112,10 +112,10 @@
             cancellationToken.ThrowIfCancellationRequested();
 
             var json = JsonSerializer.Serialize(request, _serializerOptions);
-            var uri = await GetServiceUriAsync(request, cancellationToken).ConfigureAwait(false);
+            //var uri = await GetServiceUriAsync(request, cancellationToken).ConfigureAwait(false);
 
             using var content = new StringContent(json, Encoding.UTF8, MediaTypeNamesApplicationJson);
-            using var response = await _httpClient.PostAsync(uri, content, cancellationToken).ConfigureAwait(false);
+            using var response = await _httpClient.PostAsync(request.DaxTextFormatUri, content, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 #if NETSTANDARD
             using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);

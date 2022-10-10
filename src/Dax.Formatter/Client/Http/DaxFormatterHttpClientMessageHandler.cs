@@ -7,7 +7,7 @@
     {
         public DaxFormatterHttpClientMessageHandler()
         {
-            AllowAutoRedirect = false;
+            //AllowAutoRedirect = false;
             AutomaticDecompression = DecompressionMethods.GZip;
         }
     }
