@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dax.Formatter", "Dax.Format
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dax.Formatter.Tests", "Dax.Formatter.Tests\Dax.Formatter.Tests.csproj", "{44162C15-9AC7-406F-B1A4-1A49E73F962B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dax.Formatter.McpServer", "Dax.Formatter.McpServer\Dax.Formatter.McpServer.csproj", "{D839ACC9-427A-40AC-81FD-1DC4352FA019}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{44162C15-9AC7-406F-B1A4-1A49E73F962B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44162C15-9AC7-406F-B1A4-1A49E73F962B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44162C15-9AC7-406F-B1A4-1A49E73F962B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D839ACC9-427A-40AC-81FD-1DC4352FA019}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D839ACC9-427A-40AC-81FD-1DC4352FA019}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D839ACC9-427A-40AC-81FD-1DC4352FA019}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D839ACC9-427A-40AC-81FD-1DC4352FA019}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
