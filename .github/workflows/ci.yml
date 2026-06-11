@@ -11,21 +11,22 @@ on:
 
 jobs:
   build-and-test:
-    name: build-and-test--${{ matrix.os-version }}
-    runs-on: ${{ matrix.os-version }}
-    strategy:
-      matrix:
-        os-version: [windows-latest] #, ubuntu-latest, macos-latest]
+    name: build-and-test
+    runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
-      - name: restore
-        run: dotnet restore ./src
+
       - name: build
-        run: dotnet build ./src/Dax.Formatter.sln --configuration Release --no-restore
+        run: dotnet build ./src/Dax.Formatter.sln --configuration Release
+
       - name: test
         run: dotnet test ./src/Dax.Formatter.Tests/Dax.Formatter.Tests.csproj --configuration Release --no-build --verbosity normal
+
       - name: pack
-        run: dotnet pack ./src/Dax.Formatter/Dax.Formatter.csproj --configuration Release --no-build --no-restore --verbosity normal
+        run: dotnet pack ./src/Dax.Formatter/Dax.Formatter.csproj --configuration Release --no-build
