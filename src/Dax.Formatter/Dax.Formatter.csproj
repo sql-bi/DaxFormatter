@@ -43,9 +43,5 @@
     <AssemblyTitle>Dax.Formatter .NET 10.0</AssemblyTitle>
   </PropertyGroup>
 
-  <PropertyGroup Condition="Exists('$(MSBuildThisFileDirectory)DaxFormatter.snk')">
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)DaxFormatter.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
 
 </Project>
