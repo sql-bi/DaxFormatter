@@ -1,0 +1,44 @@
+{
+  "name": "@sqlbi/daxformatter-mcp",
+  "version": "0.0.0-placeholder",
+  "description": "Model Context Protocol (MCP) server for the DAX Formatter service.",
+  "keywords": ["mcp", "model-context-protocol", "dax", "formatter", "sqlbi", "powerbi"],
+  "license": "MIT",
+  "author": "SQLBI",
+  "homepage": "https://github.com/sql-bi/DaxFormatter/tree/master/mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sql-bi/DaxFormatter.git",
+    "directory": "mcp"
+  },
+  "bugs": "https://github.com/sql-bi/DaxFormatter/issues",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "daxformatter-mcp": "./dist/stdio.js"
+  },
+  "files": ["dist", "README.md"],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "start": "node dist/stdio.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepack": "nbgv-setversion",
+    "postpack": "nbgv-setversion --reset"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.25"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "nerdbank-gitversioning": "^3.10.85",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
