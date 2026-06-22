@@ -1,0 +1,52 @@
+name: publish-mcp
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # npm provenance
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # Nerdbank.GitVersioning needs full history
+          persist-credentials: false
+          
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: install
+        working-directory: mcp
+        run: npm ci
+
+      - name: build
+        working-directory: mcp
+        run: npm run build
+
+      - name: test
+        working-directory: mcp
+        run: npm test
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+          cache-dependency-path: mcp/package-lock.json
+
+      # Stamp the Nerdbank.GitVersioning version into package.json
+      - name: set version
+        working-directory: mcp
+        run: npx nbgv-setversion
+
+      - name: publish
+        working-directory: mcp
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
