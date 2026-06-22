@@ -26,9 +26,7 @@
     "build": "tsup",
     "start": "node dist/stdio.js",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit",
-    "prepack": "nbgv-setversion",
-    "postpack": "nbgv-setversion --reset"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

@@ -40,7 +40,11 @@ jobs:
           cache: npm
           cache-dependency-path: mcp/package-lock.json
 
-      # `prepack` stamps the Nerdbank.GitVersioning version into package.json; `postpack` resets it.
+      # Stamp the Nerdbank.GitVersioning version into package.json
+      - name: set version
+        working-directory: mcp
+        run: npx nbgv-setversion
+
       - name: publish
         working-directory: mcp
         run: npm publish --provenance --access public
