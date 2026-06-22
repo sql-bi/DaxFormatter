@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write # create github release
   id-token: write # npm provenance
 
 jobs:
@@ -20,6 +20,11 @@ jobs:
       - uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
+
+      - uses: dotnet/nbgv@v0.4
+        id: nbgv
+        with:
+          path: mcp # version the mcp/ subtree (mcp/version.json)
 
       - name: install
         working-directory: mcp
@@ -50,3 +55,8 @@ jobs:
         run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: create github release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "DaxFormatter_MCP_v${{ steps.nbgv.outputs.NpmPackageVersion }}" --title "DaxFormatter_MCP_v${{ steps.nbgv.outputs.NpmPackageVersion }}" --target "${{ github.sha }}" --generate-notes --draft
