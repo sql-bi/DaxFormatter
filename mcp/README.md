@@ -8,8 +8,6 @@ Local **stdio** server, run on demand via `npx`. Requires [Node.js](https://node
 
 The server is **local, stdio, anonymous** — no install step, no API key, no login. It exposes one tool, `format_dax`. After connecting, just ask the agent to format DAX.
 
-The registration name below is `DaxFormatter`, matching the remote Streamable HTTP server, so a single name works across both.
-
 ### Visual Studio Code
 
 [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_DAX_Formatter-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=DaxFormatter&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40sqlbi%2Fdaxformatter-mcp%22%5D%7D)
