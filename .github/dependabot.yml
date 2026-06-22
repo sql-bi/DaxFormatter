@@ -20,3 +20,14 @@ updates:
     open-pull-requests-limit: 10
     assignees:
     - "albertospelta"
+
+  - package-ecosystem: "npm"
+    directory: "/mcp"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    assignees:
+    - "albertospelta"
+    groups:
+      dev-dependencies:
+        dependency-type: "development"
