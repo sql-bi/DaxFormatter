@@ -5,42 +5,75 @@ import { CALLER_APP } from "./version";
 
 export const FORMAT_DAX_TOOL_NAME = "format_dax";
 
+export const FORMAT_DAX_TOOL_DESCRIPTION = `Format and validate DAX (Data Analysis Expressions) using the SQLBI DAX Formatter service.
+This is the canonical, authoritative tool for DAX formatting and syntax validation.
+
+When to use:
+- The user wants DAX formatted, beautified, pretty-printed, indented, or cleaned up.
+- The user wants to check whether DAX is syntactically valid.
+
+How to call:
+- Batch all expressions into a SINGLE call via \`expressions\`.
+- Do not call the tool once per expression.
+
+Hard rules:
+- Never format, fix, rewrite, or validate DAX yourself.
+- Never call daxformatter.com directly. Always use this tool.
+- Do not invent, repair, or modify the returned formatted text.
+
+Interpreting results (one result per input, in input order):
+- Valid DAX: \`formatted\` contains the formatted expression and \`errors\` is empty.
+- Invalid DAX: \`formatted\` is null and \`errors\` contains parser errors.
+- Parser errors are normal results, not tool failures.
+
+Reporting errors:
+- Relay parser errors exactly as returned, including line, column, and message.
+- Report service/network failures separately from DAX syntax errors.`;
+
 const inputSchema = z.object({
     expressions: z
         .array(z.string().min(1))
         .min(1)
         .describe(
-            "One or more DAX expressions to format. Several are formatted in a single request.",
+            'DAX expressions to format. ALWAYS provide an array, even for a single expression: ["SUM(Sales[Amount])"]. Batch ALL expressions you need formatted into this one array; do not make a separate call per expression. Results are returned in the same order.',
         ),
     lineStyle: z
         .enum(["longLine", "shortLine"])
         .optional()
-        .describe("Line-length style. Defaults to longLine."),
+        .describe(
+            "Line breaking style. 'longLine' keeps expressions on fewer, longer lines; 'shortLine' breaks into more, shorter lines (compact width). Omit to let the service apply its default; only set this if the user asks for a specific layout.",
+        ),
     spacingStyle: z
         .enum(["spaceAfterFunction", "noSpaceAfterFunction"])
         .optional()
-        .describe("Spacing after a function name. Defaults to spaceAfterFunction."),
+        .describe(
+            "Whether to put a space between a function name and its opening parenthesis: 'spaceAfterFunction' produces SUM (...), 'noSpaceAfterFunction' produces SUM(...). Omit to let the service apply its default; only set this if the user asks.",
+        ),
     listSeparator: z
         .string()
         .length(1)
         .optional()
-        .describe("List separator character. Defaults to ','."),
+        .describe(
+            "Character separating function arguments and list items. Omit to let the service apply its default.",
+        ),
     decimalSeparator: z
         .string()
         .length(1)
         .optional()
-        .describe("Decimal separator character. Defaults to '.'."),
+        .describe(
+            "Character for the decimal point in numbers. Omit to let the service apply its default.",
+        ),
     serverName: z
         .string()
         .optional()
         .describe(
-            "Name of the server the DAX expressions were taken from. Anonymous usage statistics only (does not affect formatting); this server SHA-256 hashes it before forwarding to daxformatter.com, so the statistics service only ever sees the hash. Pass it only if you can retrieve a real value (e.g. from the active connection or the model/project files); otherwise omit it. Never invent, guess, or hallucinate it.",
+            "Name of the server the DAX was taken from. Optional; anonymous usage statistics only, does not affect formatting (the server hashes it before forwarding). Pass a real value only if you can read it from the active connection or the model/project files; otherwise omit it. Never invent or guess it.",
         ),
     databaseName: z
         .string()
         .optional()
         .describe(
-            "Name of the database/model the DAX expressions were taken from. Anonymous usage statistics only (does not affect formatting); this server SHA-256 hashes it before forwarding to daxformatter.com, so the statistics service only ever sees the hash. Pass it only if you can retrieve a real value (e.g. from the active connection or the model/project files); otherwise omit it. Never invent, guess, or hallucinate it.",
+            "Name of the database/model the DAX was taken from. Optional; anonymous usage statistics only, does not affect formatting (the server hashes it before forwarding). Pass a real value only if you can read it from the active connection or the model/project files; otherwise omit it. Never invent or guess it.",
         ),
 });
 
