@@ -2,40 +2,58 @@ name: publish-mcp
 
 on:
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Build, test and run every check, but skip npm publish and the GitHub release
+        type: boolean
+        default: false
 
 permissions:
-  contents: write # create github release
-  id-token: write # npm provenance
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+  queue: max # a new run waits instead of canceling a pending one
 
 jobs:
   release:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write # create github release
+      id-token: write # npm provenance
     steps:
-      - uses: actions/checkout@v6
+      - name: check branch
+        run: |
+          if [ "$GITHUB_REF" != "refs/heads/master" ]; then
+            echo "::error::Releases run only from refs/heads/master, not $GITHUB_REF"
+            exit 1
+          fi
+
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0 # Nerdbank.GitVersioning needs full history
           persist-credentials: false
-          
-      - uses: actions/setup-dotnet@v5
-        with:
-          global-json-file: global.json
 
-      - uses: actions/setup-node@v6
+      # No npm cache: a release installs only what the lock file names, from the registry.
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: "20"
           registry-url: "https://registry.npmjs.org"
-          cache: npm
-          cache-dependency-path: mcp/package-lock.json
-
-      - uses: dotnet/nbgv@v0.4
-        id: nbgv
-        with:
-          path: mcp # version the mcp/ subtree (mcp/version.json)
 
       - name: install
         working-directory: mcp
         run: npm ci
+
+      # The nbgv CLI of the nerdbank-gitversioning package, the one that stamps package.json,
+      # so the tag can't differ from the published version. It runs on the runner's .NET.
+      - name: read version
+        id: version
+        working-directory: mcp
+        run: |
+          version=$(npx --no nbgv get-version --variable NpmPackageVersion)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: build
         working-directory: mcp
@@ -45,18 +63,26 @@ jobs:
         working-directory: mcp
         run: npm test
 
-      # Stamp the Nerdbank.GitVersioning version into package.json
       - name: set version
         working-directory: mcp
-        run: npx nbgv-setversion
+        run: npx --no nbgv-setversion
+
+      # npm pack --dry-run lists what npm publish would upload, without network or credentials.
+      - name: list package contents
+        if: ${{ inputs.dry_run }}
+        working-directory: mcp
+        run: npm pack --dry-run
 
       - name: publish
+        if: ${{ !inputs.dry_run }}
         working-directory: mcp
-        run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
 
       - name: create github release
+        if: ${{ !inputs.dry_run }}
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "DaxFormatter_MCP_v${{ steps.nbgv.outputs.NpmPackageVersion }}" --title "DaxFormatter_MCP_v${{ steps.nbgv.outputs.NpmPackageVersion }}" --target "${{ github.sha }}" --generate-notes --draft
+          GH_TOKEN: ${{ github.token }}
+          TAG: DaxFormatter_MCP_v${{ steps.version.outputs.version }}
+        run: gh release create "$TAG" --title "$TAG" --target "$GITHUB_SHA" --generate-notes --draft
