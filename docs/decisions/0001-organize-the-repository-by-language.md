@@ -1,6 +1,6 @@
 ---
-status: proposed
-date: 2026-11-16
+status: accepted
+date: 2026-11-17
 decision-makers: Alberto Spelta, Marco Russo
 ---
 
@@ -24,7 +24,7 @@ Chosen option: "Group by language", because each language folder is one toolchai
 - `dotnet/` is the .NET toolchain root: solution, build settings, SDK pin, package sources, version file, and the NuGet readme and icon, with projects under `src/`, `tests/` and `samples/`.
 - Each npm package is a toolchain root of its own under `typescript/packages/<package>`, with its manifest, lockfile and version file; the MCP server is `typescript/packages/daxformatter-mcp`.
 - Later, `python/` holds the Python client and `spec/` the OpenAPI contract shared by all clients (see the [backlog](../backlog.md)).
-- Workflows carry as a prefix the language folder they work in, and CI workflows filter on its paths; a TypeScript release workflow also names its package, since each npm package releases on its own: `dotnet-ci.yml`, `dotnet-release.yml`, `typescript-ci.yml`, `typescript-release-mcp.yml`.
+- Workflows carry as a prefix the language folder they work in. A CI workflow builds and tests the whole folder and filters on its paths: `dotnet-ci.yml`, `typescript-ci.yml`. A release workflow also names its package, since each package releases on its own ([ADR-0002](0002-version-and-tag-each-package-independently.md)): `<language>-release-<package>.yml`, where the package is the id of its tags in lowercase, with dashes for dots: `dotnet-release-dax-formatter.yml`, `typescript-release-daxformatter-mcp.yml`.
 - The default branch stays `master`, because renaming it is not needed for the layout and `master` is named in both packages' NBGV `publicReleaseRefSpec` and in the workflow triggers. Package ids don't change.
 
 ### Consequences
@@ -35,7 +35,7 @@ Chosen option: "Group by language", because each language folder is one toolchai
 * Bad, because the readme of every published NuGet version shows the CI badge of `ci.yml`, which breaks when the workflow is renamed; only the next release carries the new badge.
 * Bad, because open branches and pull requests that touch moved files must be rebased onto the move.
 * Bad, because the history of a moved file before the move needs `git log --follow`.
-* Bad, because the nuget.org Trusted Publishing policy names the workflow file, so renaming `release.yml` to `dotnet-release.yml` needs a new policy before the next .NET release.
+* Bad, because the nuget.org Trusted Publishing policy names the workflow file, so renaming `release.yml` to `dotnet-release-dax-formatter.yml` needs a new policy before the next .NET release, and each new NuGet package, with its own release workflow, needs one too.
 * Bad, because the MCP package's NBGV version height restarts at the move, so its version moves to 0.2-beta ([ADR-0002](0002-version-and-tag-each-package-independently.md)).
 
 ### Confirmation
