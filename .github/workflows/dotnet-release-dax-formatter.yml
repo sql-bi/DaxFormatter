@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: Build, test, pack and run every check, but skip nuget push and the GitHub release
+        description: Build, test, pack and run every check, but skip nuget push and only print the GitHub release command
         type: boolean
         default: false
 
@@ -38,7 +38,7 @@ jobs:
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0 # Nerdbank.GitVersioning needs full history
+          fetch-depth: 0 # Nerdbank.GitVersioning and git describe need full history
           persist-credentials: false
 
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
@@ -53,6 +53,29 @@ jobs:
           $version = dotnet msbuild ./src/Dax.Formatter/Dax.Formatter.csproj -restore -target:GetBuildVersion -getProperty:NuGetPackageVersion
           if ($LASTEXITCODE -ne 0) { $version; exit $LASTEXITCODE }
           "version=$version" >> $env:GITHUB_OUTPUT
+
+      # Fails if this version is already tagged. The notes start from the nearest
+      # tag of this package, new or legacy form (v<version>), so the legacy tags
+      # count until the first Dax.Formatter-v tag. Runs in a dry run too.
+      - name: read tags
+        id: tag
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $tag = "Dax.Formatter-v$env:VERSION"
+          if (git tag --list $tag) {
+            Write-Output "::error::Tag $tag already exists, so this version is already released"
+            exit 1
+          }
+          $previous = git describe --tags --abbrev=0 --match 'Dax.Formatter-v*' --match 'v[0-9]*'
+          if ($LASTEXITCODE -ne 0) {
+            Write-Output "::error::No previous Dax.Formatter-v* or v[0-9]* tag reachable from this commit"
+            exit 1
+          }
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          "previous=$previous" >> $env:GITHUB_OUTPUT
+          Write-Output "Tag: $tag"
+          Write-Output "Previous tag: $previous"
 
       - name: restore signing key
         env:
@@ -88,9 +111,26 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: dotnet nuget push "./artifacts/Dax.Formatter.$env:VERSION.nupkg" --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
 
+      # A draft, so a maintainer removes the other packages' pull requests from the notes.
       - name: create github release
-        if: ${{ !inputs.dry_run }}
         env:
           GH_TOKEN: ${{ github.token }}
+          DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
           VERSION: ${{ steps.version.outputs.version }}
-        run: gh release create "v$env:VERSION" --title "DaxFormatter v$env:VERSION" --target "$env:GITHUB_SHA" --generate-notes --draft
+          TAG: ${{ steps.tag.outputs.tag }}
+          PREVIOUS_TAG: ${{ steps.tag.outputs.previous }}
+        run: |
+          $releaseArgs = @(
+            'release', 'create', $env:TAG,
+            '--title', "DaxFormatter v$env:VERSION",
+            '--target', $env:GITHUB_SHA,
+            '--generate-notes', '--notes-start-tag', $env:PREVIOUS_TAG,
+            '--latest', '--draft'
+          )
+          $command = 'gh ' + (($releaseArgs -replace '.*\s.*', '"$0"') -join ' ')
+          if ($env:DRY_RUN -eq 'true') {
+            Write-Output "Dry run, would run: $command"
+          } else {
+            Write-Output $command
+            gh @releaseArgs
+          }
