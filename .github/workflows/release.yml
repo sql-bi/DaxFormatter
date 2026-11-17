@@ -2,31 +2,63 @@ name: release
 
 on:
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Build, test, pack and run every check, but skip nuget push and the GitHub release
+        type: boolean
+        default: false
 
 permissions:
-  contents: write
-  id-token: write
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+  queue: max # a new run waits instead of canceling a pending one
 
 jobs:
   release:
     runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write # create github release
+      id-token: write # nuget.org Trusted Publishing
     steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+      - name: check branch
+        run: |
+          if ($env:GITHUB_REF -cne 'refs/heads/master') {
+            Write-Output "::error::Releases run only from refs/heads/master, not $env:GITHUB_REF"
+            exit 1
+          }
 
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          fetch-depth: 0 # Nerdbank.GitVersioning needs full history
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
         with:
           global-json-file: global.json
 
-      - uses: dotnet/nbgv@v0.4
-        id: nbgv
+      # The Nerdbank.GitVersioning MSBuild task, the one that stamps the package,
+      # so the pushed file and the tag can't differ from the packed version.
+      - name: read version
+        id: version
+        run: |
+          $version = dotnet msbuild ./src/Dax.Formatter/Dax.Formatter.csproj -restore -target:GetBuildVersion -getProperty:NuGetPackageVersion
+          if ($LASTEXITCODE -ne 0) { $version; exit $LASTEXITCODE }
+          "version=$version" >> $env:GITHUB_OUTPUT
 
       - name: restore signing key
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         run: |
-          $bytes = [Convert]::FromBase64String("${{ secrets.SIGNING_KEY }}")
+          $bytes = [Convert]::FromBase64String("$env:SIGNING_KEY")
+          if ($bytes.Length -eq 0) {
+            Write-Output "::error::The SIGNING_KEY secret is missing or empty"
+            exit 1
+          }
           [IO.File]::WriteAllBytes("src/Dax.Formatter/DaxFormatter.snk", $bytes)
-        shell: pwsh
 
       - name: build
         run: dotnet build ./src/Dax.Formatter.sln --configuration Release
@@ -37,16 +69,23 @@ jobs:
       - name: pack
         run: dotnet pack ./src/Dax.Formatter/Dax.Formatter.csproj --configuration Release --no-build --output ./artifacts
 
+      # Runs in a dry run too, so that a dry run checks the Trusted Publishing policy.
       - name: nuget login
-        uses: NuGet/login@v1
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
         id: login
         with:
           user: ${{ secrets.NUGET_USER }}
 
       - name: nuget push
-        run: dotnet nuget push "./artifacts/Dax.Formatter.${{ steps.nbgv.outputs.NuGetPackageVersion }}.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+        if: ${{ !inputs.dry_run }}
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: dotnet nuget push "./artifacts/Dax.Formatter.$env:VERSION.nupkg" --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
 
       - name: create github release
+        if: ${{ !inputs.dry_run }}
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "v${{ steps.nbgv.outputs.NuGetPackageVersion }}" --title "DaxFormatter v${{ steps.nbgv.outputs.NuGetPackageVersion }}" --target "${{ github.sha }}" --generate-notes --draft
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: gh release create "v$env:VERSION" --title "DaxFormatter v$env:VERSION" --target "$env:GITHUB_SHA" --generate-notes --draft
