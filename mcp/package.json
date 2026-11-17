@@ -35,9 +35,9 @@
   "devDependencies": {
     "@types/node": "^26.0.0",
     "nerdbank-gitversioning": "^3.10.85",
-    "tsup": "^8.3.5",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "tsup": "^9.0.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
   },
   "overrides": {
     "esbuild": "^0.28.1"
