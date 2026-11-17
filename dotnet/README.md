@@ -14,7 +14,7 @@ Possibly, use the `DaxFormatterMultipleRequest` structure to provide more statis
 
 # DaxFormatterClient
 The default constructor creates an instance of the client using the current assembly name and version to identify the client. You can specify an application name and version in the constructor arguments.
-The client instance resolve the server endpoint just once and reuse it in following requests.
+Each instance creates one `HttpClient` and reuses it for every request.
 It is suggested to reuse the same instance in multiple requests to minimize the latency.
 ```csharp
 var formatter = new DaxFormatterClient();

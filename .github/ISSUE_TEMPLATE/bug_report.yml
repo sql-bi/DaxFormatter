@@ -1,0 +1,80 @@
+name: 🐛 Bug Report
+description: Something in a package, or a formatting result, doesn't work as expected.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening a bug report, search the existing issues for the same behavior.
+        To report a security vulnerability, don't open an issue: follow the [security policy](https://github.com/sql-bi/DaxFormatter/security/policy).
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Where the problem shows.
+      options:
+        - .NET client
+        - MCP server
+        - Formatting result (the service)
+    validations:
+      required: true
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version
+      description: The version of `Dax.Formatter` or `@sqlbi/daxformatter-mcp`. For the remote MCP server or the daxformatter.com website, write that instead.
+      placeholder: e.g. 1.2.2
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: For the .NET client, the .NET version and the operating system; for the MCP server, the Node.js version, the operating system and the AI client.
+      placeholder: e.g. .NET 8 on Windows 11, or Node.js 22 on macOS with VS Code
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the problem
+      description: What you were trying to do and what happened, with any error message.
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: The steps or the code that reproduce the problem.
+      placeholder: |
+        1. ...
+        2. ...
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        **Issues are public: don't paste confidential code.** For a formatting result, reduce the expression to the smallest one that shows the problem, and rename tables, columns and measures if needed.
+  - type: textarea
+    id: dax-input
+    attributes:
+      label: DAX input
+      description: For a formatting result, the expression you sent.
+  - type: textarea
+    id: dax-output
+    attributes:
+      label: DAX output
+      description: For a formatting result, the result you got.
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Anything else that helps, such as options you set, screenshots or logs.

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Documentation
+    url: https://docs.sqlbi.com/dax-formatter/
+    about: How to use the .NET client and how to connect AI clients to the MCP servers.
+  - name: 🔒 Security vulnerability
+    url: https://github.com/sql-bi/DaxFormatter/security/policy
+    about: Report vulnerabilities privately, not in a public issue.

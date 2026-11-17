@@ -1,0 +1,36 @@
+name: 💡 Feature Request
+description: Suggest an idea for a package or for the formatting.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for submitting a feature request! Before opening one, search the existing issues for the same idea.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: What the request is about.
+      options:
+        - .NET client
+        - MCP server
+        - Formatting result (the service)
+    validations:
+      required: true
+  - type: textarea
+    id: the-feature-request
+    attributes:
+      label: The feature request
+      description: What you need, or the problem to solve.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: How it could work, and how it would help you and other users.
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Anything else that helps, such as examples or alternatives you considered. Don't paste confidential code.
