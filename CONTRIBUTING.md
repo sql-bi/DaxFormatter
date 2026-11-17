@@ -52,7 +52,7 @@ The tests replace `fetch` with a mock and run offline. Build and test with a cur
 - Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/): `type(scope): summary`, in the imperative, lowercase start, at most 72 characters, for example `docs(mcp): link client setup on SQLBI Docs`. Usual types: `feat`, `fix`, `docs`, `refactor`, `test`, `build` (also dependencies, as Dependabot writes them), `ci`, `chore`.
 - One logical change per commit; the body says what changed and why, in `-` bullets wrapped at 72 columns.
 - Pull requests are squash-merged into `master`, so the pull request title becomes the commit subject: write it as a Conventional Commits subject. The description is plain text with `-` bullets, without headings or tables; the template starts it.
-- CI builds and tests the language folders that a pull request changes.
+- CI builds and tests the language folders that a pull request changes, and again after the merge into `master`.
 - A change updates the documents it affects in the same pull request; a change to the REST contract starts from [`docs/design/rest-api.md`](docs/design/rest-api.md) and updates both clients. An architectural decision is recorded in [`docs/decisions/`](docs/decisions/README.md).
 
 ## Versions, tags and releases
