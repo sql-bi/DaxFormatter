@@ -1,4 +1,4 @@
-name: publish-mcp
+name: typescript-release-daxformatter-mcp
 
 on:
   workflow_dispatch:

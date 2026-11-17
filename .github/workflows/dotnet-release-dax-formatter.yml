@@ -1,4 +1,4 @@
-name: release
+name: dotnet-release-dax-formatter
 
 on:
   workflow_dispatch:

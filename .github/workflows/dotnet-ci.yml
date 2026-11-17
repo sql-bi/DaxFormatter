@@ -1,4 +1,4 @@
-name: ci
+name: dotnet-ci
 
 on:
   pull_request:

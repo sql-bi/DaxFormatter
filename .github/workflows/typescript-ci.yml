@@ -1,4 +1,4 @@
-name: ci-mcp
+name: typescript-ci
 
 on:
   pull_request:
