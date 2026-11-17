@@ -5,11 +5,11 @@
   "keywords": ["mcp", "model-context-protocol", "dax", "formatter", "sqlbi", "powerbi"],
   "license": "MIT",
   "author": "SQLBI",
-  "homepage": "https://github.com/sql-bi/DaxFormatter/tree/master/mcp",
+  "homepage": "https://github.com/sql-bi/DaxFormatter/tree/master/typescript/packages/daxformatter-mcp",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sql-bi/DaxFormatter.git",
-    "directory": "mcp"
+    "directory": "typescript/packages/daxformatter-mcp"
   },
   "bugs": "https://github.com/sql-bi/DaxFormatter/issues",
   "type": "module",

@@ -13,10 +13,10 @@
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
-  <PropertyGroup Condition="Exists('$(MSBuildThisFileDirectory)Dax.Formatter\DaxFormatter.snk')">
+  <PropertyGroup Condition="Exists('$(MSBuildThisFileDirectory)src\Dax.Formatter\DaxFormatter.snk')">
     <DefineConstants>$(DefineConstants);SIGNED</DefineConstants>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Dax.Formatter\DaxFormatter.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)src\Dax.Formatter\DaxFormatter.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>

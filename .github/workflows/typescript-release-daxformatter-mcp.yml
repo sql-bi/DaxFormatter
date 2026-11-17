@@ -43,39 +43,39 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: install
-        working-directory: mcp
+        working-directory: typescript/packages/daxformatter-mcp
         run: npm ci
 
       # The nbgv CLI of the nerdbank-gitversioning package, the one that stamps package.json,
       # so the tag can't differ from the published version. It runs on the runner's .NET.
       - name: read version
         id: version
-        working-directory: mcp
+        working-directory: typescript/packages/daxformatter-mcp
         run: |
           version=$(npx --no nbgv get-version --variable NpmPackageVersion)
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: build
-        working-directory: mcp
+        working-directory: typescript/packages/daxformatter-mcp
         run: npm run build
 
       - name: test
-        working-directory: mcp
+        working-directory: typescript/packages/daxformatter-mcp
         run: npm test
 
       - name: set version
-        working-directory: mcp
+        working-directory: typescript/packages/daxformatter-mcp
         run: npx --no nbgv-setversion
 
       # npm pack --dry-run lists what npm publish would upload, without network or credentials.
       - name: list package contents
         if: ${{ inputs.dry_run }}
-        working-directory: mcp
+        working-directory: typescript/packages/daxformatter-mcp
         run: npm pack --dry-run
 
       - name: publish
         if: ${{ !inputs.dry_run }}
-        working-directory: mcp
+        working-directory: typescript/packages/daxformatter-mcp
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --provenance --access public

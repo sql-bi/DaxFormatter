@@ -23,8 +23,13 @@ jobs:
     permissions:
       contents: write # create github release
       id-token: write # nuget.org Trusted Publishing
+    defaults:
+      run:
+        working-directory: dotnet
     steps:
+      # Runs before checkout, so it can't start in dotnet/.
       - name: check branch
+        working-directory: .
         run: |
           if ($env:GITHUB_REF -cne 'refs/heads/master') {
             Write-Output "::error::Releases run only from refs/heads/master, not $env:GITHUB_REF"
@@ -38,7 +43,7 @@ jobs:
 
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
-          global-json-file: global.json
+          global-json-file: dotnet/global.json
 
       # The Nerdbank.GitVersioning MSBuild task, the one that stamps the package,
       # so the pushed file and the tag can't differ from the packed version.
@@ -61,10 +66,10 @@ jobs:
           [IO.File]::WriteAllBytes("src/Dax.Formatter/DaxFormatter.snk", $bytes)
 
       - name: build
-        run: dotnet build ./src/Dax.Formatter.sln --configuration Release
+        run: dotnet build ./Dax.Formatter.sln --configuration Release
 
       - name: test
-        run: dotnet test ./src/Dax.Formatter.Tests/Dax.Formatter.Tests.csproj --configuration Release --no-build --verbosity normal
+        run: dotnet test ./tests/Dax.Formatter.Tests/Dax.Formatter.Tests.csproj --configuration Release --no-build --verbosity normal
 
       - name: pack
         run: dotnet pack ./src/Dax.Formatter/Dax.Formatter.csproj --configuration Release --no-build --output ./artifacts

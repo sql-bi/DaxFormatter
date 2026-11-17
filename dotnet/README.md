@@ -1,5 +1,5 @@
 
-# Dax Formatter [![CI](https://github.com/sql-bi/DaxFormatter/actions/workflows/ci.yml/badge.svg)](https://github.com/sql-bi/DaxFormatter/actions/workflows/ci.yml)
+# Dax Formatter [![CI](https://github.com/sql-bi/DaxFormatter/actions/workflows/dotnet-ci.yml/badge.svg)](https://github.com/sql-bi/DaxFormatter/actions/workflows/dotnet-ci.yml)
 
 DAX Formatter is a service available at https://www.daxformatter.com.
 The service receives DAX expressions and format them according to rules for [DAX code formatting](https://www.sqlbi.com/articles/rules-for-dax-code-formatting/).
