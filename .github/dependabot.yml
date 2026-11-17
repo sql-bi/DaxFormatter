@@ -1,10 +1,13 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/"
+    directory: "/dotnet"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    commit-message:
+      prefix: "build"
+      include: "scope"
     assignees:
     - "albertospelta"
     ignore:
@@ -18,14 +21,20 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    commit-message:
+      prefix: "ci"
+      include: "scope"
     assignees:
     - "albertospelta"
 
   - package-ecosystem: "npm"
-    directory: "/mcp"
+    directory: "/typescript/packages/daxformatter-mcp"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    commit-message:
+      prefix: "build"
+      include: "scope"
     assignees:
     - "albertospelta"
     groups:

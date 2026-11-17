@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\..\LICENSE.md" Pack="true" PackagePath="\" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     <None Include="..\..\package-icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>

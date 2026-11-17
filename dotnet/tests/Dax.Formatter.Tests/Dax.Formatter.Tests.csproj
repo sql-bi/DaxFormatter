@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dax.Formatter\Dax.Formatter.csproj" />
+    <ProjectReference Include="..\..\src\Dax.Formatter\Dax.Formatter.csproj" />
   </ItemGroup>
 
 </Project>

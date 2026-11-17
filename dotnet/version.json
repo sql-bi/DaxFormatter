@@ -11,6 +11,6 @@
     "^refs/heads/master$"
   ],
   "pathFilters": [
-    "src/Dax.Formatter"
+    "./src/Dax.Formatter"
   ]
 }

@@ -6,7 +6,7 @@ Reports and requests from users stay in [GitHub Issues](https://github.com/sql-b
 Reorganizing the repository by language and releasing each package with its own version and tags: [`plans/language-first-layout.md`](plans/language-first-layout.md).
 
 ## Next
-- npm trusted publishing for the MCP server release: the release workflow publishes with a long-lived npm token, which can leak and must be rotated by hand; with trusted publishing npm issues a short-lived credential to the workflow and adds provenance on its own. Done when the trusted publisher on npm names `typescript-release-mcp.yml` (so after the move), the release job runs on Node 22.14 or later with npm 11.5.1 or later, a release publishes without the token, and the Maintainer deletes the token.
+- npm trusted publishing for the MCP server release: the release workflow publishes with a long-lived npm token, which can leak and must be rotated by hand; with trusted publishing npm issues a short-lived credential to the workflow and adds provenance on its own. Done when the trusted publisher on npm names `typescript-release-daxformatter-mcp.yml` (so after the move), the release job runs on Node 22.14 or later with npm 11.5.1 or later, a release publishes without the token, and the Maintainer deletes the token.
 - MCP registry entry for the stdio server: AI clients that browse the registry find it there. Done when a `server.json` describes the npm package with `repository.subfolder` set to `typescript/packages/daxformatter-mcp`, the server appears in the registry, and the release guide says how to update the entry.
 
 ## Later

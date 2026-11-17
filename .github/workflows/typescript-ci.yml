@@ -4,7 +4,8 @@ on:
   pull_request:
     branches: [master]
     paths:
-      - mcp/**
+      - typescript/**
+      - .github/workflows/typescript-ci.yml
   workflow_dispatch:
 
 permissions:
@@ -24,20 +25,20 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: mcp/package-lock.json
+          cache-dependency-path: typescript/packages/daxformatter-mcp/package-lock.json
 
       - name: install
-        working-directory: mcp
+        working-directory: typescript/packages/daxformatter-mcp
         run: npm ci
 
       - name: typecheck
-        working-directory: mcp
+        working-directory: typescript/packages/daxformatter-mcp
         run: npm run typecheck
 
       - name: build
-        working-directory: mcp
+        working-directory: typescript/packages/daxformatter-mcp
         run: npm run build
 
       - name: test
-        working-directory: mcp
+        working-directory: typescript/packages/daxformatter-mcp
         run: npm test
