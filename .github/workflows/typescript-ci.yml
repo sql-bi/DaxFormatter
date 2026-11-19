@@ -1,11 +1,6 @@
 name: typescript-ci
 
 on:
-  push:
-    branches: [master]
-    paths:
-      - typescript/**
-      - .github/workflows/typescript-ci.yml
   pull_request:
     branches: [master]
     paths:
