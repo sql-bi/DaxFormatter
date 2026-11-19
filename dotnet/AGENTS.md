@@ -10,6 +10,8 @@ Run from `dotnet/`, never from the repository root ([why](../CONTRIBUTING.md#net
 dotnet build ./Dax.Formatter.sln --configuration Release
 dotnet test ./tests/Dax.Formatter.Tests/Dax.Formatter.Tests.csproj --configuration Release
 dotnet pack ./src/Dax.Formatter/Dax.Formatter.csproj --configuration Release
+# the version a release would publish, when run on an up-to-date master; elsewhere it has a commit suffix
+dotnet msbuild ./src/Dax.Formatter/Dax.Formatter.csproj -restore -target:GetBuildVersion -getProperty:NuGetPackageVersion
 # the sample, against the package on nuget.org and without the build settings of dotnet/
 dotnet build ./samples/GettingStarted/getting-started.sln
 ```
@@ -30,7 +32,7 @@ dotnet build ./samples/GettingStarted/getting-started.sln
 
 ## When you change X, update Y
 
-- `version.json` → read the [NBGV caveat](../docs/design/architecture.md#versions-and-releases) first; after the change, check with the version command of the [release guide](../docs/guides/release.md#before-you-start) that a commit under `src/Dax.Formatter` still raises the version.
+- `version.json` → read the [NBGV caveat](../docs/design/architecture.md#versions-and-releases) first; after the change, check with the version command above that a commit under `src/Dax.Formatter` still raises the version.
 - The public API or the behavior of the client → `README.md` in this folder, the NuGet package readme, written for package users and packed into the package.
 - A new project → `src/`, `tests/` or `samples/` ([ADR-0001](../docs/decisions/0001-organize-the-repository-by-language.md), [ADR-0003](../docs/decisions/0003-keep-one-net-solution-with-role-folders.md)); libraries and tests go into `Dax.Formatter.sln`. A new test project also goes into the test step of `dotnet-ci.yml` and of the release workflow, which name the test project they run.
 

@@ -13,6 +13,9 @@ npm run typecheck
 npm run build
 npm test
 npm pack --dry-run
+# the version a release would publish, when run on an up-to-date master; elsewhere it has a commit suffix
+# (the nbgv CLI runs on .NET, which must be on the PATH)
+npx --no nbgv get-version --variable NpmPackageVersion
 ```
 
 ## Done means
