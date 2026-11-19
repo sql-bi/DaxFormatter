@@ -42,4 +42,4 @@ There is no build at the root: each language folder builds and tests on its own,
 
 - [`docs/design/`](docs/design/README.md): how the packages work, call the service, version and release. Read before changing a package's boundaries, the REST contract, a `version.json` or a workflow.
 - [`docs/decisions/`](docs/decisions/README.md): why it is so, one record per decision. Read the titles before proposing a design choice.
-- [`docs/backlog.md`](docs/backlog.md): what comes next, open decisions and known debt. Read before picking up work.
+- [`docs/backlog.md`](docs/backlog.md): what comes next, open decisions and known debt. Read before picking up work; a new item takes the `Next ID`, and IDs are never reused.
