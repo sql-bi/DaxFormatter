@@ -1,6 +1,11 @@
 name: dotnet-ci
 
 on:
+  push:
+    branches: [master]
+    paths:
+      - dotnet/**
+      - .github/workflows/dotnet-ci.yml
   pull_request:
     branches: [master]
     paths:
