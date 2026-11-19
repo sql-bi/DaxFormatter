@@ -24,6 +24,7 @@ dotnet build ./samples/GettingStarted/getting-started.sln
 - Ask first: changes to `Directory.Build.props`, package references, target frameworks, or the public API of `Dax.Formatter`, which is a published package.
 - Never: edit `global.json` or `nuget.config` to make a build pass.
 - Never: commit `src/Dax.Formatter/DaxFormatter.snk`, the strong-name key that the release workflow writes from a secret; `.gitignore` ignores it.
+- Never: delete `samples/Directory.Build.props` or `samples/Directory.Build.targets`. They contain only `<Project />`, so the samples don't inherit the build settings of `dotnet/`; an empty file fails with MSB4024.
 - Never: run `dotnet format`, lower `AnalysisMode` or `AnalysisLevel`, or add a broad `NoWarn` to get a clean build.
 - Always: follow the root `.editorconfig` (C# style, indentation, encoding) in the lines you change; don't reformat the rest of a file.
 

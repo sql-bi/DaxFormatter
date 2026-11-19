@@ -28,10 +28,12 @@ There is no build at the root: each language builds and tests from its own folde
 - How the packages fit together, version or release → [`docs/design/architecture.md`](docs/design/architecture.md); a release step → [`docs/guides/release.md`](docs/guides/release.md).
 - An architectural decision → a new record in [`docs/decisions/`](docs/decisions/README.md), in the same pull request.
 - How to connect an AI client to the MCP servers → SQLBI Docs ([remote](https://docs.sqlbi.com/dax-formatter/mcp-http), [stdio](https://docs.sqlbi.com/dax-formatter/mcp-stdio)), which are maintained outside this repository; this repository only links them.
+- The `.snk` path in `dotnet/Directory.Build.props` → the path where `dotnet-release-dax-formatter.yml` writes the key from `SIGNING_KEY`, and the other way round: the build signs only when the file exists, so a mismatch builds an unsigned package without an error.
 - Work planned, open decisions, known debt → [`docs/backlog.md`](docs/backlog.md); a large piece of work in progress → its plan in `docs/plans/`, with its Progress updated in every pull request.
 
 ## Conventions
 
 - Accepted records in [`docs/decisions/`](docs/decisions/README.md) are binding: when a change contradicts one, stop and ask. Proposed records are context.
 - Commits and pull requests follow [`CONTRIBUTING.md`](CONTRIBUTING.md#commits-and-pull-requests).
+- Workflows follow GitHub's [secure use reference](https://docs.github.com/en/actions/reference/security/secure-use): actions pinned to a full commit SHA with the version in a comment on the same line, which [Dependabot updates](https://docs.github.com/en/code-security/dependabot/ecosystems-supported-by-dependabot/supported-ecosystems-and-repositories#github-actions) with the SHA; `permissions: contents: read` at the top, and write permissions only on the job that needs them; expressions passed to scripts through `env`, never written into `run`. Every checkout also sets `persist-credentials: false`.
 - Documents are in plain English, describe the present, and link within the repository with relative links. Package READMEs are written for their registry, with only what a package user needs: the npm README uses absolute URLs only.
