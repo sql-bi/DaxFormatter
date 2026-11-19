@@ -13,11 +13,14 @@ npm run typecheck
 npm run build
 npm test
 npm pack --dry-run
+# the version a release would publish, when run on an up-to-date master; elsewhere it has a commit suffix
+# (the nbgv CLI runs on .NET, which must be on the PATH)
+npx --no nbgv get-version --variable NpmPackageVersion
 ```
 
 ## Done means
 
-- `npm run typecheck`, `npm run build` and `npm test` pass, on the Node.js version that [`CONTRIBUTING.md`](../CONTRIBUTING.md#typescript) names; the code keeps working on the versions in `engines`.
+- `npm run typecheck`, `npm run build` and `npm test` pass on a current release of the Node.js major that `.github/workflows/typescript-ci.yml` sets: the build and test tools need a newer Node.js than the published package, which keeps working on the versions in `engines`.
 - `npm pack --dry-run` still lists only `dist/**`, `README.md` and `package.json`.
 
 ## Boundaries
@@ -29,5 +32,5 @@ npm pack --dry-run
 
 ## When you change X, update Y
 
-- The package README → the root rules on package READMEs and on AI client setup apply; like any change in the package folder, it raises the package's version ([architecture](../docs/design/architecture.md#versions-and-releases)).
+- The package README → the root rules on package READMEs and on AI client setup apply; like any change in the package folder, it raises the package's version ([architecture](../docs/design/architecture.md#deployment)).
 - A second npm package → its own folder under `packages/`, then the root rule for a new package; npm workspaces rooted at `typescript/` are a backlog item.

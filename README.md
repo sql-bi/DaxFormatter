@@ -15,7 +15,6 @@ The service also hosts a remote MCP server, which needs nothing installed.
 
 - User documentation: [SQLBI Docs](https://docs.sqlbi.com/dax-formatter/).
 - Connecting an AI client: to the [remote MCP server](https://docs.sqlbi.com/dax-formatter/mcp-http) or to the [stdio MCP server](https://docs.sqlbi.com/dax-formatter/mcp-stdio).
-- For contributors and maintainers: [`docs/`](docs/README.md).
 
 ## Support
 
