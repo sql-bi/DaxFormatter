@@ -1,6 +1,6 @@
 ---
-status: accepted
-date: 2026-11-17
+status: superseded by ADR-0004
+date: 2026-11-19
 decision-makers: Alberto Spelta, Marco Russo
 ---
 

@@ -1,12 +1,7 @@
-name: publish-mcp
+name: typescript-release-daxformatter-mcp
 
 on:
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: Build, test and run every check, but skip npm publish and the GitHub release
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -67,22 +62,15 @@ jobs:
         working-directory: typescript/packages/daxformatter-mcp
         run: npx --no nbgv-setversion
 
-      # npm pack --dry-run lists what npm publish would upload, without network or credentials.
-      - name: list package contents
-        if: ${{ inputs.dry_run }}
-        working-directory: typescript/packages/daxformatter-mcp
-        run: npm pack --dry-run
-
       - name: publish
-        if: ${{ !inputs.dry_run }}
         working-directory: typescript/packages/daxformatter-mcp
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --provenance --access public
 
+      # A draft, so a maintainer removes the other packages' pull requests from the notes.
       - name: create github release
-        if: ${{ !inputs.dry_run }}
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: DaxFormatter_MCP_v${{ steps.version.outputs.version }}
-        run: gh release create "$TAG" --title "$TAG" --target "$GITHUB_SHA" --generate-notes --draft
+          TAG: daxformatter-mcp-v${{ steps.version.outputs.version }}
+        run: gh release create "$TAG" --title "$TAG" --target "$GITHUB_SHA" --generate-notes --prerelease --latest=false --draft

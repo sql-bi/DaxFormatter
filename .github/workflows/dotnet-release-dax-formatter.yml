@@ -1,12 +1,7 @@
-name: release
+name: dotnet-release-dax-formatter
 
 on:
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: Build, test, pack and run every check, but skip nuget push and the GitHub release
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -74,7 +69,6 @@ jobs:
       - name: pack
         run: dotnet pack ./src/Dax.Formatter/Dax.Formatter.csproj --configuration Release --no-build --output ./artifacts
 
-      # Runs in a dry run too, so that a dry run checks the Trusted Publishing policy.
       - name: nuget login
         uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
         id: login
@@ -82,15 +76,14 @@ jobs:
           user: ${{ secrets.NUGET_USER }}
 
       - name: nuget push
-        if: ${{ !inputs.dry_run }}
         env:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
           VERSION: ${{ steps.version.outputs.version }}
         run: dotnet nuget push "./artifacts/Dax.Formatter.$env:VERSION.nupkg" --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
 
+      # A draft, so a maintainer removes the other packages' pull requests from the notes.
       - name: create github release
-        if: ${{ !inputs.dry_run }}
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
-        run: gh release create "v$env:VERSION" --title "DaxFormatter v$env:VERSION" --target "$env:GITHUB_SHA" --generate-notes --draft
+        run: gh release create "Dax.Formatter-v$env:VERSION" --title "DaxFormatter v$env:VERSION" --target "$env:GITHUB_SHA" --generate-notes --latest --draft

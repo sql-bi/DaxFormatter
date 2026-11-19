@@ -76,7 +76,7 @@ Formatting from an AI client through the stdio server:
 
 ## Versions and releases
 
-Each package has its own version, tags and release workflow ([ADR-0002](../decisions/0002-version-and-tag-each-package-independently.md)). Nerdbank.GitVersioning (NBGV) computes the version from the package's `version.json`: the version height counts the commits that touch the file's path filters, and a build of `master` gets a version without the commit suffix. How to release is in the [release guide](../guides/release.md).
+Each package has its own version, tags and release workflow ([ADR-0004](../decisions/0004-version-tag-and-release-each-package-independently.md)). Nerdbank.GitVersioning (NBGV) computes the version from the package's `version.json`: the version height counts the commits that touch the file's path filters, and a build of `master` gets a version without the commit suffix. How to release is in the [release guide](../guides/release.md).
 
 | | `Dax.Formatter` | `@sqlbi/daxformatter-mcp` |
 |---|---|---|
