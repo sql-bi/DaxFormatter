@@ -18,6 +18,7 @@ Publish a new version of `Dax.Formatter` to nuget.org or of `@sqlbi/daxformatter
 - Set up once by a maintainer:
   - .NET: on nuget.org, a Trusted Publishing policy for this repository and the workflow file `dotnet-release-dax-formatter.yml`; the repository secrets `NUGET_USER`, the nuget.org user name (profile name, not the email address) that `NuGet/login` signs in with, and `SIGNING_KEY`, the strong-name key in base64.
   - MCP server: the repository secret `NPM_TOKEN`, an npm token that can publish `@sqlbi/daxformatter-mcp`.
+  - Tags: one tag ruleset targeting `*-v*`, `v*` and `DaxFormatter_MCP_v*`, with "Restrict updates", "Restrict deletions" and "Block force pushes". Not "Restrict creations": GitHub doesn't document whether publishing a draft, or `gh release create` with the workflow's `GITHUB_TOKEN`, would then need a bypass.
 
 | Package | Workflow file | Tag | Release title | Release flags |
 |---|---|---|---|---|
@@ -53,6 +54,7 @@ Actions shows each workflow under its file name without `.yml`.
 - "Releases run only from refs/heads/master": run the workflow again with branch `master`.
 - "The SIGNING_KEY secret is missing or empty": a maintainer sets the secret, then run again.
 - The nuget.org sign-in fails: the Trusted Publishing policy must name `dotnet-release-dax-formatter.yml` and this repository.
+- The MCP release fails at `npm ci` with an authentication error or one about `NODE_AUTH_TOKEN`: nothing is published yet. The `.npmrc` that setup-node writes reads the token from `NODE_AUTH_TOKEN`, which only the publish step sets, and since v7 setup-node no longer sets a placeholder, without which older Node.js and npm versions may fail ([README](https://github.com/actions/setup-node)). In a pull request, give the install step a placeholder `NODE_AUTH_TOKEN`, not the `NPM_TOKEN` secret, which the install scripts of the dependencies would see; then run again.
 - `dotnet nuget push` or `npm publish` fails because the version exists: no commit has touched the package's path filter since the last release. Merge the change to release first.
 - The package is published but the GitHub release is missing: create the draft by hand on the commit the workflow ran on, with the tag, title and flags of the table; then continue from step 2. If GitHub rejects `--latest` on a draft, run the command without it: step 3 sets it at publish.
   ```bash
