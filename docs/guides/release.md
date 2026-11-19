@@ -1,6 +1,6 @@
 # How to release a package
 
-Publish a new version of `Dax.Formatter` to nuget.org or of `@sqlbi/daxformatter-mcp` to npm. Each package releases on its own, from its own workflow ([ADR-0002](../decisions/0002-version-and-tag-each-package-independently.md)); how versions are computed is in the [architecture](../design/architecture.md#versions-and-releases).
+Publish a new version of `Dax.Formatter` to nuget.org or of `@sqlbi/daxformatter-mcp` to npm. Each package releases on its own, from its own workflow ([ADR-0004](../decisions/0004-version-tag-and-release-each-package-independently.md)); how versions are computed is in the [architecture](../design/architecture.md#versions-and-releases).
 
 ## Before you start
 
@@ -38,7 +38,7 @@ Actions shows each workflow under its file name without `.yml`.
    - MCP server: installs with `npm ci`, reads the version, builds, tests, writes the version into `package.json` with `nbgv-setversion`, runs `npm publish --provenance --access public`, and creates the GitHub release.
    - Every check runs before the push to nuget.org or npm: a run that stops at a check publishes nothing, so fix the cause and run it again.
    - The GitHub release is a draft with the tag, title and flags of the table, on the commit the workflow ran on, and notes that GitHub generates from the merged pull requests.
-2. In GitHub, Releases, open the draft and edit its notes. GitHub chooses where they start, so they can begin at a release of the other package and include its pull requests: keep only this package's changes since its previous release, whose tag is in the form of the table or, before the first one, in the package's legacy form ([ADR-0002](../decisions/0002-version-and-tag-each-package-independently.md)).
+2. In GitHub, Releases, open the draft and edit its notes. GitHub chooses where they start, so they can begin at a release of the other package and include its pull requests: keep only this package's changes since its previous release, whose tag is in the form of the table or, before the first one, in the package's legacy form ([ADR-0004](../decisions/0004-version-tag-and-release-each-package-independently.md)).
 3. Publish the draft. The workflow already set the flags, but GitHub doesn't document that a draft keeps them, so set them again:
    - .NET: check "Set as the latest release".
    - MCP server: check "Set as a pre-release" and leave "Set as the latest release" unchecked, so that "Latest" stays on the .NET client.

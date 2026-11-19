@@ -57,7 +57,7 @@ The tests replace `fetch` with a mock and run offline. Build and test with a cur
 
 ## Versions, tags and releases
 
-- Each package gets its version from Nerdbank.GitVersioning and its own `version.json` ([ADR-0002](docs/decisions/0002-version-and-tag-each-package-independently.md)): don't set versions in project files or in `package.json`.
+- Each package gets its version from Nerdbank.GitVersioning and its own `version.json` ([ADR-0004](docs/decisions/0004-version-tag-and-release-each-package-independently.md)): don't set versions in project files or in `package.json`.
 - The maintainers release each package with its release workflow; the [release guide](docs/guides/release.md) gives the steps and the tags.
 
 ## Reading history across the move
