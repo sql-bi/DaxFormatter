@@ -29,7 +29,6 @@ There is no build at the root: each language folder builds and tests on its own,
 - How the packages fit together, version or release → [`docs/design/architecture.md`](docs/design/architecture.md).
 - An architectural decision → a new record in [`docs/decisions/`](docs/decisions/README.md), in the same pull request.
 - How to connect an AI client to the MCP servers → SQLBI Docs ([remote](https://docs.sqlbi.com/dax-formatter/mcp-http), [stdio](https://docs.sqlbi.com/dax-formatter/mcp-stdio)), maintained outside this repository, which only links them.
-- The `.snk` path in `dotnet/Directory.Build.props` → the path where `dotnet-release-dax-formatter.yml` writes the key from `SIGNING_KEY`, and the other way round: the build signs only when the file exists, so a mismatch builds an unsigned package without an error.
 - Work planned, open decisions, known debt → [`docs/backlog.md`](docs/backlog.md).
 
 ## Conventions

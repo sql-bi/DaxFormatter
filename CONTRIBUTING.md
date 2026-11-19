@@ -18,34 +18,7 @@ The repository is organized by language ([ADR-0001](docs/decisions/0001-organize
 
 ## Build and test
 
-### .NET
-
-Run the commands from `dotnet/`: the `dotnet` CLI looks for `global.json` from the current folder upward, so only there does it use the SDK that `dotnet/global.json` pins.
-
-```bash
-cd dotnet
-dotnet build
-dotnet test
-dotnet pack
-```
-
-- The tests call the live DAX Formatter service: they need network access, and they fail when the service is unreachable.
-- The test project also targets .NET Framework 4.7.2, which runs only on Windows, where CI runs; on other systems, run `dotnet test --framework net10.0`.
-- Local builds are not strong-named: the signing key exists only in the release workflow.
-
-### TypeScript
-
-Run the commands from the package folder; each npm package has its own lockfile.
-
-```bash
-cd typescript/packages/daxformatter-mcp
-npm ci
-npm run typecheck
-npm run build
-npm test
-```
-
-The tests replace `fetch` with a mock and run offline. Build and test with a current release of the Node.js major version that `.github/workflows/typescript-ci.yml` sets: the build and test tools need a newer Node.js than the published package, which supports the versions in the `engines` field of `package.json`.
+Each language folder builds and tests on its own: the commands and their requirements are in [`dotnet/AGENTS.md`](dotnet/AGENTS.md) and [`typescript/AGENTS.md`](typescript/AGENTS.md).
 
 ## Commits and pull requests
 

@@ -20,7 +20,7 @@ npx --no nbgv get-version --variable NpmPackageVersion
 
 ## Done means
 
-- `npm run typecheck`, `npm run build` and `npm test` pass, on the Node.js version that [`CONTRIBUTING.md`](../CONTRIBUTING.md#typescript) names; the code keeps working on the versions in `engines`.
+- `npm run typecheck`, `npm run build` and `npm test` pass on a current release of the Node.js major that `.github/workflows/typescript-ci.yml` sets: the build and test tools need a newer Node.js than the published package, which keeps working on the versions in `engines`.
 - `npm pack --dry-run` still lists only `dist/**`, `README.md` and `package.json`.
 
 ## Boundaries
