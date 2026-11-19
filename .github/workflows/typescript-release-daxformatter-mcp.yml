@@ -28,7 +28,7 @@ jobs:
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0 # Nerdbank.GitVersioning and git describe need full history
+          fetch-depth: 0 # Nerdbank.GitVersioning needs full history
           persist-credentials: false
 
       # No npm cache: a release installs only what the lock file names, from the registry.
@@ -49,28 +49,6 @@ jobs:
         run: |
           version=$(npx --no nbgv get-version --variable NpmPackageVersion)
           echo "version=$version" >> "$GITHUB_OUTPUT"
-
-      # Fails if this version is already tagged. The notes start from the nearest
-      # tag of this package, new or legacy form (DaxFormatter_MCP_v<version>), so
-      # the legacy tags count until the first daxformatter-mcp-v tag.
-      - name: read tags
-        id: tag
-        env:
-          VERSION: ${{ steps.version.outputs.version }}
-        run: |
-          tag="daxformatter-mcp-v$VERSION"
-          if [ -n "$(git tag --list "$tag")" ]; then
-            echo "::error::Tag $tag already exists, so this version is already released"
-            exit 1
-          fi
-          if ! previous=$(git describe --tags --abbrev=0 --match 'daxformatter-mcp-v*' --match 'DaxFormatter_MCP_v*'); then
-            echo "::error::No previous daxformatter-mcp-v* or DaxFormatter_MCP_v* tag reachable from this commit"
-            exit 1
-          fi
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          echo "previous=$previous" >> "$GITHUB_OUTPUT"
-          echo "Tag: $tag"
-          echo "Previous tag: $previous"
 
       - name: build
         working-directory: typescript/packages/daxformatter-mcp
@@ -94,6 +72,5 @@ jobs:
       - name: create github release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ steps.tag.outputs.tag }}
-          PREVIOUS_TAG: ${{ steps.tag.outputs.previous }}
-        run: gh release create "$TAG" --title "$TAG" --target "$GITHUB_SHA" --generate-notes --notes-start-tag "$PREVIOUS_TAG" --prerelease --latest=false --draft
+          TAG: daxformatter-mcp-v${{ steps.version.outputs.version }}
+        run: gh release create "$TAG" --title "$TAG" --target "$GITHUB_SHA" --generate-notes --prerelease --latest=false --draft

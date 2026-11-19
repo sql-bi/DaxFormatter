@@ -33,7 +33,7 @@ jobs:
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0 # Nerdbank.GitVersioning and git describe need full history
+          fetch-depth: 0 # Nerdbank.GitVersioning needs full history
           persist-credentials: false
 
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
@@ -48,29 +48,6 @@ jobs:
           $version = dotnet msbuild ./src/Dax.Formatter/Dax.Formatter.csproj -restore -target:GetBuildVersion -getProperty:NuGetPackageVersion
           if ($LASTEXITCODE -ne 0) { $version; exit $LASTEXITCODE }
           "version=$version" >> $env:GITHUB_OUTPUT
-
-      # Fails if this version is already tagged. The notes start from the nearest
-      # tag of this package, new or legacy form (v<version>), so the legacy tags
-      # count until the first Dax.Formatter-v tag.
-      - name: read tags
-        id: tag
-        env:
-          VERSION: ${{ steps.version.outputs.version }}
-        run: |
-          $tag = "Dax.Formatter-v$env:VERSION"
-          if (git tag --list $tag) {
-            Write-Output "::error::Tag $tag already exists, so this version is already released"
-            exit 1
-          }
-          $previous = git describe --tags --abbrev=0 --match 'Dax.Formatter-v*' --match 'v[0-9]*'
-          if ($LASTEXITCODE -ne 0) {
-            Write-Output "::error::No previous Dax.Formatter-v* or v[0-9]* tag reachable from this commit"
-            exit 1
-          }
-          "tag=$tag" >> $env:GITHUB_OUTPUT
-          "previous=$previous" >> $env:GITHUB_OUTPUT
-          Write-Output "Tag: $tag"
-          Write-Output "Previous tag: $previous"
 
       - name: restore signing key
         env:
@@ -109,6 +86,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
-          TAG: ${{ steps.tag.outputs.tag }}
-          PREVIOUS_TAG: ${{ steps.tag.outputs.previous }}
-        run: gh release create "$env:TAG" --title "DaxFormatter v$env:VERSION" --target "$env:GITHUB_SHA" --generate-notes --notes-start-tag "$env:PREVIOUS_TAG" --latest --draft
+        run: gh release create "Dax.Formatter-v$env:VERSION" --title "DaxFormatter v$env:VERSION" --target "$env:GITHUB_SHA" --generate-notes --latest --draft

@@ -34,12 +34,12 @@ Actions shows each workflow under its file name without `.yml`.
    gh workflow run typescript-release-daxformatter-mcp.yml --ref master
    ```
    The workflow:
-   - .NET: reads the version and the tags, writes the signing key from `SIGNING_KEY` and fails if it is missing, builds, runs the tests against the live service, packs, signs in to nuget.org, pushes `Dax.Formatter.<version>.nupkg`, and creates the GitHub release.
-   - MCP server: installs with `npm ci`, reads the version and the tags, builds, tests, writes the version into `package.json` with `nbgv-setversion`, runs `npm publish --provenance --access public`, and creates the GitHub release.
+   - .NET: reads the version, writes the signing key from `SIGNING_KEY` and fails if it is missing, builds, runs the tests against the live service, packs, signs in to nuget.org, pushes `Dax.Formatter.<version>.nupkg`, and creates the GitHub release.
+   - MCP server: installs with `npm ci`, reads the version, builds, tests, writes the version into `package.json` with `nbgv-setversion`, runs `npm publish --provenance --access public`, and creates the GitHub release.
    - Every check runs before the push to nuget.org or npm: a run that stops at a check publishes nothing, so fix the cause and run it again.
-   - The GitHub release is a draft with the tag, title and flags of the table, on the commit the workflow ran on. Its notes start from the previous tag: the package's nearest tag on the history of `master`, in the form of the table or in the package's legacy form ([ADR-0002](../decisions/0002-version-and-tag-each-package-independently.md)).
-2. In GitHub, Releases, open the draft. GitHub generates its notes from the merged pull requests, which can include those of the other package: remove the lines that don't belong to this package.
-3. Publish the draft before the package's next release, whose notes start from this one. The workflow already set the flags, but GitHub doesn't document that a draft keeps them, so set them again:
+   - The GitHub release is a draft with the tag, title and flags of the table, on the commit the workflow ran on, and notes that GitHub generates from the merged pull requests.
+2. In GitHub, Releases, open the draft and edit its notes. GitHub chooses where they start, so they can begin at a release of the other package and include its pull requests: keep only this package's changes since its previous release, whose tag is in the form of the table or, before the first one, in the package's legacy form ([ADR-0002](../decisions/0002-version-and-tag-each-package-independently.md)).
+3. Publish the draft. The workflow already set the flags, but GitHub doesn't document that a draft keeps them, so set them again:
    - .NET: check "Set as the latest release".
    - MCP server: check "Set as a pre-release" and leave "Set as the latest release" unchecked, so that "Latest" stays on the .NET client.
 
@@ -51,12 +51,11 @@ Actions shows each workflow under its file name without `.yml`.
 ## If something goes wrong
 
 - "Releases run only from refs/heads/master": run the workflow again with branch `master`.
-- "No previous ... tag reachable from this commit": the release notes have no starting point. The package's tags, new or legacy, must be on the history of the commit the workflow ran on, and the checkout must keep `fetch-depth: 0`, which also fetches them.
 - "The SIGNING_KEY secret is missing or empty": a maintainer sets the secret, then run again.
 - The nuget.org sign-in fails: the Trusted Publishing policy must name `dotnet-release-dax-formatter.yml` and this repository.
-- "Tag ... already exists", or `dotnet nuget push` or `npm publish` fails because the version exists: no commit has touched the package's path filter since the last release. Merge the change to release first.
-- The package is published but the GitHub release is missing: create the draft by hand on the commit the workflow ran on, with the title and flags of the table and the tag and previous tag that its "read tags" step printed; then continue from step 2. If GitHub rejects `--latest` on a draft, run the command without it: step 3 sets it at publish.
+- `dotnet nuget push` or `npm publish` fails because the version exists: no commit has touched the package's path filter since the last release. Merge the change to release first.
+- The package is published but the GitHub release is missing: create the draft by hand on the commit the workflow ran on, with the tag, title and flags of the table; then continue from step 2. If GitHub rejects `--latest` on a draft, run the command without it: step 3 sets it at publish.
   ```bash
-  gh release create "<tag>" --title "<title>" --target <commit> --generate-notes --notes-start-tag <previous tag> <flags> --draft
+  gh release create "<tag>" --title "<title>" --target <commit> --generate-notes <flags> --draft
   ```
 - A published version can't be replaced: on nuget.org it can only be unlisted. Fix the problem and release the next version.
