@@ -32,5 +32,5 @@ npx --no nbgv get-version --variable NpmPackageVersion
 
 ## When you change X, update Y
 
-- The package README → the root rules on package READMEs and on AI client setup apply; like any change in the package folder, it raises the package's version ([architecture](../docs/design/architecture.md#versions-and-releases)).
+- The package README → the root rules on package READMEs and on AI client setup apply; like any change in the package folder, it raises the package's version ([architecture](../docs/design/architecture.md#deployment)).
 - A second npm package → its own folder under `packages/`, then the root rule for a new package; npm workspaces rooted at `typescript/` are a backlog item.
