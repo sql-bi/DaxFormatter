@@ -2,11 +2,6 @@ name: dotnet-release-dax-formatter
 
 on:
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: Build, test, pack and run every check, but skip nuget push and only print the GitHub release command
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -56,7 +51,7 @@ jobs:
 
       # Fails if this version is already tagged. The notes start from the nearest
       # tag of this package, new or legacy form (v<version>), so the legacy tags
-      # count until the first Dax.Formatter-v tag. Runs in a dry run too.
+      # count until the first Dax.Formatter-v tag.
       - name: read tags
         id: tag
         env:
@@ -97,7 +92,6 @@ jobs:
       - name: pack
         run: dotnet pack ./src/Dax.Formatter/Dax.Formatter.csproj --configuration Release --no-build --output ./artifacts
 
-      # Runs in a dry run too, so that a dry run checks the Trusted Publishing policy.
       - name: nuget login
         uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
         id: login
@@ -105,7 +99,6 @@ jobs:
           user: ${{ secrets.NUGET_USER }}
 
       - name: nuget push
-        if: ${{ !inputs.dry_run }}
         env:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
           VERSION: ${{ steps.version.outputs.version }}
@@ -115,22 +108,7 @@ jobs:
       - name: create github release
         env:
           GH_TOKEN: ${{ github.token }}
-          DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
           VERSION: ${{ steps.version.outputs.version }}
           TAG: ${{ steps.tag.outputs.tag }}
           PREVIOUS_TAG: ${{ steps.tag.outputs.previous }}
-        run: |
-          $releaseArgs = @(
-            'release', 'create', $env:TAG,
-            '--title', "DaxFormatter v$env:VERSION",
-            '--target', $env:GITHUB_SHA,
-            '--generate-notes', '--notes-start-tag', $env:PREVIOUS_TAG,
-            '--latest', '--draft'
-          )
-          $command = 'gh ' + (($releaseArgs -replace '.*\s.*', '"$0"') -join ' ')
-          if ($env:DRY_RUN -eq 'true') {
-            Write-Output "Dry run, would run: $command"
-          } else {
-            Write-Output $command
-            gh @releaseArgs
-          }
+        run: gh release create "$env:TAG" --title "DaxFormatter v$env:VERSION" --target "$env:GITHUB_SHA" --generate-notes --notes-start-tag "$env:PREVIOUS_TAG" --latest --draft
