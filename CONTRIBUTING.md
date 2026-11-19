@@ -14,7 +14,7 @@ The repository is organized by language ([ADR-0001](docs/decisions/0001-organize
 
 - `dotnet/`: the .NET client library `Dax.Formatter`, its tests and samples ([ADR-0003](docs/decisions/0003-keep-one-net-solution-with-role-folders.md)).
 - `typescript/packages/daxformatter-mcp/`: the MCP server `@sqlbi/daxformatter-mcp`, with its own TypeScript port of the client.
-- `docs/`: documentation for contributors and maintainers; [`docs/README.md`](docs/README.md) says where each kind of fact lives. The user documentation is on [SQLBI Docs](https://docs.sqlbi.com/dax-formatter/).
+- `docs/`: documentation for contributors and maintainers; [`AGENTS.md`](AGENTS.md#documentation) says where each kind of fact lives. The user documentation is on [SQLBI Docs](https://docs.sqlbi.com/dax-formatter/).
 
 ## Build and test
 

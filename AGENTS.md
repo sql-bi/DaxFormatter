@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Client packages for the DAX Formatter service, organized by language: the .NET client library `Dax.Formatter` (NuGet) in `dotnet/`, and the MCP server `@sqlbi/daxformatter-mcp` (npm), which carries its own TypeScript port of the client, in `typescript/packages/daxformatter-mcp/`. The service, its REST API and its remote MCP server are maintained outside this repository. Documentation map: [`docs/README.md`](docs/README.md).
+Client packages for the DAX Formatter service, organized by language: the .NET client library `Dax.Formatter` (NuGet) in `dotnet/`, and the MCP server `@sqlbi/daxformatter-mcp` (npm), which carries its own TypeScript port of the client, in `typescript/packages/daxformatter-mcp/`. The service, its REST API and its remote MCP server are maintained outside this repository.
 
 ## Commands
 
@@ -15,7 +15,7 @@ There is no build at the root: each language builds and tests from its own folde
 
 ## Boundaries
 
-- Always: work on a branch, never on `master`; one logical change per commit; keep each fact in one home and link to it ([`docs/README.md`](docs/README.md)).
+- Always: work on a branch, never on `master`; one logical change per commit; keep each fact in one home ([Documentation](#documentation)) and link to it.
 - Ask first: changes to `.github/workflows/`, `.github/dependabot.yml` or `.github/CODEOWNERS`; any `version.json`; package ids, tags or release conventions; the wire format of a request or response; a new dependency.
 - Never: commit secrets, tokens or signing keys; rewrite published history (force-push `master`, move or delete tags); run a release workflow without being asked.
 - Never, because this repository is public: name private repositories, internal hosts, cloud resources, private package feeds or secret values in any file, commit message or pull request.
@@ -37,3 +37,9 @@ There is no build at the root: each language builds and tests from its own folde
 - Commits and pull requests follow [`CONTRIBUTING.md`](CONTRIBUTING.md#commits-and-pull-requests).
 - Workflows follow GitHub's [secure use reference](https://docs.github.com/en/actions/reference/security/secure-use): actions pinned to a full commit SHA with the version in a comment on the same line, which [Dependabot updates](https://docs.github.com/en/code-security/dependabot/ecosystems-supported-by-dependabot/supported-ecosystems-and-repositories#github-actions) with the SHA; `permissions: contents: read` at the top, and write permissions only on the job that needs them; expressions passed to scripts through `env`, never written into `run`. Every checkout also sets `persist-credentials: false`.
 - Documents are in plain English, describe the present, and link within the repository with relative links. Package READMEs are written for their registry, with only what a package user needs: the npm README uses absolute URLs only.
+
+## Documentation
+
+- [`docs/design/`](docs/design/README.md): how the packages work, call the service, version and release. Read before changing a package's boundaries, the REST contract, a `version.json` or a workflow.
+- [`docs/decisions/`](docs/decisions/README.md): why it is so, one record per decision. Read the titles before proposing a design choice.
+- [`docs/backlog.md`](docs/backlog.md): what comes next, open decisions and known debt. Read before picking up work.
