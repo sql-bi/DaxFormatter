@@ -65,6 +65,44 @@ public class ReadmeSamples
     }
 
     [Fact]
+    public async Task FormatBatchAsync_MixedObjectsSample_UpdatesTheObjectsOfEveryType()
+    {
+        var client = new DaxFormatterClient();
+        var model = new Model();
+
+        #region MixedObjects
+        var items = new List<(string Expression, Action<string> Update)>();
+
+        foreach (var measure in model.Measures)
+        {
+            items.Add((measure.Expression, text => measure.Expression = text));
+        }
+
+        foreach (var function in model.Functions)
+        {
+            items.Add((function.Expression, text => function.Expression = text));
+        }
+
+        var options = new DaxFormatOptions { Kind = DaxKind.Expression };
+
+        var results = await client.FormatBatchAsync(items, item => item.Expression, options);
+
+        foreach (var result in results)
+        {
+            if (result.Succeeded)
+            {
+                result.Item.Update(result.FormattedText);
+            }
+        }
+        #endregion
+
+        Assert.Equal("CALCULATE ( SUM ( Sales[Amount] ), Sales[Quantity] > 0 )", model.Measures[0].Expression);
+        Assert.Equal("SUMX(Sales, Sales[Amount] *", model.Measures[1].Expression);
+        Assert.Equal(
+            "(\r\n    amount : NUMERIC,\r\n    rate : NUMERIC\r\n) =>\r\namount * ( 1 + rate )", model.Functions[0].Expression);
+    }
+
+    [Fact]
     public async Task FormatAsync_OptionsSample_SendsTheOptions()
     {
         var client = new DaxFormatterClient();
@@ -236,5 +274,20 @@ public class ReadmeSamples
             new Measure("Broken", "SUMX(Sales, Sales[Amount] *"),
             new Measure("Cost Ratio", "DIVIDE([Sales Amount], [Total Cost])"),
         ];
+
+        public List<Function> Functions { get; } =
+        [
+            new Function("(amount : NUMERIC, rate : NUMERIC) => amount * (1 + rate)"),
+        ];
+    }
+
+    private sealed class Function
+    {
+        public Function(string expression)
+        {
+            Expression = expression;
+        }
+
+        public string Expression { get; set; }
     }
 }

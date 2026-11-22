@@ -59,6 +59,38 @@ Here `Measure` and `model` stand for the types of your application: any type wor
 - A blank text gets an empty formatted text, without a request.
 - `FormatBatchAsync` also takes plain strings: `await client.FormatBatchAsync(texts)`.
 
+### Format objects of different types
+
+One call formats the objects of a model whatever their type, because `DaxKind.Expression` covers them all. Put them in one list, each with its DAX and a function that writes the formatted text back to it.
+
+```csharp
+var items = new List<(string Expression, Action<string> Update)>();
+
+foreach (var measure in model.Measures)
+{
+    items.Add((measure.Expression, text => measure.Expression = text));
+}
+
+foreach (var function in model.Functions)
+{
+    items.Add((function.Expression, text => function.Expression = text));
+}
+
+var options = new DaxFormatOptions { Kind = DaxKind.Expression };
+
+var results = await client.FormatBatchAsync(items, item => item.Expression, options);
+
+foreach (var result in results)
+{
+    if (result.Succeeded)
+    {
+        result.Item.Update(result.FormattedText);
+    }
+}
+```
+
+`Update` is not part of the client: it is the function you stored in the item, which the result gives back in `Item`. Only texts of the other kind need a call of their own, such as queries, which take `DaxKind.Auto`.
+
 ### Options
 
 ```csharp
