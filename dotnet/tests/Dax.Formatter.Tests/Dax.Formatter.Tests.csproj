@@ -30,6 +30,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Fixtures\*.json" LogicalName="Fixtures/%(Filename)%(Extension)" />
     <EmbeddedResource Include="PublicApi.approved.txt" LogicalName="PublicApi.approved.txt" />
+    <EmbeddedResource Include="..\..\README.md" LogicalName="README.md" Link="Readme\README.md" />
+    <EmbeddedResource Include="Readme\ReadmeSamples.cs" LogicalName="ReadmeSamples.cs" />
   </ItemGroup>
 
 </Project>
