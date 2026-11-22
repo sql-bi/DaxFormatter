@@ -17,6 +17,7 @@ internal sealed class RecordedRequest
         Uri = request.RequestUri;
         Body = body;
         ContentType = request.Content?.Headers.ContentType?.ToString();
+        ExpectContinue = request.Headers.ExpectContinue;
 
         foreach (var header in request.Headers)
         {
@@ -37,6 +38,12 @@ internal sealed class RecordedRequest
     public byte[] Body { get; }
 
     public string? ContentType { get; }
+
+    /// <summary>
+    /// Gets what the request says about <c>Expect: 100-continue</c>. The header itself is written by the real
+    /// handler, which on .NET Framework adds it to a POST unless the request says no.
+    /// </summary>
+    public bool? ExpectContinue { get; }
 
     public JsonElement Json { get; }
 

@@ -32,7 +32,7 @@ internal static class ResponseReader
         List<FormatResponseItem?>? items;
         try
         {
-            items = JsonSerializer.Deserialize(content, WireJsonContext.Default.ListFormatResponseItem);
+            items = Parse(content);
         }
         catch (JsonException exception)
         {
@@ -64,13 +64,33 @@ internal static class ResponseReader
         return AttemptResult.Rejected(DaxFormatterFailureReason.InvalidResponse, detail, response, error);
     }
 
+    private static List<FormatResponseItem?>? Parse(byte[] content)
+    {
+        // A byte order mark is not JSON, but an intermediary between the client and the service can add one.
+        ReadOnlySpan<byte> byteOrderMark = [0xEF, 0xBB, 0xBF];
+        var json = content.AsSpan();
+        if (json.StartsWith(byteOrderMark))
+        {
+            json = json.Slice(byteOrderMark.Length);
+        }
+
+        return JsonSerializer.Deserialize(json, WireJsonContext.Default.ListFormatResponseItem);
+    }
+
     private static Task<byte[]> ReadContentAsync(HttpResponseMessage response, CancellationToken cancellationToken)
     {
 #if NET
         return response.Content.ReadAsByteArrayAsync(cancellationToken);
 #else
-        // The content is already in memory here, so a read that cannot be cancelled does not wait.
         cancellationToken.ThrowIfCancellationRequested();
+
+        // Before .NET 5 a response can have no content at all, when a handler of the caller builds it so.
+        if (response.Content is null)
+        {
+            return Task.FromResult(Array.Empty<byte>());
+        }
+
+        // The content is already in memory here, so a read that cannot be cancelled does not wait.
         return response.Content.ReadAsByteArrayAsync();
 #endif
     }

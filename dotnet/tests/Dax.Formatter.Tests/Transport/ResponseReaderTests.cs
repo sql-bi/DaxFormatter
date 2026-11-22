@@ -67,6 +67,28 @@ public class ResponseReaderTests
     }
 
     [Fact]
+    public async Task ReadAsync_ResponseWithoutContent_IsAnInvalidResponse()
+    {
+        using var response = new HttpResponseMessage(HttpStatusCode.OK);
+
+        var result = await ResponseReader.ReadAsync(response, 1, CancellationToken.None).ConfigureAwait(true);
+
+        Assert.Equal(DaxFormatterFailureReason.InvalidResponse, result.Reason);
+    }
+
+    [Fact]
+    public async Task ReadAsync_JsonAfterAByteOrderMark_ReturnsTheResults()
+    {
+        byte[] body = [0xEF, 0xBB, 0xBF, .. Encoding.UTF8.GetBytes(TwoResults)];
+        using var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(body) };
+
+        var result = await ResponseReader.ReadAsync(response, 2, CancellationToken.None).ConfigureAwait(true);
+
+        Assert.True(result.Succeeded);
+        Assert.Equal(2, result.Items!.Count);
+    }
+
+    [Fact]
     public async Task ReadAsync_NoContentStatus_IsAnInvalidResponse()
     {
         using var response = CreateResponse(HttpStatusCode.NoContent, string.Empty, "application/json");

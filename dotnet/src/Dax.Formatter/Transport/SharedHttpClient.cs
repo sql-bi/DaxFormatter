@@ -26,6 +26,12 @@ internal static class SharedHttpClient
 #if NET
     private static HttpClient CreateWithPooledConnections()
     {
+        // In a browser there are no sockets: the default handler of the platform is the only one.
+        if (!SocketsHttpHandler.IsSupported)
+        {
+            return new HttpClient();
+        }
+
         SocketsHttpHandler? handler = null;
         try
         {

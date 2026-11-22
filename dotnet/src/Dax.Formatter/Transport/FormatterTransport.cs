@@ -54,8 +54,13 @@ internal sealed class FormatterTransport
             // or the Timeout of an HttpClient that the caller supplied.
             cancellationToken.ThrowIfCancellationRequested();
 
-            var seconds = _requestTimeout.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
-            var detail = $"the service did not answer within {seconds} seconds";
+            var detail = "the request timed out before the service answered";
+            if (timeout.IsCancellationRequested)
+            {
+                var seconds = _requestTimeout.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+                detail = $"the service did not answer within {seconds} seconds";
+            }
+
             return AttemptResult.NoResponse(DaxFormatterFailureReason.Timeout, detail, exception);
         }
         catch (HttpRequestException exception)

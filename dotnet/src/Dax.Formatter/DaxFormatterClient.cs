@@ -217,6 +217,7 @@ public class DaxFormatterClient
         IProgress<DaxFormatProgressInfo>? progress,
         CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (texts.Length == 0)
         {
             return [];

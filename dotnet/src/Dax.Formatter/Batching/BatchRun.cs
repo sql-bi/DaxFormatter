@@ -106,9 +106,10 @@ internal sealed class BatchRun : IDisposable
         {
             Interlocked.CompareExchange(ref _failure, exception, null);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (_stop.IsCancellationRequested)
         {
-            // The caller or a failed request stopped the call: RunAsync tells which.
+            // The caller or a failed request stopped the call: RunAsync tells which. A cancellation that comes
+            // from elsewhere, such as the progress receiver of the caller, is not swallowed.
         }
         finally
         {

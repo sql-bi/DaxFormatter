@@ -55,7 +55,7 @@ public class FormatterTransportTests
         var request = Assert.Single(harness.Handler.Requests);
         Assert.Equal("application/json", request.GetHeader("Accept"));
         Assert.Null(request.GetHeader("Accept-Encoding"));
-        Assert.Null(request.GetHeader("Expect"));
+        Assert.False(request.ExpectContinue);
     }
 
     [Fact]
@@ -89,7 +89,23 @@ public class FormatterTransportTests
     }
 
     [Fact]
-    public async Task FormatAsync_TimeoutOfTheHttpClientOfTheCaller_FailsWithTimeout()
+    public async Task FormatAsync_NoAnswerWithinTheRequestTimeout_SaysHowLongItWaited()
+    {
+        using var harness = new FormatterHarness(Respond.Hang, options =>
+        {
+            options.RequestTimeout = TimeSpan.FromMilliseconds(50);
+            options.MaxRetries = 0;
+        });
+
+        var exception = await Assert
+            .ThrowsAsync<DaxFormatterException>(() => harness.Client.FormatAsync("EVALUATE Sales"))
+            .ConfigureAwait(true);
+
+        Assert.Contains("within 0.05 seconds", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task FormatAsync_TimeoutOfTheHttpClientOfTheCaller_FailsWithTimeoutWithoutNamingTheRequestTimeout()
     {
         using var harness = new FormatterHarness(
             Respond.Throw(() => new TaskCanceledException("The request was canceled due to HttpClient.Timeout.")),
@@ -100,6 +116,7 @@ public class FormatterTransportTests
             .ConfigureAwait(true);
 
         Assert.Equal(DaxFormatterFailureReason.Timeout, exception.Reason);
+        Assert.DoesNotContain("60 seconds", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

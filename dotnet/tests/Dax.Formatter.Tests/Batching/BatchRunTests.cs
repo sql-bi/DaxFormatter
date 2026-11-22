@@ -135,6 +135,32 @@ public class BatchRunTests
     }
 
     [Fact]
+    public async Task FormatBatchAsync_NoTextsWithTokenAlreadyCancelled_Throws()
+    {
+        var cancelled = new CancellationToken(canceled: true);
+        using var harness = new FormatterHarness(Respond.Echo);
+
+        await Assert
+            .ThrowsAnyAsync<OperationCanceledException>(
+                () => harness.Client.FormatBatchAsync([], cancellationToken: cancelled))
+            .ConfigureAwait(true);
+    }
+
+    [Fact]
+    public async Task FormatBatchAsync_ProgressReceiverCancelsOnItsOwn_ThrowsTheExceptionOfTheReceiver()
+    {
+        using var harness = new FormatterHarness(Respond.Echo, limits: s_oneTextPerRequest);
+        var progress = new CancellingProgress();
+
+        var exception = await Assert
+            .ThrowsAnyAsync<OperationCanceledException>(
+                () => harness.Client.FormatBatchAsync(s_fiveTexts, progress: progress))
+            .ConfigureAwait(true);
+
+        Assert.Equal(CancellingProgress.Message, exception.Message);
+    }
+
+    [Fact]
     public async Task FormatBatchAsync_ResultWithoutTheHeaderOfTheClient_FailsAndNamesTheText()
     {
         var withoutHeader = Respond.Json("[{\"formatted\":\"1 + 2\\r\\n\",\"errors\":[]}]");
@@ -163,5 +189,16 @@ public class BatchRunTests
         await harness.Client.FormatBatchAsync(["", "a", "b", " "], progress: progress).ConfigureAwait(true);
 
         Assert.Equal([(2, 4), (3, 4), (4, 4)], progress.Reports);
+    }
+
+    // A receiver that cancels with a token of its own, which the client knows nothing about.
+    private sealed class CancellingProgress : IProgress<DaxFormatProgressInfo>
+    {
+        public const string Message = "The receiver of the progress cancelled.";
+
+        public void Report(DaxFormatProgressInfo value)
+        {
+            throw new OperationCanceledException(Message);
+        }
     }
 }
