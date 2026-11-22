@@ -61,19 +61,25 @@ Here `Measure` and `model` stand for the types of your application: any type wor
 
 ### Format objects of different types
 
-One call formats the objects of a model whatever their type, because `DaxKind.Expression` covers them all. Put them in one list, each with its DAX and a function that writes the formatted text back to it.
+One call formats the objects of a model whatever their type, because `DaxKind.Expression` covers them all. Declare a small type that holds the name of an object, its DAX and a function that writes the formatted text back to it:
 
 ```csharp
-var items = new List<(string Expression, Action<string> Update)>();
+sealed record ModelExpression(string Name, string Expression, Action<string> Update);
+```
+
+Then put every object in one list:
+
+```csharp
+var items = new List<ModelExpression>();
 
 foreach (var measure in model.Measures)
 {
-    items.Add((measure.Expression, text => measure.Expression = text));
+    items.Add(new(measure.Name, measure.Expression, text => measure.Expression = text));
 }
 
 foreach (var function in model.Functions)
 {
-    items.Add((function.Expression, text => function.Expression = text));
+    items.Add(new(function.Name, function.Expression, text => function.Expression = text));
 }
 
 var options = new DaxFormatOptions { Kind = DaxKind.Expression };
@@ -86,10 +92,14 @@ foreach (var result in results)
     {
         result.Item.Update(result.FormattedText);
     }
+    else
+    {
+        Console.WriteLine($"{result.Item.Name}: {result.Errors[0].Message}");
+    }
 }
 ```
 
-`Update` is not part of the client: it is the function you stored in the item, which the result gives back in `Item`. Only texts of the other kind need a call of their own, such as queries, which take `DaxKind.Auto`.
+`Update` is not part of the client: it is the function stored in the item, which the result gives back in `Item`. An object with several DAX texts, such as a measure with a format string expression, adds one item for each text. Only texts of the other kind need a call of their own, such as queries, which take `DaxKind.Auto`.
 
 ### Options
 
