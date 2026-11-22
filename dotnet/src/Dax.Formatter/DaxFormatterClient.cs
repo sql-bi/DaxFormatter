@@ -40,26 +40,18 @@ public class DaxFormatterClient
     /// Initializes a new instance of the <see cref="DaxFormatterClient"/> class that sends its requests with
     /// the given <see cref="HttpClient"/>.
     /// </summary>
+    /// <remarks>
+    /// This is the only constructor that takes an <see cref="HttpClient"/>, so that
+    /// <c>services.AddHttpClient&lt;DaxFormatterClient&gt;()</c> can create the client: the container passes
+    /// the options when it has them.
+    /// </remarks>
     /// <param name="httpClient">
     /// The <see cref="HttpClient"/> to use. The caller owns it: the client never changes or disposes it, and
     /// ignores its <see cref="HttpClient.BaseAddress"/>.
     /// </param>
-    public DaxFormatterClient(HttpClient httpClient)
-        : this(httpClient, new DaxFormatterClientOptions())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DaxFormatterClient"/> class that sends its requests with
-    /// the given <see cref="HttpClient"/>, with the given options.
-    /// </summary>
-    /// <param name="httpClient">
-    /// The <see cref="HttpClient"/> to use. The caller owns it: the client never changes or disposes it, and
-    /// ignores its <see cref="HttpClient.BaseAddress"/>.
-    /// </param>
-    /// <param name="options">The options, which are copied.</param>
-    public DaxFormatterClient(HttpClient httpClient, DaxFormatterClientOptions options)
-        : this(httpClient, options, TaskDelay.Instance, BatchLimits.Default)
+    /// <param name="options">The options, which are copied, or <see langword="null"/> for the defaults.</param>
+    public DaxFormatterClient(HttpClient httpClient, DaxFormatterClientOptions? options = null)
+        : this(httpClient, options ?? new DaxFormatterClientOptions(), TaskDelay.Instance, BatchLimits.Default)
     {
     }
 

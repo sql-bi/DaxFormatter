@@ -23,8 +23,7 @@ class Dax.Formatter.DaxFormatterClient
     System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Dax.Formatter.DaxFormatResult<TItem>>> FormatBatchAsync<TItem>(System.Collections.Generic.IEnumerable<TItem> items, System.Func<TItem, System.String> textSelector, Dax.Formatter.DaxFormatOptions options = default, System.IProgress<Dax.Formatter.DaxFormatProgressInfo> progress = default, System.Threading.CancellationToken cancellationToken = default)
     constructor()
     constructor(Dax.Formatter.DaxFormatterClientOptions options)
-    constructor(System.Net.Http.HttpClient httpClient)
-    constructor(System.Net.Http.HttpClient httpClient, Dax.Formatter.DaxFormatterClientOptions options)
+    constructor(System.Net.Http.HttpClient httpClient, Dax.Formatter.DaxFormatterClientOptions options = default)
     virtual System.Threading.Tasks.Task<Dax.Formatter.DaxFormatResult> FormatAsync(System.String text, Dax.Formatter.DaxFormatOptions options = default, System.Threading.CancellationToken cancellationToken = default)
     virtual System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Dax.Formatter.DaxFormatResult>> FormatBatchAsync(System.Collections.Generic.IEnumerable<System.String> texts, Dax.Formatter.DaxFormatOptions options = default, System.IProgress<Dax.Formatter.DaxFormatProgressInfo> progress = default, System.Threading.CancellationToken cancellationToken = default)
 sealed class Dax.Formatter.DaxFormatterClientOptions

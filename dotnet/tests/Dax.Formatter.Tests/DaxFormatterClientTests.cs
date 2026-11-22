@@ -13,11 +13,20 @@ public class DaxFormatterClientTests
     [Fact]
     public void Constructor_NullArgument_Throws()
     {
-        using var httpClient = new HttpClient();
-
         Assert.Throws<ArgumentNullException>("httpClient", () => new DaxFormatterClient((HttpClient)null!));
         Assert.Throws<ArgumentNullException>("options", () => new DaxFormatterClient((DaxFormatterClientOptions)null!));
-        Assert.Throws<ArgumentNullException>("options", () => new DaxFormatterClient(httpClient, null!));
+    }
+
+    [Fact]
+    public async Task Constructor_HttpClientWithoutOptions_UsesTheDefaults()
+    {
+        using var handler = new FakeFormatterHandler(Respond.Echo);
+        using var httpClient = new HttpClient(handler);
+        var client = new DaxFormatterClient(httpClient, options: null);
+
+        await client.FormatAsync("EVALUATE Sales");
+
+        Assert.Equal(new Uri("https://api.daxformatter.com/api/daxtextformatmulti"), handler.Requests[0].Uri);
     }
 
     [Fact]

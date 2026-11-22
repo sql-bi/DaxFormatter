@@ -207,7 +207,7 @@ Without an `HttpClient`, all the clients share one that lives as long as the pro
 var client = new DaxFormatterClient(httpClient);
 ```
 
-The client never changes or disposes an `HttpClient` it is given, and ignores its `BaseAddress`. If its `Timeout` is shorter than `RequestTimeout`, the shorter one wins. With `IHttpClientFactory`, register the client as a typed client with a factory, because more than one of its constructors takes an `HttpClient`: `services.AddHttpClient<DaxFormatterClient, DaxFormatterClient>(httpClient => new DaxFormatterClient(httpClient))`.
+The client never changes or disposes an `HttpClient` it is given, and ignores its `BaseAddress`. If its `Timeout` is shorter than `RequestTimeout`, the shorter one wins. With `IHttpClientFactory`, register it as a typed client: `services.AddHttpClient<DaxFormatterClient>()`. The client then takes the `DaxFormatterClientOptions` registered in the container, if any.
 
 On .NET Framework the shared `HttpClient` opens at most [`ServicePointManager.DefaultConnectionLimit`](https://learn.microsoft.com/dotnet/api/system.net.servicepointmanager.defaultconnectionlimit) connections to the service, which is 2 unless the application changes it. Raise that limit, or pass your own `HttpClient`, before you raise `MaxConcurrentRequests` or run several calls at the same time: a request that waits for a connection uses up its `RequestTimeout`.
 
