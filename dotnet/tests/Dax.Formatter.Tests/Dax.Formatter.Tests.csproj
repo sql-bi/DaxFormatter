@@ -27,4 +27,8 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Fixtures\*.json" LogicalName="Fixtures/%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>
