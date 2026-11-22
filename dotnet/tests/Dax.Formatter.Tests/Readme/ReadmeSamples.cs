@@ -71,16 +71,16 @@ public class ReadmeSamples
         var model = new Model();
 
         #region MixedObjects
-        var items = new List<(string Expression, Action<string> Update)>();
+        var items = new List<ModelExpression>();
 
         foreach (var measure in model.Measures)
         {
-            items.Add((measure.Expression, text => measure.Expression = text));
+            items.Add(new(measure.Name, measure.Expression, text => measure.Expression = text));
         }
 
         foreach (var function in model.Functions)
         {
-            items.Add((function.Expression, text => function.Expression = text));
+            items.Add(new(function.Name, function.Expression, text => function.Expression = text));
         }
 
         var options = new DaxFormatOptions { Kind = DaxKind.Expression };
@@ -93,14 +93,22 @@ public class ReadmeSamples
             {
                 result.Item.Update(result.FormattedText);
             }
+            else
+            {
+                Console.WriteLine($"{result.Item.Name}: {result.Errors[0].Message}");
+            }
         }
         #endregion
 
         Assert.Equal("CALCULATE ( SUM ( Sales[Amount] ), Sales[Quantity] > 0 )", model.Measures[0].Expression);
-        Assert.Equal("SUMX(Sales, Sales[Amount] *", model.Measures[1].Expression);
         Assert.Equal(
             "(\r\n    amount : NUMERIC,\r\n    rate : NUMERIC\r\n) =>\r\namount * ( 1 + rate )", model.Functions[0].Expression);
+        Assert.Equal("Broken", results.Single(result => !result.Succeeded).Item.Name);
     }
+
+    #region MixedObjectsType
+    sealed record ModelExpression(string Name, string Expression, Action<string> Update);
+    #endregion
 
     [Fact]
     public async Task FormatAsync_OptionsSample_SendsTheOptions()
@@ -277,16 +285,19 @@ public class ReadmeSamples
 
         public List<Function> Functions { get; } =
         [
-            new Function("(amount : NUMERIC, rate : NUMERIC) => amount * (1 + rate)"),
+            new Function("AddRate", "(amount : NUMERIC, rate : NUMERIC) => amount * (1 + rate)"),
         ];
     }
 
     private sealed class Function
     {
-        public Function(string expression)
+        public Function(string name, string expression)
         {
+            Name = name;
             Expression = expression;
         }
+
+        public string Name { get; }
 
         public string Expression { get; set; }
     }
