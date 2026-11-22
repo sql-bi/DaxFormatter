@@ -11,11 +11,32 @@ public class DaxFormatterExceptionTests
         var inner = new InvalidOperationException("inner");
 
         var exception = new DaxFormatterException(
-            "message", DaxFormatterFailureReason.HttpError, HttpStatusCode.BadGateway, "request", "service", inner);
+            "message",
+            DaxFormatterFailureReason.HttpError,
+            HttpStatusCode.BadGateway,
+            "request",
+            "service",
+            "operation",
+            [3, 5],
+            inner);
 
         Assert.Equal(("message", inner), (exception.Message, exception.InnerException));
         Assert.Equal((DaxFormatterFailureReason.HttpError, HttpStatusCode.BadGateway), (exception.Reason, exception.StatusCode));
-        Assert.Equal(("request", "service"), (exception.RequestId, exception.ServiceRequestId));
+        Assert.Equal(
+            ("request", "service", "operation", "3,5"),
+            (exception.RequestId, exception.ServiceRequestId, exception.OperationId, string.Join(",", exception.TextIndexes)));
+    }
+
+    [Fact]
+    public void Constructor_TextIndexes_KeepsACopy()
+    {
+        var indexes = new List<int> { 3, 5 };
+        var exception = new DaxFormatterException(
+            "message", DaxFormatterFailureReason.HttpError, null, null, null, null, indexes, null);
+
+        indexes.Add(7);
+
+        Assert.Equal(2, exception.TextIndexes.Count);
     }
 
     [Fact]
@@ -25,6 +46,7 @@ public class DaxFormatterExceptionTests
 
         Assert.Equal(DaxFormatterFailureReason.Unknown, exception.Reason);
         Assert.Equal((null, null, null), (exception.StatusCode, exception.RequestId, exception.ServiceRequestId));
+        Assert.Equal((null, 0), (exception.OperationId, exception.TextIndexes.Count));
     }
 
     [Fact]

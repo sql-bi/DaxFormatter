@@ -44,6 +44,10 @@ public sealed class DaxFormatterException : Exception
     /// <param name="statusCode">The HTTP status of the answer, when one arrived.</param>
     /// <param name="requestId">The identifier that the client gave to the request.</param>
     /// <param name="serviceRequestId">The identifier that the service gave to the request.</param>
+    /// <param name="operationId">The identifier that the client gave to the call.</param>
+    /// <param name="textIndexes">
+    /// The indexes, in the texts of the call, of the texts that the request carried, which are copied.
+    /// </param>
     /// <param name="innerException">The exception that caused the failure, if any.</param>
     public DaxFormatterException(
         string message,
@@ -51,6 +55,8 @@ public sealed class DaxFormatterException : Exception
         HttpStatusCode? statusCode,
         string? requestId,
         string? serviceRequestId,
+        string? operationId,
+        IEnumerable<int>? textIndexes,
         Exception? innerException)
         : base(message, innerException)
     {
@@ -58,6 +64,11 @@ public sealed class DaxFormatterException : Exception
         StatusCode = statusCode;
         RequestId = requestId;
         ServiceRequestId = serviceRequestId;
+        OperationId = operationId;
+        if (textIndexes is not null)
+        {
+            TextIndexes = [.. textIndexes];
+        }
     }
 
     /// <summary>
@@ -81,4 +92,16 @@ public sealed class DaxFormatterException : Exception
     /// answer, or <see langword="null"/> when no answer arrived.
     /// </summary>
     public string? ServiceRequestId { get; }
+
+    /// <summary>
+    /// Gets the identifier that the client gave to the call and sent in the <c>DaxFormatter-Operation-Id</c>
+    /// header of each of its requests, or <see langword="null"/> when the client did not create the exception.
+    /// </summary>
+    public string? OperationId { get; }
+
+    /// <summary>
+    /// Gets the indexes, in the texts of the call, of the texts that the failed request carried, in order, or
+    /// an empty list when they are not known. Blank texts are never sent, so they are never among them.
+    /// </summary>
+    public IReadOnlyList<int> TextIndexes { get; } = [];
 }

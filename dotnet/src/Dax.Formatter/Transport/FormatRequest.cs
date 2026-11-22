@@ -8,25 +8,20 @@ namespace Dax.Formatter.Transport;
 /// </summary>
 internal sealed class FormatRequest
 {
-    public FormatRequest(byte[] body, int textCount, int firstIndex, int lastIndex, Guid operationId)
+    public FormatRequest(byte[] body, IReadOnlyList<int> textIndexes, Guid operationId)
     {
         Body = body;
-        TextCount = textCount;
-        FirstIndex = firstIndex;
-        LastIndex = lastIndex;
+        TextIndexes = textIndexes;
         OperationId = operationId;
         RequestId = Guid.NewGuid();
     }
 
     public byte[] Body { get; }
 
-    public int TextCount { get; }
+    public int TextCount => TextIndexes.Count;
 
-    /// <summary>Gets the index, in the texts of the call, of the first text of the request.</summary>
-    public int FirstIndex { get; }
-
-    /// <summary>Gets the index, in the texts of the call, of the last text of the request.</summary>
-    public int LastIndex { get; }
+    /// <summary>Gets the indexes, in the texts of the call, of the texts of the request, in order.</summary>
+    public IReadOnlyList<int> TextIndexes { get; }
 
     /// <summary>Gets the identifier of the call, which its requests share.</summary>
     public Guid OperationId { get; }
@@ -41,9 +36,11 @@ internal sealed class FormatRequest
         string? serviceRequestId,
         Exception? innerException)
     {
-        var texts = FirstIndex == LastIndex
-            ? FormattableString.Invariant($"the text at index {FirstIndex}")
-            : FormattableString.Invariant($"the texts at indexes {FirstIndex} to {LastIndex}");
+        var first = TextIndexes[0];
+        var last = TextIndexes[TextIndexes.Count - 1];
+        var texts = first == last
+            ? FormattableString.Invariant($"the text at index {first}")
+            : FormattableString.Invariant($"the texts at indexes {first} to {last}");
         var message = $"The DAX Formatter request for {texts} failed: {detail}.";
 
         return new DaxFormatterException(
@@ -52,6 +49,8 @@ internal sealed class FormatRequest
             statusCode,
             RequestId.ToString(),
             serviceRequestId,
+            OperationId.ToString(),
+            TextIndexes,
             innerException);
     }
 }

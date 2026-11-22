@@ -36,12 +36,14 @@ sealed class Dax.Formatter.DaxFormatterClientOptions
     constructor()
 sealed class Dax.Formatter.DaxFormatterException : System.Exception
     Dax.Formatter.DaxFormatterFailureReason Reason { get; }
+    System.Collections.Generic.IReadOnlyList<System.Int32> TextIndexes { get; }
     System.Net.HttpStatusCode? StatusCode { get; }
+    System.String OperationId { get; }
     System.String RequestId { get; }
     System.String ServiceRequestId { get; }
     constructor()
     constructor(System.String message)
-    constructor(System.String message, Dax.Formatter.DaxFormatterFailureReason reason, System.Net.HttpStatusCode? statusCode, System.String requestId, System.String serviceRequestId, System.Exception innerException)
+    constructor(System.String message, Dax.Formatter.DaxFormatterFailureReason reason, System.Net.HttpStatusCode? statusCode, System.String requestId, System.String serviceRequestId, System.String operationId, System.Collections.Generic.IEnumerable<System.Int32> textIndexes, System.Exception innerException)
     constructor(System.String message, System.Exception innerException)
 enum Dax.Formatter.DaxFormatterFailureReason
     HttpError = 3
