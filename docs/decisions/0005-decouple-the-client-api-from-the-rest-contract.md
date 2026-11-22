@@ -76,4 +76,5 @@ Chosen option: "A new API on a model of its own", because the work that every ca
 - The arrow `=>` belongs to function definitions only: [FUNCTION statement](https://learn.microsoft.com/dax/function-statement-dax).
 - The shared `HttpClient`: [Guidelines for using HttpClient](https://learn.microsoft.com/dotnet/fundamentals/networking/http/httpclient-guidelines).
 - The version of the package: [ADR-0006](0006-write-the-dax-formatter-package-version-by-hand.md).
+- How a batch takes the caller's objects, and how the API grows: [ADR-0007](0007-keep-the-batch-api-on-the-callers-items-and-grow-it-only-by-addition.md).
 - Revisit if the service gets an endpoint that takes the kind of a text, which would make the header line unnecessary, or if users ask for MDX again.

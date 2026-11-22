@@ -1,6 +1,6 @@
 # Backlog
 
-Next ID: B-23
+Next ID: B-24
 
 Reports and requests from users stay in [GitHub Issues](https://github.com/sql-bi/DaxFormatter/issues); an item here links its issue instead of copying it.
 
@@ -19,6 +19,7 @@ Reports and requests from users stay in [GitHub Issues](https://github.com/sql-b
 - B-9 `concurrency` groups in both CI workflows, so that a newer push to a pull request cancels its older run.
 - B-17 The .NET client finds the text that makes a request fail: when the service fails on one text, the whole request fails and the call with it, and the exception names only the texts of that request by their indexes. Done when the client sends the texts of a failed request again in smaller requests, reports the one that fails, and [`client-api.md`](design/client-api.md) says how.
 - B-18 Measured limits for the requests of the .NET client: 250 texts and 250,000 characters for each request and 2 requests at a time are estimates ([client API](design/client-api.md#requests)). Done when the numbers come from measures on the service with real models, and `client-api.md` states them.
+- B-23 Package validation for `Dax.Formatter` once 2.0.0 is on nuget.org: `PublicApiTests` shows every change of the public surface, but doesn't tell an addition from a breaking change ([ADR-0007](decisions/0007-keep-the-batch-api-on-the-callers-items-and-grow-it-only-by-addition.md)). Done when `Dax.Formatter.csproj` sets `EnablePackageValidation` and `PackageValidationBaselineVersion` to `2.0.0`, and a pack fails on a removed public member ([package validation](https://learn.microsoft.com/dotnet/fundamentals/apicompat/package-validation/overview)).
 - B-21 One version scheme for both packages when the MCP server leaves its beta: until then it stays on `0.2-beta` with the git height as its third number, while `Dax.Formatter` has a version written by hand ([ADR-0006](decisions/0006-write-the-dax-formatter-package-version-by-hand.md)). Done when a decision record says which scheme the MCP server follows from its first stable version.
 
 ## Open decisions

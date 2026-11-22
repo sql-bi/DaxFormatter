@@ -20,7 +20,9 @@ The model of a DAX Formatter client: what a caller gives it, what it returns, an
 - **Result** (`DaxFormatResult`): `OriginalText`, `Succeeded`, `FormattedText` (absent when `Succeeded` is false) and `Errors` (empty when it is true). A result of the batch operation that takes items also has `Item`, the caller's object.
 - **Syntax error** (`DaxSyntaxError`): `Line`, `Column`, `Message`, with value equality.
 - **Progress** (`DaxFormatProgressInfo`): `Completed` and `Total`, as numbers of texts.
-- **Failure** (`DaxFormatterException`): `Reason` (`Timeout`, `NetworkError`, `HttpError`, `InvalidResponse`, or `Unknown` when the exception was not created by the client), `StatusCode`, `RequestId`, `ServiceRequestId`.
+- **Failure** (`DaxFormatterException`): `Reason` (`Timeout`, `NetworkError`, `HttpError`, `InvalidResponse`, or `Unknown` when the exception was not created by the client), `StatusCode`, `RequestId`, `ServiceRequestId`, `OperationId`, and `TextIndexes`, the indexes of the texts that the failed request carried.
+- **Enums** can gain values in a minor version. The client rejects an input value that it doesn't know; a caller handles an unknown failure reason as `Unknown`. In TypeScript and Python the enums that come out of the client are open types.
+- How a batch takes the caller's objects, and how the model grows without breaking: [ADR-0007](../decisions/0007-keep-the-batch-api-on-the-callers-items-and-grow-it-only-by-addition.md).
 
 ## Outcomes
 
@@ -42,7 +44,7 @@ The model of a DAX Formatter client: what a caller gives it, what it returns, an
 
 ## Error positions
 
-`Line` and `Column` are zero-based and refer to the text that the caller gave. Lines are separated by `\n`. `Column` is an index into the UTF-16 code units of the line, and equals the length of the line, without its `\r`, when the error is at its end.
+`Line` and `Column` are zero-based and refer to the text that the caller gave. Lines are separated by `\n`. `Column` is an index into the line in the unit that the strings of the language are indexed by: UTF-16 code units in .NET and TypeScript, code points in Python. It equals the length of the line, without its `\r`, when the error is at its end.
 
 The client converts the [position that the service reports](rest-api.md#response):
 
@@ -57,7 +59,7 @@ The client converts the [position that the service reports](rest-api.md#response
 - At most `MaxConcurrentRequests` requests are in progress. Each result is stored at the index of its text.
 - Progress is reported after each request, and once before the first one for the blank texts. The count never decreases.
 - Retry: after a timeout, a network error and the statuses 408, 429, 500, 502, 503 and 504. Any other status and an invalid response fail at once. The wait starts at 0.8 seconds and doubles up to 60, varied by a quarter either way; a longer `Retry-After`, in seconds or as a date measured from the `Date` header of the same response, replaces it, and one longer than `RequestTimeout` fails the request at once. Each attempt sends the same body and the same request identifier.
-- The first request that fails after its retries stops the others, and the call fails with it. The message names the texts of that request by their indexes.
+- The first request that fails after its retries stops the others, and the call fails with it. The message names the first and the last index of the texts of that request; `TextIndexes` lists them all, without the blank texts, which are never sent.
 - A request that timed out is not split in two: the service keeps working on an abandoned request, so smaller requests would add load when it is slow.
 - Invalid responses: status 204, a body that is not the documented JSON, a number of results other than the number of texts sent, a null result. A UTF-8 byte order mark before the JSON is skipped. In a result, a null `errors` is no errors, and a null `formatted` without errors is an empty text; `formatted` is not read when there are errors.
 
