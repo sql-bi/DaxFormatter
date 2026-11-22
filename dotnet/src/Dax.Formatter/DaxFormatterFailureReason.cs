@@ -3,6 +3,9 @@
 /// <summary>
 /// Why a call to the DAX Formatter service failed.
 /// </summary>
+/// <remarks>
+/// A later minor version can add values: handle a value that you don't know as <see cref="Unknown"/>.
+/// </remarks>
 public enum DaxFormatterFailureReason
 {
     /// <summary>
