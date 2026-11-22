@@ -46,7 +46,7 @@ Chosen options: "The caller's items with a text selector, next to texts" and "A 
 ### The shape of 2.0
 
 - `FormatBatchAsync(texts)` and `FormatBatchAsync(items, textSelector)` return an `IReadOnlyList` with one result for each input, in its order. The items version gives each result its item in `Item`.
-- Objects of different types go in one call through a small type of the caller, which holds the text and what to do with the result. So do several texts of one object, with one item for each text. The package readme shows such a type.
+- Objects of different types go in one call through a small type of the caller, which holds the text and what to do with the result. So do several texts of one object, with one item for each text.
 - A batch is atomic: it returns every result, or throws `DaxFormatterException`. On a failure, `TextIndexes` says which texts the failed request carried and `OperationId` which call failed.
 - A syntax error is a value in the result of its text.
 - `Task` and `IProgress<T>` serve long calls; there is no stream.

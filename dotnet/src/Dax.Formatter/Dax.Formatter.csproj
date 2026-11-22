@@ -12,7 +12,7 @@
     <Company>SQLBI</Company>
     <Authors>Alberto Spelta, Marco Russo</Authors>
     <Product>Dax Formatter client libraries</Product>
-    <Description>Client library for the DAX Formatter service (daxformatter.com): formats DAX queries, measures, columns and functions, one or thousands in a call, and reports their syntax errors.</Description>
+    <Description>Client library for the DAX Formatter service (daxformatter.com).</Description>
     <PackageId>Dax.Formatter</PackageId>
     <PackageTags>DAX;FORMATTER;SQLBI;TABULAR;SSAS</PackageTags>
     <PackageIcon>package-icon.png</PackageIcon>
