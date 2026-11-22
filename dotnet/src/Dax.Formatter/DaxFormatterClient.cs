@@ -65,10 +65,13 @@ public class DaxFormatterClient
     }
 
     // Nothing is created or resolved here: a class that derives from this one, such as a mock, pays nothing.
+    // A creation that fails is not kept: the next call tries again. Two first calls at the same time can each
+    // create a formatter, which holds no resources, and one of them is kept.
     private DaxFormatterClient(HttpClient? httpClient, ClientSettings settings, IDelay delay, BatchLimits limits)
     {
         _formatter = new Lazy<BatchFormatter>(
-            () => BatchFormatter.Create(httpClient ?? SharedHttpClient.Instance, settings, delay, limits));
+            () => BatchFormatter.Create(httpClient ?? SharedHttpClient.Instance, settings, delay, limits),
+            LazyThreadSafetyMode.PublicationOnly);
     }
 
     /// <summary>
