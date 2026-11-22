@@ -1,0 +1,33 @@
+{
+  "description": "Texts of kind 'expression' with whether a client takes them for the body of a user-defined function: after spaces and comments, a parameter list in balanced parentheses followed by '=>'. Line breaks appear only as escapes.",
+  "cases": [
+    { "name": "two parameters", "text": "(a, b) => a + b", "isFunction": true },
+    { "name": "no parameters", "text": "() => 1", "isFunction": true },
+    { "name": "typed parameters", "text": "(a : NUMERIC, b : SCALAR INT64 VAL) => a + b", "isFunction": true },
+    { "name": "semicolon as the list separator", "text": "(a; b) => a + b", "isFunction": true },
+    { "name": "spaces and line breaks first", "text": "  \r\n\t(a) => a", "isFunction": true },
+    { "name": "line comment with slashes first", "text": "// c\n(a) => a", "isFunction": true },
+    { "name": "line comment with dashes first", "text": "-- c\n(a) => a", "isFunction": true },
+    { "name": "block comment first", "text": "/* c1\n   c2 */ (a) => a", "isFunction": true },
+    { "name": "comment that looks like code first", "text": "// 1 + (2\n(a) => a", "isFunction": true },
+    { "name": "default value with nested parentheses", "text": "(a, b = (1 + (2 * 3))) => a + b", "isFunction": true },
+    { "name": "default value with a parenthesis in a string", "text": "(a, b = \")\") => a", "isFunction": true },
+    { "name": "default value with a parenthesis in a quoted name", "text": "(a, b = COUNTROWS('Sales (old)')) => a", "isFunction": true },
+    { "name": "default value with a parenthesis in a bracket name", "text": "(a, b = [Amount (net)]]]) => a", "isFunction": true },
+    { "name": "comment between the parameters and the arrow", "text": "(a) /* c */ => a", "isFunction": true },
+    { "name": "line break between the parameters and the arrow", "text": "(a)\n=> a", "isFunction": true },
+    { "name": "expression that starts with a parenthesis", "text": "(1 + 2) * 3", "isFunction": false },
+    { "name": "expression in parentheses compared with greater or equal", "text": "(1 + 2) >= 3", "isFunction": false },
+    { "name": "expression in parentheses followed by an equal sign", "text": "(Sales[Quantity]) = 1", "isFunction": false },
+    { "name": "function call", "text": "SUM(Sales[Amount])", "isFunction": false },
+    { "name": "arrow inside a string", "text": "\"(a) => a\"", "isFunction": false },
+    { "name": "arrow inside a comment", "text": "// (a) => a\n1", "isFunction": false },
+    { "name": "arrow with a space inside", "text": "(a) = > a", "isFunction": false },
+    { "name": "parenthesis that is not closed", "text": "(a => a", "isFunction": false },
+    { "name": "string that is not closed in the parameters", "text": "(a = \") => a", "isFunction": false },
+    { "name": "definition with its own name", "text": "[x] := (a) => a", "isFunction": false },
+    { "name": "empty text", "text": "", "isFunction": false },
+    { "name": "blank text", "text": "  \n ", "isFunction": false },
+    { "name": "only a comment", "text": "/* (a) => a */", "isFunction": false }
+  ]
+}

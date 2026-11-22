@@ -1,0 +1,726 @@
+{
+  "description": "Texts sent to the DAX Formatter service with what it answered on 2026-11-22, and the result that a client returns for each. 'sent' is 'text' under the header that a client adds for kind 'expression'. Error messages are cut after 'expected:'. Line breaks appear only as escapes.",
+  "cases": [
+    {
+      "name": "query sent as it is",
+      "kind": "auto",
+      "text": "EVALUATE Sales",
+      "sent": "EVALUATE Sales",
+      "response": {
+        "formatted": "EVALUATE\r\nSales\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "EVALUATE\r\nSales"
+      }
+    },
+    {
+      "name": "query with an error that the service reports past the end of the text",
+      "kind": "auto",
+      "text": "EVALUATE\t\tSa les x",
+      "sent": "EVALUATE\t\tSa les x",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 1,
+            "column": 0,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 18,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "text sent as it is with an error on its only line",
+      "kind": "auto",
+      "text": "SUM(Sales[Amount]) +* 1",
+      "sent": "SUM(Sales[Amount]) +* 1",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 0,
+            "column": 20,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 20,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "text sent as it is with an error after a tab on its second line",
+      "kind": "auto",
+      "text": "Sales[Amount] = 1 +\n\t2 ** 3",
+      "sent": "Sales[Amount] = 1 +\n\t2 ** 3",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 1,
+            "column": 11,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 1,
+            "column": 4,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression with a leading line comment",
+      "kind": "expression",
+      "text": "// c\nSUM(Sales[Amount])",
+      "sent": "[x] :=\n// c\nSUM(Sales[Amount])",
+      "response": {
+        "formatted": "[x] :=\r\n// c\r\nSUM ( Sales[Amount] )\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "// c\r\nSUM ( Sales[Amount] )"
+      }
+    },
+    {
+      "name": "expression with a leading block comment",
+      "kind": "expression",
+      "text": "/* block */ 1 + 2",
+      "sent": "[x] :=\n/* block */ 1 + 2",
+      "response": {
+        "formatted": "[x] :=\r\n/* block */\r\n1 + 2\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "/* block */\r\n1 + 2"
+      }
+    },
+    {
+      "name": "expression with a string that spans lines",
+      "kind": "expression",
+      "text": "\"a\nb\" & \"c\"",
+      "sent": "[x] :=\n\"a\nb\" & \"c\"",
+      "response": {
+        "formatted": "[x] :=\r\n\"a\nb\" & \"c\"\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "\"a\nb\" & \"c\""
+      }
+    },
+    {
+      "name": "expression with a block comment and a string that span lines",
+      "kind": "expression",
+      "text": "IF(1=1,\n/* a\n   b */\n\"s1\n  s2\", 0)",
+      "sent": "[x] :=\nIF(1=1,\n/* a\n   b */\n\"s1\n  s2\", 0)",
+      "response": {
+        "formatted": "[x] :=\r\nIF ( 1 = 1, /* a\n   b */\r\n    \"s1\n  s2\", 0 )\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "IF ( 1 = 1, /* a\n   b */\r\n    \"s1\n  s2\", 0 )"
+      }
+    },
+    {
+      "name": "expression with final line breaks",
+      "kind": "expression",
+      "text": "1 + 2\n\n\n",
+      "sent": "[x] :=\n1 + 2\n\n\n",
+      "response": {
+        "formatted": "[x] :=\r\n1 + 2\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "1 + 2"
+      }
+    },
+    {
+      "name": "expression that starts with a parenthesis and is not a function",
+      "kind": "expression",
+      "text": "(1 + 2) * 3",
+      "sent": "[x] :=\n(1 + 2) * 3",
+      "response": {
+        "formatted": "[x] :=\r\n( 1 + 2 ) * 3\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "( 1 + 2 ) * 3"
+      }
+    },
+    {
+      "name": "expression with an error on its first line",
+      "kind": "expression",
+      "text": "1 +* 2",
+      "sent": "[x] :=\n1 +* 2",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 1,
+            "column": 3,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 3,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression with an error after two tabs",
+      "kind": "expression",
+      "text": "1\t+\t* 2",
+      "sent": "[x] :=\n1\t+\t* 2",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 1,
+            "column": 16,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 4,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression with an error after a tab at a tab stop",
+      "kind": "expression",
+      "text": "12345678\t+* 2",
+      "sent": "[x] :=\n12345678\t+* 2",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 1,
+            "column": 17,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 10,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression with an error after a tab before a tab stop",
+      "kind": "expression",
+      "text": "1234567\t+* 2",
+      "sent": "[x] :=\n1234567\t+* 2",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 1,
+            "column": 9,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 9,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression with an error after tabs, one of them inside a string",
+      "kind": "expression",
+      "text": "\tIF(\t1=1,\"a\tb\",\t+* 2)",
+      "sent": "[x] :=\n\tIF(\t1=1,\"a\tb\",\t+* 2)",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 1,
+            "column": 33,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 17,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression with an error after a character outside the basic plane",
+      "kind": "expression",
+      "text": "\"😀\" +* 2",
+      "sent": "[x] :=\n\"😀\" +* 2",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 1,
+            "column": 6,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 6,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression with an error after a carriage return without a line feed",
+      "kind": "expression",
+      "text": "1 +\r2 +* 3",
+      "sent": "[x] :=\n1 +\r2 +* 3",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 1,
+            "column": 6,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 7,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "definition with its own name and carriage returns, with an error on its third line",
+      "kind": "auto",
+      "text": "[x] :=\r\n1 +\r\n\t2 +* 3",
+      "sent": "[x] :=\r\n1 +\r\n\t2 +* 3",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 2,
+            "column": 11,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 2,
+            "column": 4,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression with carriage returns and an error on its second line",
+      "kind": "expression",
+      "text": "1 +\r\n\t2 +* 3",
+      "sent": "[x] :=\n1 +\r\n\t2 +* 3",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 2,
+            "column": 11,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 1,
+            "column": 4,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression that ends too early, with a final carriage return and line feed",
+      "kind": "expression",
+      "text": "1 +\r\n",
+      "sent": "[x] :=\n1 +\r\n",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 3,
+            "column": 0,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 1,
+            "column": 0,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression that ends too early",
+      "kind": "expression",
+      "text": "1 +",
+      "sent": "[x] :=\n1 +",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 2,
+            "column": 0,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 3,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression that ends too early, with a final line break",
+      "kind": "expression",
+      "text": "1 +\n",
+      "sent": "[x] :=\n1 +\n",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 3,
+            "column": 0,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 1,
+            "column": 0,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression with only a comment",
+      "kind": "expression",
+      "text": "// only a comment",
+      "sent": "[x] :=\n// only a comment",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 2,
+            "column": 0,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 17,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression with an arrow inside a string, which the service rejects on the header line",
+      "kind": "expression",
+      "text": "\"a => b\"",
+      "sent": "[x] :=\n\"a => b\"",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 0,
+            "column": 9,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 0,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "function",
+      "kind": "expression",
+      "text": "(a, b) => a + b",
+      "sent": "FUNCTION x =\n(a, b) => a + b",
+      "response": {
+        "formatted": "FUNCTION x = (\r\n        a,\r\n        b\r\n    ) =>\r\n    a + b\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "(\r\n    a,\r\n    b\r\n) =>\r\na + b"
+      }
+    },
+    {
+      "name": "function with typed parameters and a long body",
+      "kind": "expression",
+      "text": "(a : NUMERIC, b : SCALAR INT64 VAL) => CALCULATE(SUM(Sales[Amount]), FILTER(ALL(Sales), Sales[Quantity] > a && Sales[Price] > b), Sales[Color] = \"Red\", Sales[Brand] = \"Contoso\")",
+      "sent": "FUNCTION x =\n(a : NUMERIC, b : SCALAR INT64 VAL) => CALCULATE(SUM(Sales[Amount]), FILTER(ALL(Sales), Sales[Quantity] > a && Sales[Price] > b), Sales[Color] = \"Red\", Sales[Brand] = \"Contoso\")",
+      "response": {
+        "formatted": "FUNCTION x = (\r\n        a : NUMERIC,\r\n        b : SCALAR INT64 VAL\r\n    ) =>\r\n    CALCULATE (\r\n        SUM ( Sales[Amount] ),\r\n        FILTER ( ALL ( Sales ), Sales[Quantity] > a && Sales[Price] > b ),\r\n        Sales[Color] = \"Red\",\r\n        Sales[Brand] = \"Contoso\"\r\n    )\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "(\r\n    a : NUMERIC,\r\n    b : SCALAR INT64 VAL\r\n) =>\r\nCALCULATE (\r\n    SUM ( Sales[Amount] ),\r\n    FILTER ( ALL ( Sales ), Sales[Quantity] > a && Sales[Price] > b ),\r\n    Sales[Color] = \"Red\",\r\n    Sales[Brand] = \"Contoso\"\r\n)"
+      }
+    },
+    {
+      "name": "function with a leading line comment",
+      "kind": "expression",
+      "text": "// c\n(a) => a",
+      "sent": "FUNCTION x =\n// c\n(a) => a",
+      "response": {
+        "formatted": "FUNCTION x =\r\n    // c\r\n    (\r\n        a\r\n    ) =>\r\n    a\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "// c\r\n(\r\n    a\r\n) =>\r\na"
+      }
+    },
+    {
+      "name": "function with a leading block comment that spans lines",
+      "kind": "expression",
+      "text": "/* c1\n   c2 */\n(a) => a",
+      "sent": "FUNCTION x =\n/* c1\n   c2 */\n(a) => a",
+      "response": {
+        "formatted": "FUNCTION x =\r\n    /* c1\n   c2 */\r\n    (\r\n        a\r\n    ) =>\r\n    a\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "/* c1\n   c2 */\r\n(\r\n    a\r\n) =>\r\na"
+      }
+    },
+    {
+      "name": "function with comments and blank lines in its body",
+      "kind": "expression",
+      "text": "(a) =>\n\n// c1\n\nVAR y = a\n\n-- c2\nRETURN y /* tail */",
+      "sent": "FUNCTION x =\n(a) =>\n\n// c1\n\nVAR y = a\n\n-- c2\nRETURN y /* tail */",
+      "response": {
+        "formatted": "FUNCTION x = (\r\n        a\r\n    ) =>\r\n    // c1\r\n    VAR y = a -- c2\r\n    RETURN y /* tail */\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "(\r\n    a\r\n) =>\r\n// c1\r\nVAR y = a -- c2\r\nRETURN y /* tail */"
+      }
+    },
+    {
+      "name": "function with a string that spans lines",
+      "kind": "expression",
+      "text": "(a) => \"line1\nline2\" & a",
+      "sent": "FUNCTION x =\n(a) => \"line1\nline2\" & a",
+      "response": {
+        "formatted": "FUNCTION x = (\r\n        a\r\n    ) =>\r\n    \"line1\nline2\" & a\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "(\r\n    a\r\n) =>\r\n\"line1\nline2\" & a"
+      }
+    },
+    {
+      "name": "function with a block comment that spans lines",
+      "kind": "expression",
+      "text": "(a) => /* c1\nc2 */ a",
+      "sent": "FUNCTION x =\n(a) => /* c1\nc2 */ a",
+      "response": {
+        "formatted": "FUNCTION x = (\r\n        a\r\n    ) =>\r\n    /* c1\nc2 */\r\n    a\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "(\r\n    a\r\n) =>\r\n/* c1\nc2 */\r\na"
+      }
+    },
+    {
+      "name": "function with a string whose second line starts with spaces",
+      "kind": "expression",
+      "text": "(a) => \"x\n        y\" & a",
+      "sent": "FUNCTION x =\n(a) => \"x\n        y\" & a",
+      "response": {
+        "formatted": "FUNCTION x = (\r\n        a\r\n    ) =>\r\n    \"x\n        y\" & a\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "(\r\n    a\r\n) =>\r\n\"x\n        y\" & a"
+      }
+    },
+    {
+      "name": "function with a block comment whose second line starts with spaces, and names in quotes and brackets",
+      "kind": "expression",
+      "text": "(a) => IF(a > 0, /* keep\n        this */ \"p\", 'My Table'[Col ]] x] & \"q\")",
+      "sent": "FUNCTION x =\n(a) => IF(a > 0, /* keep\n        this */ \"p\", 'My Table'[Col ]] x] & \"q\")",
+      "response": {
+        "formatted": "FUNCTION x = (\r\n        a\r\n    ) =>\r\n    IF ( a > 0, /* keep\n        this */\r\n        \"p\", 'My Table'[Col ]] x] & \"q\" )\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "(\r\n    a\r\n) =>\r\nIF ( a > 0, /* keep\n        this */\r\n    \"p\", 'My Table'[Col ]] x] & \"q\" )"
+      }
+    },
+    {
+      "name": "function after blank lines",
+      "kind": "expression",
+      "text": "\n  (a) => a",
+      "sent": "FUNCTION x =\n\n  (a) => a",
+      "response": {
+        "formatted": "FUNCTION x = (\r\n        a\r\n    ) =>\r\n    a\r\n",
+        "errors": []
+      },
+      "result": {
+        "formattedText": "(\r\n    a\r\n) =>\r\na"
+      }
+    },
+    {
+      "name": "function with an error in its body",
+      "kind": "expression",
+      "text": "(a) => a +* 1",
+      "sent": "FUNCTION x =\n(a) => a +* 1",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 1,
+            "column": 10,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 10,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "function without parameters, which the service rejects",
+      "kind": "expression",
+      "text": "() => 1",
+      "sent": "FUNCTION x =\n() => 1",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 1,
+            "column": 1,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 1,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    },
+    {
+      "name": "function with a default value of a parameter, which the service rejects",
+      "kind": "expression",
+      "text": "(a, b = 1) => a + b",
+      "sent": "FUNCTION x =\n(a, b = 1) => a + b",
+      "response": {
+        "formatted": "",
+        "errors": [
+          {
+            "line": 1,
+            "column": 6,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      },
+      "result": {
+        "errors": [
+          {
+            "line": 0,
+            "column": 6,
+            "message": "Syntax error, expected: ..."
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "description": "Calls of a client with the JSON body of the request that it sends. The application is the name and the version that the client was given. Blank texts are not sent. Line breaks appear only as escapes.",
+  "cases": [
+    {
+      "name": "default options",
+      "application": { "name": "Test App", "version": "1.2.3" },
+      "options": {},
+      "texts": [ "EVALUATE Sales", "EVALUATE Customer" ],
+      "body": {
+        "dax": [ "EVALUATE Sales", "EVALUATE Customer" ],
+        "maxLineLength": 0,
+        "skipSpaceAfterFunctionName": false,
+        "listSeparator": ",",
+        "decimalSeparator": ".",
+        "callerApp": "Test App",
+        "callerVersion": "1.2.3"
+      }
+    },
+    {
+      "name": "short lines",
+      "application": { "name": "Test App", "version": "1.2.3" },
+      "options": { "lineStyle": "shortLine" },
+      "texts": [ "EVALUATE Sales" ],
+      "body": {
+        "dax": [ "EVALUATE Sales" ],
+        "maxLineLength": 1,
+        "skipSpaceAfterFunctionName": false,
+        "listSeparator": ",",
+        "decimalSeparator": ".",
+        "callerApp": "Test App",
+        "callerVersion": "1.2.3"
+      }
+    },
+    {
+      "name": "no space after function names",
+      "application": { "name": "Test App", "version": "1.2.3" },
+      "options": { "spacingStyle": "noSpaceAfterFunction" },
+      "texts": [ "EVALUATE Sales" ],
+      "body": {
+        "dax": [ "EVALUATE Sales" ],
+        "maxLineLength": 0,
+        "skipSpaceAfterFunctionName": true,
+        "listSeparator": ",",
+        "decimalSeparator": ".",
+        "callerApp": "Test App",
+        "callerVersion": "1.2.3"
+      }
+    },
+    {
+      "name": "semicolon and comma as separators",
+      "application": { "name": "Test App", "version": "1.2.3" },
+      "options": { "separatorStyle": "semicolonAndComma" },
+      "texts": [ "EVALUATE ROW(\"a\"; 1,5)" ],
+      "body": {
+        "dax": [ "EVALUATE ROW(\"a\"; 1,5)" ],
+        "maxLineLength": 0,
+        "skipSpaceAfterFunctionName": false,
+        "listSeparator": ";",
+        "decimalSeparator": ",",
+        "callerApp": "Test App",
+        "callerVersion": "1.2.3"
+      }
+    },
+    {
+      "name": "expressions under their headers",
+      "application": { "name": "Test App", "version": "1.2.3" },
+      "options": { "kind": "expression" },
+      "texts": [ "SUM(Sales[Amount])", "(a, b) => a + b", "// c\r\n(a) => a", "(1 + 2) * 3" ],
+      "body": {
+        "dax": [
+          "[x] :=\nSUM(Sales[Amount])",
+          "FUNCTION x =\n(a, b) => a + b",
+          "FUNCTION x =\n// c\r\n(a) => a",
+          "[x] :=\n(1 + 2) * 3"
+        ],
+        "maxLineLength": 0,
+        "skipSpaceAfterFunctionName": false,
+        "listSeparator": ",",
+        "decimalSeparator": ".",
+        "callerApp": "Test App",
+        "callerVersion": "1.2.3"
+      }
+    },
+    {
+      "name": "blank texts left out",
+      "application": { "name": "Test App", "version": "1.2.3" },
+      "options": { "kind": "expression" },
+      "texts": [ "", "1 + 2", " \r\n\t" ],
+      "body": {
+        "dax": [ "[x] :=\n1 + 2" ],
+        "maxLineLength": 0,
+        "skipSpaceAfterFunctionName": false,
+        "listSeparator": ",",
+        "decimalSeparator": ".",
+        "callerApp": "Test App",
+        "callerVersion": "1.2.3"
+      }
+    },
+    {
+      "name": "text with characters outside ASCII",
+      "application": { "name": "Test App", "version": "1.2.3" },
+      "options": {},
+      "texts": [ "EVALUATE ROW(\"città\", \"😀 <&>\")" ],
+      "body": {
+        "dax": [ "EVALUATE ROW(\"città\", \"😀 <&>\")" ],
+        "maxLineLength": 0,
+        "skipSpaceAfterFunctionName": false,
+        "listSeparator": ",",
+        "decimalSeparator": ".",
+        "callerApp": "Test App",
+        "callerVersion": "1.2.3"
+      }
+    },
+    {
+      "name": "every property of the model",
+      "application": { "name": "Test App", "version": "1.2.3" },
+      "options": {
+        "modelInfo": {
+          "serverName": "MyServerName1",
+          "databaseName": "MyDatabaseName1",
+          "serverType": "analysisServices",
+          "serverMode": "tabular",
+          "serverEdition": "enterprise64",
+          "serverLocation": "onPremise",
+          "serverVersion": "16.0.143.21",
+          "compatibilityLevel": 1600
+        }
+      },
+      "texts": [ "EVALUATE Sales" ],
+      "body": {
+        "dax": [ "EVALUATE Sales" ],
+        "maxLineLength": 0,
+        "skipSpaceAfterFunctionName": false,
+        "listSeparator": ",",
+        "decimalSeparator": ".",
+        "serverName": "f4139cb312e198bedebf0d71198c27db761f5c4cab73da7dd2faea2672d082af",
+        "databaseName": "6341a49658aeebdfbcc648aea92b6005b393d3f89205cf56166c5626c80b9863",
+        "serverType": "SSAS",
+        "serverMode": "Tabular",
+        "serverEdition": "Enterprise64",
+        "serverLocation": "OnPremise",
+        "serverVersion": "16.0.143.21",
+        "databaseCompatibilityLevel": "1600",
+        "callerApp": "Test App",
+        "callerVersion": "1.2.3"
+      }
+    },
+    {
+      "name": "empty names of the model",
+      "application": { "name": "Test App", "version": "1.2.3" },
+      "options": { "modelInfo": { "serverName": "", "databaseName": "" } },
+      "texts": [ "EVALUATE Sales" ],
+      "body": {
+        "dax": [ "EVALUATE Sales" ],
+        "maxLineLength": 0,
+        "skipSpaceAfterFunctionName": false,
+        "listSeparator": ",",
+        "decimalSeparator": ".",
+        "serverName": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "databaseName": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "callerApp": "Test App",
+        "callerVersion": "1.2.3"
+      }
+    },
+    {
+      "name": "application name with a space",
+      "application": { "name": "DAX Studio", "version": "3.0.11" },
+      "options": {},
+      "texts": [ "EVALUATE Sales" ],
+      "body": {
+        "dax": [ "EVALUATE Sales" ],
+        "maxLineLength": 0,
+        "skipSpaceAfterFunctionName": false,
+        "listSeparator": ",",
+        "decimalSeparator": ".",
+        "callerApp": "DAX Studio",
+        "callerVersion": "3.0.11"
+      }
+    }
+  ]
+}

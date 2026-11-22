@@ -1,87 +1,100 @@
+# Dax.Formatter [![CI](https://github.com/sql-bi/DaxFormatter/actions/workflows/dotnet-ci.yml/badge.svg)](https://github.com/sql-bi/DaxFormatter/actions/workflows/dotnet-ci.yml)
 
-# Dax Formatter [![CI](https://github.com/sql-bi/DaxFormatter/actions/workflows/dotnet-ci.yml/badge.svg)](https://github.com/sql-bi/DaxFormatter/actions/workflows/dotnet-ci.yml)
+`Dax.Formatter` is the .NET client of [DAX Formatter](https://www.daxformatter.com), the service by SQLBI that formats DAX code and reports its syntax errors.
 
-DAX Formatter is a service available at https://www.daxformatter.com.
-The service receives DAX expressions and format them according to rules for [DAX code formatting](https://www.sqlbi.com/articles/rules-for-dax-code-formatting/).
-The NuGet package contains a client library to invoke the service from your .NET application.
-All the requests are designed to be asynchronous.
-You should minimize the requests made to the service: to format multiple expressions, use a single API call providing the `DaxFormatterMultipleRequest` structure.
+## Install
 
-# Quick guide
-Create an instance of `DaxFormatterClient`.
-Invoke the `FormatAsync` method for each request.
-Possibly, use the `DaxFormatterMultipleRequest` structure to provide more statistical details about the database and the server (all the names are anonymized and used only to count the number of unique servers/databases serviced).
+The package targets .NET Standard 2.0 and .NET 10.
 
-# DaxFormatterClient
-The default constructor creates an instance of the client using the current assembly name and version to identify the client. You can specify an application name and version in the constructor arguments.
-Each instance creates one `HttpClient` and reuses it for every request.
-It is suggested to reuse the same instance in multiple requests to minimize the latency.
-```csharp
-var formatter = new DaxFormatterClient();
-var response = await formatter.FormatAsync( "evaluate('Table') order by 'Table'[Column]" );
+```bash
+dotnet add package Dax.Formatter
 ```
-# DaxFormatterMultipleRequest
-Use the `DaxFormatterMultipleRequest` class to send multiple DAX expressions in a single API call.
+
+## Format a query
+
 ```csharp
-var formatter = new DaxFormatterClient();
-var request = new DaxFormatterMultipleRequest
+var client = new DaxFormatterClient();
+
+DaxFormatResult result = await client.FormatAsync("EVALUATE FILTER(Customer, Customer[Country] = \"Italy\")");
+
+Console.WriteLine(result.FormattedText);
+// EVALUATE
+// FILTER ( Customer, Customer[Country] = "Italy" )
+```
+
+Create one client and reuse it: it is thread-safe.
+
+## Format the measures of a model
+
+Pass your objects and a function that returns the DAX of each one. Each result carries its object in `Item`.
+
+```csharp
+var options = new DaxFormatOptions { Kind = DaxKind.Expression };
+
+IReadOnlyList<DaxFormatResult<Measure>> results =
+    await client.FormatBatchAsync(model.Measures, measure => measure.Expression, options);
+
+foreach (var result in results)
 {
-    DatabaseName = "MyDatabaseName", // The name will be anonymized by the client library
-    ServerName = "MyServerName",     // The name will be anonymized by the client library
-
-    // Format arguments (you can skip all of them to keep the default values)
-    ListSeparator = ',',
-    DecimalSeparator = '.',
-    MaxLineLength = DaxFormatterLineStyle.LongLine,
-    SkipSpaceAfterFunctionName = DaxFormatterSpacingStyle.BestPractice,
-
-    // Identify the server type using the corresponding enum values
-    ServerMode = Dax.Formatter.AnalysisServices.ServerMode.Tabular,
-    ServerType = Dax.Formatter.AnalysisServices.ServerType.AnalysisServices,
-    ServerEdition = Dax.Formatter.AnalysisServices.ServerEdition.Enterprise,
-    ServerLocation = Dax.Formatter.AnalysisServices.ServerLocation.OnPremise,
-};
-
-// Add the code to format    
-request.Dax.Add( "evaluate('Table') order by 'Table'[Column]" );
-request.Dax.Add( "[X]:=CALCULATE([Amt],USERELATIONSHIP(Sales[DueDateKey],'Date'[DateKey]))" );
-
-// Send the request and wait the result
-var responses = await formatter.FormatAsync(request);
-
-// Process the result
-foreach (var response in responses)
-{
-    Console.WriteLine(response.Formatted);
+    if (result.Succeeded)
+    {
+        result.Item.Expression = result.FormattedText;
+    }
+    else
+    {
+        Console.WriteLine($"{result.Item.Name}: {result.Errors[0].Message}");
+    }
 }
 ```
-# DaxFormatterSingleRequest
-Use the `DaxFormatterSingleRequest` class to send one DAX expressions in a single API call.
+
+- Use `DaxKind.Expression` for the DAX of a model object: a measure, a calculated column or table, a calculation item, a user-defined function. Use the default, `DaxKind.Auto`, for queries.
+- One call takes thousands of texts. The results come back in the order of the input.
+
+## Describe your model
+
+Optionally, describe the model your DAX comes from. The data is anonymized, and helps SQLBI understand how DAX Formatter is used and improve it.
+
 ```csharp
-var formatter = new DaxFormatterClient();
-var request = new DaxFormatterSingleRequest
+var options = new DaxFormatOptions
 {
-    Dax = "evaluate('Table') order by 'Table'[Column]",
-
-    DatabaseName = "MyDatabaseName", // The name will be anonymized by the client library
-    ServerName = "MyServerName",     // The name will be anonymized by the client library
-
-    // Format arguments (you can skip all of them to keep the default values)
-    ListSeparator = ',',
-    DecimalSeparator = '.',
-    MaxLineLength = DaxFormatterLineStyle.LongLine,
-    SkipSpaceAfterFunctionName = DaxFormatterSpacingStyle.BestPractice,
-
-    // Identify the server type using the corresponding enum values
-    ServerMode = Dax.Formatter.AnalysisServices.ServerMode.Tabular,
-    ServerType = Dax.Formatter.AnalysisServices.ServerType.AnalysisServices,
-    ServerEdition = Dax.Formatter.AnalysisServices.ServerEdition.Enterprise,
-    ServerLocation = Dax.Formatter.AnalysisServices.ServerLocation.OnPremise,
+    ModelInfo = new DaxModelInfo
+    {
+        ServerName = "MyServer",
+        DatabaseName = "Contoso",
+        ServerType = DaxServerType.AnalysisServices,
+        ServerMode = DaxServerMode.Tabular,
+        ServerEdition = DaxServerEdition.Enterprise64,
+        ServerLocation = DaxServerLocation.OnPremise,
+        ServerVersion = "16.0.143.21",
+        CompatibilityLevel = 1600,
+    },
 };
- 
-// Send the request and wait the result
-var response = await formatter.FormatAsync(request);
-
-// Display the result
-Console.WriteLine(response.Formatted);
 ```
+
+- `ModelInfo` doesn't change the formatting.
+- `ServerName` and `DatabaseName` leave your machine only as SHA-256 hashes, never as names.
+- `ServerMode`, `ServerEdition` and `ServerLocation` have the names of the TOM enums: convert them by name, such as `Enum.Parse<DaxServerEdition>(server.Edition.ToString())`.
+
+## Formatting options
+
+```csharp
+var options = new DaxFormatOptions
+{
+    LineStyle = DaxLineStyle.ShortLine,
+    SpacingStyle = DaxSpacingStyle.NoSpaceAfterFunction,
+    SeparatorStyle = DaxSeparatorStyle.SemicolonAndComma,
+};
+```
+
+- `LineStyle`: `LongLine` (default) keeps an expression on one line while it fits, `ShortLine` puts each argument on its own line.
+- `SpacingStyle`: `SpaceAfterFunction` (default) writes `SUM ( x )`, `NoSpaceAfterFunction` writes `SUM( x )`.
+- `SeparatorStyle`: `CommaAndPoint` (default) for `DIVIDE ( 1.5, 2 )`, `SemicolonAndComma` for `DIVIDE ( 1,5; 2 )`.
+
+## Errors
+
+- A syntax error doesn't throw: `Succeeded` is `false`, and `Errors` lists each error with its `Message` and its zero-based `Line` and `Column`.
+- When the service or the network fails, after a few retries the call throws `DaxFormatterException`.
+
+## Feedback
+
+Report bugs and request features in [GitHub Issues](https://github.com/sql-bi/DaxFormatter/issues).

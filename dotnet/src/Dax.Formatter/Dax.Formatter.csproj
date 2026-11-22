@@ -1,15 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net8.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net10.0</TargetFrameworks>
     <NeutralLanguage>en-US</NeutralLanguage>
     <IsPackable>true</IsPackable>
+    <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net10.0'))">true</IsAotCompatible>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnablePackageValidation>true</EnablePackageValidation>
 
     <Title>Dax.Formatter</Title>
     <Company>SQLBI</Company>
     <Authors>Alberto Spelta, Marco Russo</Authors>
     <Product>Dax Formatter client libraries</Product>
-    <Description>This client library connects to daxformatter.com service to format DAX expressions.</Description>
+    <Description>Client library for the DAX Formatter service (daxformatter.com).</Description>
     <PackageId>Dax.Formatter</PackageId>
     <PackageTags>DAX;FORMATTER;SQLBI;TABULAR;SSAS</PackageTags>
     <PackageIcon>package-icon.png</PackageIcon>
@@ -32,16 +35,5 @@
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="10.0.9" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
   </ItemGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <AssemblyTitle>Dax.Formatter .NET Standard 2.0</AssemblyTitle>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <AssemblyTitle>Dax.Formatter .NET 8.0</AssemblyTitle>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
-    <AssemblyTitle>Dax.Formatter .NET 10.0</AssemblyTitle>
-  </PropertyGroup>
-
 
 </Project>
