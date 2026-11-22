@@ -1,4 +1,5 @@
-﻿using Dax.Formatter.Configuration;
+﻿using System.Runtime.ExceptionServices;
+using Dax.Formatter.Configuration;
 using Dax.Formatter.Results;
 using Dax.Formatter.Transport;
 using Dax.Formatter.Wire;
@@ -24,7 +25,9 @@ internal sealed class BatchRun : IDisposable
     private readonly CancellationTokenSource _stop;
 
     private int _nextChunk;
-    private DaxFormatterException? _failure;
+
+    // Kept with the stack trace of the throw, so that the exception that leaves the call shows where it failed.
+    private ExceptionDispatchInfo? _failure;
     private volatile bool _stopped;
 
     public BatchRun(
@@ -65,7 +68,8 @@ internal sealed class BatchRun : IDisposable
 
         // A cancellation by the caller wins over a failure that happened at the same time.
         _callerToken.ThrowIfCancellationRequested();
-        throw _failure ?? new DaxFormatterException("The call stopped before every request was sent.");
+        _failure?.Throw();
+        throw new DaxFormatterException("The call stopped before every request was sent.");
     }
 
     public void Dispose()
@@ -104,7 +108,7 @@ internal sealed class BatchRun : IDisposable
         }
         catch (DaxFormatterException exception)
         {
-            Interlocked.CompareExchange(ref _failure, exception, null);
+            Interlocked.CompareExchange(ref _failure, ExceptionDispatchInfo.Capture(exception), null);
         }
         catch (OperationCanceledException) when (_stop.IsCancellationRequested)
         {

@@ -195,6 +195,18 @@ public class BatchRunTests
     }
 
     [Fact]
+    public async Task FormatBatchAsync_FailedRequest_KeepsTheStackTraceOfTheFailure()
+    {
+        using var harness = new FormatterHarness(Respond.Status(HttpStatusCode.BadRequest), limits: s_oneTextPerRequest);
+
+        var exception = await Assert
+            .ThrowsAsync<DaxFormatterException>(() => harness.Client.FormatBatchAsync(s_fiveTexts))
+            .ConfigureAwait(true);
+
+        Assert.Contains(nameof(Dax.Formatter.Transport.RetryingSender), exception.StackTrace, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task FormatBatchAsync_BlankTexts_CountsThemBeforeTheFirstRequest()
     {
         var progress = new ListProgress();
