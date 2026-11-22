@@ -24,8 +24,6 @@ public class ReadmeSamples
         DaxFormatResult result = await client.FormatAsync("EVALUATE FILTER(Customer, Customer[Country] = \"Italy\")");
 
         Console.WriteLine(result.FormattedText);
-        // EVALUATE
-        // FILTER ( Customer, Customer[Country] = "Italy" )
         #endregion
 
         Assert.Equal("EVALUATE\r\nFILTER ( Customer, Customer[Country] = \"Italy\" )", result.FormattedText);
