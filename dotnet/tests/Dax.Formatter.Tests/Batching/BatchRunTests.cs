@@ -76,6 +76,21 @@ public class BatchRunTests
     }
 
     [Fact]
+    public async Task FormatBatchAsync_FailedRequestAroundABlankText_ReportsTheTextsItCarriedAndTheCall()
+    {
+        string[] texts = ["a", " ", "c"];
+        int[] sentIndexes = [0, 2];
+        using var harness = new FormatterHarness(Respond.Status(HttpStatusCode.BadRequest), limits: s_twoTextsPerRequest);
+
+        var exception = await Assert
+            .ThrowsAsync<DaxFormatterException>(() => harness.Client.FormatBatchAsync(texts))
+            .ConfigureAwait(true);
+
+        Assert.Equal(sentIndexes, exception.TextIndexes);
+        Assert.Equal(harness.Handler.Requests[0].GetHeader("DaxFormatter-Operation-Id"), exception.OperationId);
+    }
+
+    [Fact]
     public async Task FormatBatchAsync_OneRequestFails_DoesNotSendTheRemainingOnes()
     {
         var responder = Respond.Sequence(Respond.Echo, Respond.Status(HttpStatusCode.BadRequest), Respond.Echo);

@@ -152,7 +152,7 @@ internal sealed class BatchRun : IDisposable
     private FormatRequest CreateRequest(Chunk chunk)
     {
         var body = _bodyWriter.Write(_plan.GetTextsToSend(chunk), _settings);
-        return new FormatRequest(body, chunk.Count, chunk.FirstIndex, chunk.LastIndex, _operationId);
+        return new FormatRequest(body, chunk.TextIndexes, _operationId);
     }
 
     private Task StopOthersAsync()
