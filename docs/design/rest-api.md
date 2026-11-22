@@ -132,6 +132,7 @@ What the service does with a text:
 - An empty name is hashed too: `""` becomes `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. A missing name is not sent.
 - The .NET client hashes when it copies the options of a call, and keeps only the hashes. The TypeScript port hashes while it builds the request.
 - Both clients test the same vectors: the fixture `name-hashes.json` in .NET and `hash.test.ts` in TypeScript.
+- The hash never changes: the service counts distinct names across every client and version, so a different hash would count the same server twice. `Dax.Formatter` 1.x computed it the same way, and its test vectors are the first four cases of `name-hashes.json`.
 
 ## Caller identity
 
