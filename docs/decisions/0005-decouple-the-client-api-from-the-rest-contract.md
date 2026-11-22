@@ -27,7 +27,7 @@ Chosen option: "A new API on a model of its own", because the work that every ca
 - The client splits a large call into requests, limits how many are in progress, retries the failures that can be temporary and reports progress. How much a request carries is an internal constant, not an option.
 - The client uses only the endpoint that takes several texts, which formats DAX only: the client doesn't format MDX.
 - The client doesn't convert line breaks: the service returns those inside strings and comments as they were sent, so converting all of them would change the content of strings. It doesn't halve a request that timed out: the service keeps working on a request that the client abandoned, so halving would double the load when the service is slow.
-- The descriptions of the model, which the service uses for statistics, are strings, as in the TypeScript port; the server types that the service knows are constants.
+- The descriptions of the model, which the service uses for statistics, are enums where the values form a known set, as in 1.x and in the TypeScript port: the type, mode, edition and location of the server. Mode, edition and location have the names and values of the enums of the Analysis Services client libraries, and the client sends the name of the member, so a caller converts a value of those libraries by its name.
 - The shape must exist in every target language and for every consumer of the .NET package: no `init`, `required` or record in public types, which a .NET Framework project on C# 7.3 can't use; no interface next to the client, whose methods are virtual; asynchronous methods only; no new dependency. The .NET package targets `netstandard2.0` and `net10.0`.
 
 ### Consequences
@@ -40,6 +40,7 @@ Chosen option: "A new API on a model of its own", because the work that every ca
 * Bad, because `Expression` depends on how the service writes its answer: the client sends a header line, expects it back, and removes it with the indentation that the service adds under a function header. A different answer is a failure, never a wrong text, and the live tests pin the answers.
 * Bad, because the client can't work around three limits of the service, which it returns as syntax errors ([`client-api.md`](../design/client-api.md#limits-of-the-service)).
 * Bad, because applications that formatted MDX with the single-text methods of 1.x lose it.
+* Bad, because a server value that the Analysis Services libraries add can't be sent until a minor version of the package adds it to its enum.
 
 ### Confirmation
 

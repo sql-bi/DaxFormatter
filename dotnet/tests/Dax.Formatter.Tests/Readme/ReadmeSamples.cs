@@ -124,7 +124,7 @@ public class ReadmeSamples
             SeparatorStyle = DaxSeparatorStyle.SemicolonAndComma,
             ModelInfo = new DaxModelInfo
             {
-                ServerType = DaxServerTypes.PowerBIDesktop,
+                ServerType = DaxServerType.PowerBIDesktop,
                 DatabaseName = "Contoso",
             },
         };

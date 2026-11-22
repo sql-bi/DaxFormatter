@@ -23,10 +23,10 @@ internal static class FixtureOptions
             {
                 ServerName = ReadString(model, "serverName"),
                 DatabaseName = ReadString(model, "databaseName"),
-                ServerType = ReadString(model, "serverType"),
-                ServerMode = ReadString(model, "serverMode"),
-                ServerEdition = ReadString(model, "serverEdition"),
-                ServerLocation = ReadString(model, "serverLocation"),
+                ServerType = ReadOptionalEnum<DaxServerType>(model, "serverType"),
+                ServerMode = ReadOptionalEnum<DaxServerMode>(model, "serverMode"),
+                ServerEdition = ReadOptionalEnum<DaxServerEdition>(model, "serverEdition"),
+                ServerLocation = ReadOptionalEnum<DaxServerLocation>(model, "serverLocation"),
                 ServerVersion = ReadString(model, "serverVersion"),
                 CompatibilityLevel = model.TryGetProperty("compatibilityLevel", out var level) ? level.GetInt32() : null,
             };
@@ -43,10 +43,16 @@ internal static class FixtureOptions
     private static TEnum ReadEnum<TEnum>(JsonElement element, string name)
         where TEnum : struct, Enum
     {
+        return ReadOptionalEnum<TEnum>(element, name) ?? default;
+    }
+
+    private static TEnum? ReadOptionalEnum<TEnum>(JsonElement element, string name)
+        where TEnum : struct, Enum
+    {
         var value = ReadString(element, name);
         if (value is null)
         {
-            return default;
+            return null;
         }
 
         return Enum.TryParse<TEnum>(value, ignoreCase: true, out var result)

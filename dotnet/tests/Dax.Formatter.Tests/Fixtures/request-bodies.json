@@ -118,10 +118,10 @@
         "modelInfo": {
           "serverName": "MyServerName1",
           "databaseName": "MyDatabaseName1",
-          "serverType": "SSAS",
-          "serverMode": "Tabular",
-          "serverEdition": "Enterprise64",
-          "serverLocation": "OnPremise",
+          "serverType": "analysisServices",
+          "serverMode": "tabular",
+          "serverEdition": "enterprise64",
+          "serverLocation": "onPremise",
           "serverVersion": "16.0.143.21",
           "compatibilityLevel": 1600
         }
