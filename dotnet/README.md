@@ -50,7 +50,7 @@ foreach (var result in results)
 
 ## Describe your model
 
-DAX Formatter is free. Tell it where your DAX comes from: it helps SQLBI see how the service is used and where to improve it.
+Optionally, describe the model your DAX comes from. The data is anonymized, and helps SQLBI understand how DAX Formatter is used and improve it.
 
 ```csharp
 var options = new DaxFormatOptions
@@ -69,7 +69,7 @@ var options = new DaxFormatOptions
 };
 ```
 
-- `ModelInfo` doesn't change the formatting: it is used only for anonymous statistics.
+- `ModelInfo` doesn't change the formatting.
 - `ServerName` and `DatabaseName` leave your machine only as SHA-256 hashes, never as names.
 - `ServerMode`, `ServerEdition` and `ServerLocation` have the names of the TOM enums: convert them by name, such as `Enum.Parse<DaxServerEdition>(server.Edition.ToString())`.
 
