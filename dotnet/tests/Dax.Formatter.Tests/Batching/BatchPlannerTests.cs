@@ -91,14 +91,14 @@ public class BatchPlannerTests
     }
 
     [Fact]
-    public void Plan_Chunk_KnowsItsFirstAndLastText()
+    public void Plan_Chunk_KnowsTheIndexesOfItsTexts()
     {
         string[] texts = ["a", "", "b", "c"];
 
         var plan = BatchPlanner.Plan(texts, DaxKind.Auto, new BatchLimits(maxTexts: 2, maxCharacters: 1000));
 
-        Assert.Equal((0, 2), (plan.Chunks[0].FirstIndex, plan.Chunks[0].LastIndex));
-        Assert.Equal((3, 3), (plan.Chunks[1].FirstIndex, plan.Chunks[1].LastIndex));
+        Assert.Equal([0, 2], plan.Chunks[0].TextIndexes);
+        Assert.Equal([3], plan.Chunks[1].TextIndexes);
     }
 
     private static string Describe(BatchPlan plan)

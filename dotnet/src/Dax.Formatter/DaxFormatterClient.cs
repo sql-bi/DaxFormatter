@@ -182,10 +182,10 @@ public class DaxFormatterClient
             texts[index] = text;
         }
 
-        // The options are checked here so that a wrong value throws now, like the other arguments.
-        _ = FormatSettings.From(options);
+        // The method that takes strings is called now, not after an await, so a wrong option throws now too.
+        var formatting = FormatBatchAsync(texts, options, progress, cancellationToken);
 
-        return FormatItemsAsync(copy, texts, options, progress, cancellationToken);
+        return PairAsync(copy, formatting);
     }
 
     private static HttpClient Required(HttpClient httpClient)
@@ -223,14 +223,11 @@ public class DaxFormatterClient
             .ConfigureAwait(false);
     }
 
-    private async Task<IReadOnlyList<DaxFormatResult<TItem>>> FormatItemsAsync<TItem>(
+    private static async Task<IReadOnlyList<DaxFormatResult<TItem>>> PairAsync<TItem>(
         TItem[] items,
-        string[] texts,
-        DaxFormatOptions? options,
-        IProgress<DaxFormatProgressInfo>? progress,
-        CancellationToken cancellationToken)
+        Task<IReadOnlyList<DaxFormatResult>> formatting)
     {
-        var results = await FormatBatchAsync(texts, options, progress, cancellationToken).ConfigureAwait(false);
+        var results = await formatting.ConfigureAwait(false);
         if (results is null || results.Count != items.Length)
         {
             throw new InvalidOperationException("FormatBatchAsync must return one result for each text.");

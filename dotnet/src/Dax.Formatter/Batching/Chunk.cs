@@ -17,10 +17,6 @@ internal sealed class Chunk
     /// <summary>Gets the indexes, in the texts of the call, of the texts of the request, in order.</summary>
     public IReadOnlyList<int> TextIndexes => _textIndexes;
 
-    public int FirstIndex => _textIndexes[0];
-
-    public int LastIndex => _textIndexes[_textIndexes.Length - 1];
-
     /// <summary>Gets the index, in the texts of the call, of the text at a position of the request.</summary>
     public int this[int position] => _textIndexes[position];
 }
