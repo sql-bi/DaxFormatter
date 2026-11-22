@@ -50,23 +50,30 @@ internal sealed class CallerIdentity
             products.Add(new ProductInfoHeaderValue(application, ToToken(applicationVersion)));
         }
 
-        products.Add(new ProductInfoHeaderValue(LibraryName, ToToken(GetLibraryVersion())));
+        var assembly = typeof(CallerIdentity).Assembly;
+        var informational = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+        var libraryVersion = informational is null ? null : ToPackageVersion(informational);
+
+        products.Add(new ProductInfoHeaderValue(LibraryName, ToToken(libraryVersion)));
         products.Add(new ProductInfoHeaderValue(ToComment(RuntimeInformation.FrameworkDescription)));
 
         return products;
     }
 
-    private static string? GetLibraryVersion()
+    /// <summary>
+    /// Gets the version of the package from the informational version that the build stamps on the assembly,
+    /// such as <c>2.0.0.5-beta.1+0123abc</c>: without the commit id, and without the fourth number, which counts
+    /// commits and is not part of the package version.
+    /// </summary>
+    public static string ToPackageVersion(string informationalVersion)
     {
-        var assembly = typeof(CallerIdentity).Assembly;
-        var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-        if (version is null)
-        {
-            return assembly.GetName().Version?.ToString();
-        }
+        var version = informationalVersion.Split('+')[0];
+        var parts = version.Split(['-'], 2);
 
-        // The informational version ends with the commit id as build metadata, which says nothing to the service.
-        return version.Split('+')[0];
+        var numbers = parts[0].Split('.');
+        var core = numbers.Length > 3 ? string.Join(".", numbers, 0, 3) : parts[0];
+
+        return parts.Length > 1 ? core + "-" + parts[1] : core;
     }
 
     private static string? NullIfBlank(string? value)

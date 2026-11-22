@@ -13,7 +13,22 @@ public class CallerIdentityTests
 
         var userAgent = string.Join(" ", identity.UserAgent);
 
-        Assert.Matches(new Regex(@"^Contoso/1\.2\.3 Dax\.Formatter/[0-9]+\.[0-9]+\.[0-9]+\S* \([^()]+\)$"), userAgent);
+        Assert.Matches(
+            new Regex(@"^Contoso/1\.2\.3 Dax\.Formatter/[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)? \([^()]+\)$"), userAgent);
+    }
+
+    [Theory]
+    [InlineData("2.0.0.0+ed2a1ca742", "2.0.0")]
+    [InlineData("2.0.1.7+ed2a1ca742", "2.0.1")]
+    [InlineData("2.1.0.3-beta.1+ed2a1ca742", "2.1.0-beta.1")]
+    [InlineData("2.0.0-beta.2", "2.0.0-beta.2")]
+    [InlineData("2.0.0", "2.0.0")]
+    [InlineData("2.0", "2.0")]
+    public void ToPackageVersion_InformationalVersion_DropsTheHeightAndTheCommit(string informational, string expected)
+    {
+        var version = CallerIdentity.ToPackageVersion(informational);
+
+        Assert.Equal(expected, version);
     }
 
     [Fact]
