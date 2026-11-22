@@ -18,8 +18,6 @@ internal static class ReadmeService
             "[x] :=\r\nCALCULATE ( SUM ( Sales[Amount] ), Sales[Quantity] > 0 )\r\n",
         ["[x] :=\nDIVIDE([Sales Amount], [Total Cost])"] =
             "[x] :=\r\nDIVIDE ( [Sales Amount], [Total Cost] )\r\n",
-        ["FUNCTION x =\n(amount : NUMERIC, rate : NUMERIC) => amount * (1 + rate)"] =
-            "FUNCTION x = (\r\n        amount : NUMERIC,\r\n        rate : NUMERIC\r\n    ) =>\r\n    amount * ( 1 + rate )\r\n",
     };
 
     // The service reports the end of the input as the line after the last one.
