@@ -1,0 +1,91 @@
+sealed class Dax.Formatter.DaxFormatOptions
+    Dax.Formatter.DaxKind Kind { get; set; }
+    Dax.Formatter.DaxLineStyle LineStyle { get; set; }
+    Dax.Formatter.DaxModelInfo ModelInfo { get; set; }
+    Dax.Formatter.DaxSeparatorStyle SeparatorStyle { get; set; }
+    Dax.Formatter.DaxSpacingStyle SpacingStyle { get; set; }
+    constructor()
+sealed class Dax.Formatter.DaxFormatProgressInfo
+    System.Int32 Completed { get; }
+    System.Int32 Total { get; }
+    constructor(System.Int32 completed, System.Int32 total)
+class Dax.Formatter.DaxFormatResult
+    System.Boolean Succeeded { get; }
+    System.Collections.Generic.IReadOnlyList<Dax.Formatter.DaxSyntaxError> Errors { get; }
+    System.String FormattedText { get; }
+    System.String OriginalText { get; }
+    static Dax.Formatter.DaxFormatResult Failure(System.String originalText, System.Collections.Generic.IEnumerable<Dax.Formatter.DaxSyntaxError> errors)
+    static Dax.Formatter.DaxFormatResult Success(System.String originalText, System.String formattedText)
+sealed class Dax.Formatter.DaxFormatResult<TItem> : Dax.Formatter.DaxFormatResult
+    TItem Item { get; }
+    constructor(TItem item, Dax.Formatter.DaxFormatResult result)
+class Dax.Formatter.DaxFormatterClient
+    System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Dax.Formatter.DaxFormatResult<TItem>>> FormatBatchAsync<TItem>(System.Collections.Generic.IEnumerable<TItem> items, System.Func<TItem, System.String> textSelector, Dax.Formatter.DaxFormatOptions options = default, System.IProgress<Dax.Formatter.DaxFormatProgressInfo> progress = default, System.Threading.CancellationToken cancellationToken = default)
+    constructor()
+    constructor(Dax.Formatter.DaxFormatterClientOptions options)
+    constructor(System.Net.Http.HttpClient httpClient)
+    constructor(System.Net.Http.HttpClient httpClient, Dax.Formatter.DaxFormatterClientOptions options)
+    virtual System.Threading.Tasks.Task<Dax.Formatter.DaxFormatResult> FormatAsync(System.String text, Dax.Formatter.DaxFormatOptions options = default, System.Threading.CancellationToken cancellationToken = default)
+    virtual System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Dax.Formatter.DaxFormatResult>> FormatBatchAsync(System.Collections.Generic.IEnumerable<System.String> texts, Dax.Formatter.DaxFormatOptions options = default, System.IProgress<Dax.Formatter.DaxFormatProgressInfo> progress = default, System.Threading.CancellationToken cancellationToken = default)
+sealed class Dax.Formatter.DaxFormatterClientOptions
+    System.Int32 MaxConcurrentRequests { get; set; }
+    System.Int32 MaxRetries { get; set; }
+    System.String ApplicationName { get; set; }
+    System.String ApplicationVersion { get; set; }
+    System.TimeSpan RequestTimeout { get; set; }
+    System.Uri Endpoint { get; set; }
+    constructor()
+sealed class Dax.Formatter.DaxFormatterException : System.Exception
+    Dax.Formatter.DaxFormatterFailureReason Reason { get; }
+    System.Net.HttpStatusCode? StatusCode { get; }
+    System.String RequestId { get; }
+    System.String ServiceRequestId { get; }
+    constructor()
+    constructor(System.String message)
+    constructor(System.String message, Dax.Formatter.DaxFormatterFailureReason reason, System.Net.HttpStatusCode? statusCode, System.String requestId, System.String serviceRequestId, System.Exception innerException)
+    constructor(System.String message, System.Exception innerException)
+enum Dax.Formatter.DaxFormatterFailureReason
+    HttpError = 3
+    InvalidResponse = 4
+    NetworkError = 2
+    Timeout = 1
+    Unknown = 0
+enum Dax.Formatter.DaxKind
+    Auto = 0
+    Expression = 1
+enum Dax.Formatter.DaxLineStyle
+    LongLine = 0
+    ShortLine = 1
+sealed class Dax.Formatter.DaxModelInfo
+    System.Int32? CompatibilityLevel { get; set; }
+    System.String DatabaseName { get; set; }
+    System.String ServerEdition { get; set; }
+    System.String ServerLocation { get; set; }
+    System.String ServerMode { get; set; }
+    System.String ServerName { get; set; }
+    System.String ServerType { get; set; }
+    System.String ServerVersion { get; set; }
+    constructor()
+enum Dax.Formatter.DaxSeparatorStyle
+    CommaAndPoint = 0
+    SemicolonAndComma = 1
+static class Dax.Formatter.DaxServerTypes
+    const System.String AnalysisServices = "SSAS"
+    const System.String AzureAnalysisServices = "AzureAS"
+    const System.String Offline = "Offline"
+    const System.String PowerBIDesktop = "PBI Desktop"
+    const System.String PowerBIReportServer = "PBI Report Server"
+    const System.String PowerBIService = "PBI Service"
+    const System.String PowerPivot = "PowerPivot"
+    const System.String Ssdt = "SSDT"
+enum Dax.Formatter.DaxSpacingStyle
+    NoSpaceAfterFunction = 1
+    SpaceAfterFunction = 0
+sealed class Dax.Formatter.DaxSyntaxError : System.IEquatable<Dax.Formatter.DaxSyntaxError>
+    System.Boolean Equals(Dax.Formatter.DaxSyntaxError other)
+    System.Int32 Column { get; }
+    System.Int32 Line { get; }
+    System.String Message { get; }
+    constructor(System.Int32 line, System.Int32 column, System.String message)
+    override System.Boolean Equals(System.Object obj)
+    override System.Int32 GetHashCode()
