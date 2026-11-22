@@ -96,8 +96,7 @@ public class RetryPolicyTests
     public void TryGetDelay_RetryAfterLongerThanTheBackoff_WaitsAsLongAsAsked(int seconds, int expectedMilliseconds)
     {
         var policy = new RetryPolicy(maxRetries: 2, s_requestTimeout);
-        using var response = CreateBusyResponse(seconds);
-        var failure = AttemptResult.Rejected(DaxFormatterFailureReason.HttpError, "detail", response);
+        var failure = Busy(retryAfterSeconds: seconds);
 
         var retry = policy.TryGetDelay(failure, 1, s_requestId, out var delay);
 
@@ -109,8 +108,7 @@ public class RetryPolicyTests
     public void TryGetDelay_RetryAfterShorterThanTheBackoff_KeepsTheBackoff()
     {
         var policy = new RetryPolicy(maxRetries: 2, s_requestTimeout);
-        using var response = CreateBusyResponse(seconds: 0);
-        var failure = AttemptResult.Rejected(DaxFormatterFailureReason.HttpError, "detail", response);
+        var failure = Busy(retryAfterSeconds: 0);
 
         policy.TryGetDelay(failure, 1, s_requestId, out var delay);
 
@@ -121,8 +119,7 @@ public class RetryPolicyTests
     public void TryGetDelay_RetryAfterLongerThanTheRequestTimeout_ReturnsFalse()
     {
         var policy = new RetryPolicy(maxRetries: 2, s_requestTimeout);
-        using var response = CreateBusyResponse(seconds: 61);
-        var failure = AttemptResult.Rejected(DaxFormatterFailureReason.HttpError, "detail", response);
+        var failure = Busy(retryAfterSeconds: 61);
 
         var retry = policy.TryGetDelay(failure, 1, s_requestId, out _);
 
@@ -134,10 +131,11 @@ public class RetryPolicyTests
         return AttemptResult.NoResponse(DaxFormatterFailureReason.Timeout, "detail", error: null);
     }
 
-    private static HttpResponseMessage CreateBusyResponse(int seconds)
+    private static AttemptResult Busy(int retryAfterSeconds)
     {
-        var response = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
-        response.Headers.RetryAfter = new RetryConditionHeaderValue(TimeSpan.FromSeconds(seconds));
-        return response;
+        using var response = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+        response.Headers.RetryAfter = new RetryConditionHeaderValue(TimeSpan.FromSeconds(retryAfterSeconds));
+
+        return AttemptResult.Rejected(DaxFormatterFailureReason.HttpError, "detail", response);
     }
 }

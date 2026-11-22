@@ -22,7 +22,7 @@ public class DaxFormatterClient
     /// uses an <see cref="HttpClient"/> that all such instances share.
     /// </summary>
     public DaxFormatterClient()
-        : this(httpClient: null, ClientSettings.From(new DaxFormatterClientOptions()), TaskDelay.Instance, BatchLimits.Default)
+        : this(new DaxFormatterClientOptions())
     {
     }
 
@@ -45,7 +45,7 @@ public class DaxFormatterClient
     /// ignores its <see cref="HttpClient.BaseAddress"/>.
     /// </param>
     public DaxFormatterClient(HttpClient httpClient)
-        : this(Required(httpClient), ClientSettings.From(new DaxFormatterClientOptions()), TaskDelay.Instance, BatchLimits.Default)
+        : this(httpClient, new DaxFormatterClientOptions())
     {
     }
 
@@ -59,7 +59,7 @@ public class DaxFormatterClient
     /// </param>
     /// <param name="options">The options, which are copied.</param>
     public DaxFormatterClient(HttpClient httpClient, DaxFormatterClientOptions options)
-        : this(Required(httpClient), ClientSettings.From(options), TaskDelay.Instance, BatchLimits.Default)
+        : this(httpClient, options, TaskDelay.Instance, BatchLimits.Default)
     {
     }
 

@@ -29,19 +29,6 @@ public class ResultMapperTests
     }
 
     [Theory]
-    [MemberData(nameof(Cases))]
-    public void AddTo_FixtureText_GivesTheTextThatWasSent(string name)
-    {
-        var testCase = FixtureFile.Case(Fixture, name);
-        var text = testCase.GetProperty("text").GetString()!;
-        var isExpression = FixtureOptions.ReadKind(testCase) == DaxKind.Expression;
-
-        var sent = isExpression ? ExpressionHeader.For(text).AddTo(text) : text;
-
-        Assert.Equal(testCase.GetProperty("sent").GetString(), sent);
-    }
-
-    [Theory]
     [InlineData("{\"formatted\":\"EVALUATE\\r\\nSales\\r\\n\",\"errors\":null}", "EVALUATE\r\nSales")]
     [InlineData("{\"formatted\":\"EVALUATE\\r\\nSales\\r\\n\"}", "EVALUATE\r\nSales")]
     [InlineData("{\"formatted\":null,\"errors\":[]}", "")]

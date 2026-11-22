@@ -26,35 +26,46 @@ internal static class EchoService
         return results.ToJsonString();
     }
 
-    private static JsonObject AnswerOne(string text)
+    /// <summary>Gets the answer for one text.</summary>
+    public static JsonObject AnswerOne(string text)
     {
         var marker = text.IndexOf(ErrorMarker, StringComparison.Ordinal);
-        if (marker >= 0)
+        if (marker < 0)
         {
-            return new JsonObject
-            {
-                ["formatted"] = string.Empty,
-                ["errors"] = new JsonArray(CreateError(text, marker)),
-            };
+            return Formatted(Format(text));
         }
 
+        var before = text.Substring(0, marker);
+        var lineStart = before.LastIndexOf('\n') + 1;
+        var line = before.Count(character => character == '\n');
+
+        return Error(line, ToServiceColumn(before.Substring(lineStart)));
+    }
+
+    /// <summary>Gets the answer of the service for a text that it formatted.</summary>
+    public static JsonObject Formatted(string formatted)
+    {
         return new JsonObject
         {
-            ["formatted"] = Format(text),
+            ["formatted"] = formatted,
             ["errors"] = new JsonArray(),
         };
     }
 
-    private static JsonObject CreateError(string text, int position)
+    /// <summary>Gets the answer of the service for a text with a syntax error at a position.</summary>
+    public static JsonObject Error(int line, int column)
     {
-        var before = text.Substring(0, position);
-        var lineStart = before.LastIndexOf('\n') + 1;
+        var error = new JsonObject
+        {
+            ["line"] = line,
+            ["column"] = column,
+            ["message"] = ErrorMessage,
+        };
 
         return new JsonObject
         {
-            ["line"] = before.Count(character => character == '\n'),
-            ["column"] = ToServiceColumn(before.Substring(lineStart)),
-            ["message"] = ErrorMessage,
+            ["formatted"] = string.Empty,
+            ["errors"] = new JsonArray(error),
         };
     }
 

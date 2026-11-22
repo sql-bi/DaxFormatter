@@ -111,7 +111,7 @@ public class LiveServiceTests
 
     private static async Task AssertFixtureResultsAsync(DaxKind kind)
     {
-        var cases = FixtureFile.Load(Fixture).GetProperty("cases").EnumerateArray()
+        var cases = FixtureFile.Cases(Fixture)
             .Where(testCase => FixtureOptions.ReadKind(testCase) == kind)
             .ToList();
         var texts = cases.Select(testCase => testCase.GetProperty("text").GetString()!);

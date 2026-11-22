@@ -1,12 +1,17 @@
 ﻿using Dax.Formatter.Batching;
 using Dax.Formatter.Configuration;
 using Dax.Formatter.Expressions;
+using Dax.Formatter.Tests.Fixtures;
 using Xunit;
 
 namespace Dax.Formatter.Tests.Batching;
 
 public class BatchPlannerTests
 {
+    private const string Fixture = "format-results.json";
+
+    public static IEnumerable<object[]> FixtureCases => FixtureFile.CaseNames(Fixture);
+
     [Theory]
     [InlineData(5, 2, "0,1|2,3|4")]
     [InlineData(4, 2, "0,1|2,3")]
@@ -69,6 +74,20 @@ public class BatchPlannerTests
         var plan = BatchPlanner.Plan(texts, DaxKind.Auto, BatchLimits.Default);
 
         Assert.Null(plan.GetHeader(0));
+    }
+
+    [Theory]
+    [MemberData(nameof(FixtureCases))]
+    public void Plan_FixtureText_SendsItAsTheServiceReceivedIt(string name)
+    {
+        var testCase = FixtureFile.Case(Fixture, name);
+        string[] texts = [testCase.GetProperty("text").GetString()!];
+
+        var plan = BatchPlanner.Plan(texts, FixtureOptions.ReadKind(testCase), BatchLimits.Default);
+
+        var chunk = Assert.Single(plan.Chunks);
+        var sent = Assert.Single(plan.GetTextsToSend(chunk));
+        Assert.Equal(testCase.GetProperty("sent").GetString(), sent);
     }
 
     [Fact]

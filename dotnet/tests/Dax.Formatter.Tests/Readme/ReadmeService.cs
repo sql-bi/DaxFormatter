@@ -34,25 +34,27 @@ internal static class ReadmeService
 
     private static string Answer(IReadOnlyList<string> dax)
     {
-        var echoed = JsonNode.Parse(EchoService.Answer(dax))!.AsArray();
-        for (var index = 0; index < dax.Count; index++)
+        var results = new JsonArray();
+        foreach (var text in dax)
         {
-            if (s_formatted.TryGetValue(dax[index], out var formatted))
-            {
-                echoed[index] = new JsonObject { ["formatted"] = formatted, ["errors"] = new JsonArray() };
-            }
-            else if (s_errors.TryGetValue(dax[index], out var position))
-            {
-                var error = new JsonObject
-                {
-                    ["line"] = position.Line,
-                    ["column"] = position.Column,
-                    ["message"] = EchoService.ErrorMessage,
-                };
-                echoed[index] = new JsonObject { ["formatted"] = string.Empty, ["errors"] = new JsonArray(error) };
-            }
+            results.Add(AnswerOne(text));
         }
 
-        return echoed.ToJsonString();
+        return results.ToJsonString();
+    }
+
+    private static JsonObject AnswerOne(string text)
+    {
+        if (s_formatted.TryGetValue(text, out var formatted))
+        {
+            return EchoService.Formatted(formatted);
+        }
+
+        if (s_errors.TryGetValue(text, out var position))
+        {
+            return EchoService.Error(position.Line, position.Column);
+        }
+
+        return EchoService.AnswerOne(text);
     }
 }

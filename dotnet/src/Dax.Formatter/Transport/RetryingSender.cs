@@ -34,7 +34,7 @@ internal sealed class RetryingSender
 
             if (!_policy.TryGetDelay(result, attempt, request.RequestId, out var delay))
             {
-                throw CreateException(request, result, attempt);
+                throw CreateException(request, result, result.Detail, attempt);
             }
 
             await _delay.WaitAsync(delay, cancellationToken).ConfigureAwait(false);
@@ -42,9 +42,12 @@ internal sealed class RetryingSender
         }
     }
 
-    private static DaxFormatterException CreateException(FormatRequest request, AttemptResult failure, int attempts)
+    private static DaxFormatterException CreateException(
+        FormatRequest request,
+        AttemptResult failure,
+        string detail,
+        int attempts)
     {
-        var detail = failure.Detail ?? "the reason is not known";
         if (attempts > 1)
         {
             detail = FormattableString.Invariant($"{detail}, after {attempts} attempts");

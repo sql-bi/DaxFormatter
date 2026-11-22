@@ -50,9 +50,7 @@ internal sealed class CallerIdentity
             products.Add(new ProductInfoHeaderValue(application, ToToken(applicationVersion)));
         }
 
-        var assembly = typeof(CallerIdentity).Assembly;
-        var informational = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-        var libraryVersion = informational is null ? null : ToPackageVersion(informational);
+        var libraryVersion = ToPackageVersion(ThisAssembly.AssemblyInformationalVersion);
 
         products.Add(new ProductInfoHeaderValue(LibraryName, ToToken(libraryVersion)));
         products.Add(new ProductInfoHeaderValue(ToComment(RuntimeInformation.FrameworkDescription)));

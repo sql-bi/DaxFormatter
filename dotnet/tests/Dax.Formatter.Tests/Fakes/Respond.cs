@@ -58,12 +58,21 @@ internal static class Respond
         return (_, _) => Task.FromException<HttpResponseMessage>(createException());
     }
 
-    /// <summary>Answers with <paramref name="then"/> once <paramref name="gate"/> completes.</summary>
-    public static Responder After(Task gate, Responder then)
+    /// <summary>
+    /// Holds every answer until <paramref name="count"/> requests have arrived, so that they are in progress at
+    /// the same time, then answers with <paramref name="then"/>.
+    /// </summary>
+    public static Responder OnceArrived(int count, Responder then)
     {
+        var arrived = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         return async (request, cancellationToken) =>
         {
-            await gate.ConfigureAwait(false);
+            if (request.Number == count - 1)
+            {
+                arrived.TrySetResult(true);
+            }
+
+            await arrived.Task.ConfigureAwait(false);
             return await then(request, cancellationToken).ConfigureAwait(false);
         };
     }

@@ -35,4 +35,23 @@ internal sealed class BatchPlan
     {
         return _headers?[index];
     }
+
+    /// <summary>Gets the texts of a request as they travel, each under its header.</summary>
+    /// <remarks>
+    /// The texts get their headers only when a request is written, so that a large call does not hold a second
+    /// copy of every text.
+    /// </remarks>
+    public List<string> GetTextsToSend(Chunk chunk)
+    {
+        var dax = new List<string>(chunk.Count);
+        for (var position = 0; position < chunk.Count; position++)
+        {
+            var index = chunk[position];
+            var text = _texts[index];
+            var header = GetHeader(index);
+            dax.Add(header is null ? text : header.AddTo(text));
+        }
+
+        return dax;
+    }
 }

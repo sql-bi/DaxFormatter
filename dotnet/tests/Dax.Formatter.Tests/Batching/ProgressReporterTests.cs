@@ -1,5 +1,4 @@
 ﻿using Dax.Formatter.Batching;
-using Dax.Formatter.Configuration;
 using Dax.Formatter.Tests.Fakes;
 using Xunit;
 
@@ -41,33 +40,13 @@ public class ProgressReporterTests
     }
 
     [Fact]
-    public async Task FormatBatchAsync_BlankTexts_CountsThemBeforeTheFirstRequest()
+    public void Report_FromSeveralThreads_NeverReportsFewerTextsThanBefore()
     {
         var progress = new ListProgress();
-        using var harness = new FormatterHarness(
-            Respond.Echo,
-            options => options.MaxConcurrentRequests = 1,
-            new BatchLimits(maxTexts: 1, maxCharacters: 1000));
+        var reporter = new ProgressReporter(progress, total: 2000);
 
-        await harness.Client.FormatBatchAsync(["", "a", "b", " "], progress: progress).ConfigureAwait(true);
+        Parallel.For(0, 2000, _ => reporter.Report(1));
 
-        Assert.Equal([(2, 4), (3, 4), (4, 4)], progress.Reports);
-    }
-
-    [Fact]
-    public async Task FormatBatchAsync_RequestsInParallel_NeverReportsFewerTextsThanBefore()
-    {
-        var progress = new ListProgress();
-        var texts = Enumerable.Range(0, 40).Select(number => "EVALUATE T" + number);
-        using var harness = new FormatterHarness(
-            Respond.Echo,
-            options => options.MaxConcurrentRequests = 4,
-            new BatchLimits(maxTexts: 3, maxCharacters: 1000));
-
-        await harness.Client.FormatBatchAsync(texts, progress: progress).ConfigureAwait(true);
-
-        var completed = progress.Reports.Select(report => report.Completed).ToList();
-        Assert.Equal(completed.OrderBy(count => count), completed);
-        Assert.Equal((40, 40), progress.Reports[progress.Reports.Count - 1]);
+        Assert.Equal(Enumerable.Range(1, 2000), progress.Reports.Select(report => report.Completed));
     }
 }

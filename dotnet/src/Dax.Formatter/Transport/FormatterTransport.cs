@@ -12,7 +12,9 @@ internal sealed class FormatterTransport
     private const string RequestIdHeader = "DaxFormatter-Request-Id";
     private const string OperationIdHeader = "DaxFormatter-Operation-Id";
 
-    private static readonly MediaTypeWithQualityHeaderValue s_json = new("application/json");
+    private const string JsonMediaType = "application/json";
+
+    private static readonly MediaTypeWithQualityHeaderValue s_json = new(JsonMediaType);
 
     private readonly HttpClient _httpClient;
     private readonly Uri _formatUri;
@@ -79,7 +81,7 @@ internal sealed class FormatterTransport
         }
 
         message.Content = new ByteArrayContent(request.Body);
-        message.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json") { CharSet = "utf-8" };
+        message.Content.Headers.ContentType = new MediaTypeHeaderValue(JsonMediaType) { CharSet = "utf-8" };
 
         return message;
     }

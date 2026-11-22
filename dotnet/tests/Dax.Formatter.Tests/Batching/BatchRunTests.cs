@@ -14,18 +14,8 @@ public class BatchRunTests
     [Fact]
     public async Task FormatBatchAsync_AnswersOutOfOrder_ReturnsTheResultsInTheOrderOfTheTexts()
     {
-        var lastArrived = NewSignal();
-        Responder responder = async (request, cancellationToken) =>
-        {
-            // The first two requests are answered only after the third one has arrived.
-            if (request.Number == 2)
-            {
-                lastArrived.TrySetResult(true);
-            }
-
-            await lastArrived.Task.ConfigureAwait(false);
-            return await Respond.Echo(request, cancellationToken).ConfigureAwait(false);
-        };
+        // The first two requests are answered only after the third one has arrived.
+        var responder = Respond.OnceArrived(3, Respond.Echo);
         using var harness = new FormatterHarness(
             responder, options => options.MaxConcurrentRequests = 3, s_twoTextsPerRequest);
 
@@ -41,18 +31,8 @@ public class BatchRunTests
     [InlineData(3)]
     public async Task FormatBatchAsync_MoreRequestsThanAllowedAtOnce_KeepsToTheLimit(int maxConcurrentRequests)
     {
-        var enoughArrived = NewSignal();
-        Responder responder = async (request, cancellationToken) =>
-        {
-            // Nothing is answered until as many requests as the limit allows are in progress.
-            if (request.Number == maxConcurrentRequests - 1)
-            {
-                enoughArrived.TrySetResult(true);
-            }
-
-            await enoughArrived.Task.ConfigureAwait(false);
-            return await Respond.Echo(request, cancellationToken).ConfigureAwait(false);
-        };
+        // Nothing is answered until as many requests as the limit allows are in progress.
+        var responder = Respond.OnceArrived(maxConcurrentRequests, Respond.Echo);
         using var harness = new FormatterHarness(
             responder, options => options.MaxConcurrentRequests = maxConcurrentRequests, s_oneTextPerRequest);
 
@@ -77,18 +57,13 @@ public class BatchRunTests
     [Fact]
     public async Task FormatBatchAsync_OneRequestFails_StopsTheOthersAndThrowsItsFailure()
     {
-        var allArrived = NewSignal();
-        Responder responder = async (request, cancellationToken) =>
+        // Once the three requests are in progress, the one that starts with "c" fails and the others never answer.
+        Responder failOne = (request, cancellationToken) =>
         {
-            if (request.Number == 2)
-            {
-                allArrived.TrySetResult(true);
-            }
-
-            await allArrived.Task.ConfigureAwait(false);
             var answer = request.Dax[0] == "c" ? Respond.Status(HttpStatusCode.BadRequest) : Respond.Hang;
-            return await answer(request, cancellationToken).ConfigureAwait(false);
+            return answer(request, cancellationToken);
         };
+        var responder = Respond.OnceArrived(3, failOne);
         using var harness = new FormatterHarness(
             responder, options => options.MaxConcurrentRequests = 3, s_twoTextsPerRequest);
 
@@ -178,8 +153,15 @@ public class BatchRunTests
         Assert.Equal(Respond.ServiceRequestId, exception.ServiceRequestId);
     }
 
-    private static TaskCompletionSource<bool> NewSignal()
+    [Fact]
+    public async Task FormatBatchAsync_BlankTexts_CountsThemBeforeTheFirstRequest()
     {
-        return new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var progress = new ListProgress();
+        using var harness = new FormatterHarness(
+            Respond.Echo, options => options.MaxConcurrentRequests = 1, s_oneTextPerRequest);
+
+        await harness.Client.FormatBatchAsync(["", "a", "b", " "], progress: progress).ConfigureAwait(true);
+
+        Assert.Equal([(2, 4), (3, 4), (4, 4)], progress.Reports);
     }
 }

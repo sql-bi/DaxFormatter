@@ -148,19 +148,9 @@ internal sealed class BatchRun : IDisposable
         _progress.Report(chunk.Count);
     }
 
-    // The texts get their headers only here, so that a large call does not hold a second copy of every text.
     private FormatRequest CreateRequest(Chunk chunk)
     {
-        var dax = new List<string>(chunk.Count);
-        for (var position = 0; position < chunk.Count; position++)
-        {
-            var index = chunk[position];
-            var text = _plan.GetText(index);
-            var header = _plan.GetHeader(index);
-            dax.Add(header is null ? text : header.AddTo(text));
-        }
-
-        var body = _bodyWriter.Write(dax, _settings);
+        var body = _bodyWriter.Write(_plan.GetTextsToSend(chunk), _settings);
         return new FormatRequest(body, chunk.Count, chunk.FirstIndex, chunk.LastIndex, _operationId);
     }
 

@@ -8,11 +8,11 @@ namespace Dax.Formatter.Tests.Fixtures;
 /// </summary>
 internal static class FixtureFile
 {
-    public static JsonElement Load(string fileName)
+    public static JsonElement.ArrayEnumerator Cases(string fileName)
     {
         using var stream = OpenResource("Fixtures/" + fileName);
         using var document = JsonDocument.Parse(stream);
-        return document.RootElement.Clone();
+        return document.RootElement.Clone().GetProperty("cases").EnumerateArray();
     }
 
     /// <summary>Gets the names of the cases of a file, which a theory takes as its data.</summary>
@@ -26,7 +26,7 @@ internal static class FixtureFile
         return Cases(fileName).Single(testCase => testCase.GetProperty("name").GetString() == name);
     }
 
-    public static Stream OpenResource(string name)
+    private static Stream OpenResource(string name)
     {
         var stream = typeof(FixtureFile).Assembly.GetManifestResourceStream(name);
         return stream ?? throw new InvalidOperationException($"The embedded resource '{name}' is missing.");
@@ -45,10 +45,5 @@ internal static class FixtureFile
         }
 
         return string.Join("\n", lines);
-    }
-
-    private static JsonElement.ArrayEnumerator Cases(string fileName)
-    {
-        return Load(fileName).GetProperty("cases").EnumerateArray();
     }
 }
