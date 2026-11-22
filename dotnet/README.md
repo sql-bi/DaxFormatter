@@ -213,48 +213,9 @@ On .NET Framework the shared `HttpClient` opens at most [`ServicePointManager.De
 
 To replace the client in the tests of your application, derive from it and override `FormatAsync` and the `FormatBatchAsync` that takes strings: both are virtual, the one that takes items calls the one that takes strings, and the parameterless constructor does no work. `DaxFormatResult.Success` and `DaxFormatResult.Failure` create the results.
 
-## Migrating from 1.x
-
-Version 2.0 replaces the whole API. The requests that 1.x exposed are gone: a call takes the text and the options, and returns results.
-
-| 1.x | 2.0 |
-|---|---|
-| `new DaxFormatterClient(application, version)` | `new DaxFormatterClient(new DaxFormatterClientOptions { ApplicationName = ..., ApplicationVersion = ... })` |
-| `FormatAsync(string)`, `FormatAsync(DaxFormatterSingleRequest)` | `FormatAsync(text, options)` |
-| `FormatAsync(IEnumerable<string>)`, `FormatAsync(DaxFormatterMultipleRequest)` | `FormatBatchAsync(texts, options)`, or `FormatBatchAsync(items, textSelector, options)` |
-| `[x] :=` written before an expression, and removed from the result | `DaxFormatOptions.Kind = DaxKind.Expression` |
-| `MaxLineLength`, `SkipSpaceAfterFunctionName` | `DaxFormatOptions.LineStyle`, `DaxFormatOptions.SpacingStyle` |
-| `ListSeparator`, `DecimalSeparator` | `DaxFormatOptions.SeparatorStyle` |
-| `ServerName`, `DatabaseName`, `ServerVersion`, `DatabaseCompatibilityLevel` on the request | `DaxFormatOptions.ModelInfo`, where the compatibility level is a number |
-| The enums `ServerType`, `ServerMode`, `ServerEdition`, `ServerLocation` | Strings; `DaxServerTypes` has the server types |
-| `DaxFormatterResponse.Formatted`, empty when there are errors | `DaxFormatResult.FormattedText`, `null` when `Succeeded` is `false` |
-| `DaxFormatterError` with nullable `Line` and `Column` | `DaxSyntaxError` |
-| `HttpRequestException`, `TaskCanceledException` after 60 seconds | `DaxFormatterException` with a `Reason` |
-| `IDaxFormatterClient` | Derive from `DaxFormatterClient`, whose methods are virtual |
-| `Dispose()` | Nothing: the client is not disposable |
-
-What else changes:
-
-- The formatted text has no final line break.
-- For `DaxKind.Expression`, the position of an error refers to your text, not to the text with `[x] :=` before it.
-- A call with many texts no longer fails for its size: the client splits it.
-- `FormatBatchAsync(texts, null)` doesn't compile, because a literal `null` fits both the options and the text selector of the other overload: leave the argument out, or write `options: null`.
-- 2.0 formats DAX only. In 1.x, `FormatAsync(string)` and `FormatAsync(DaxFormatterSingleRequest)` also formatted MDX.
-- The package no longer has a `net8.0` target: applications on .NET 8 and 9 use the .NET Standard 2.0 one.
-
-## Service limits
-
-The service, not the client, rejects these texts with a syntax error:
-
-- a function without parameters, such as `() => 1`;
-- a function parameter with a default value, such as `(a, b = 1) => a + b`;
-- with `DaxKind.Expression`, an expression that has `=>` inside a string or a comment.
-
 ## Additional documentation
 
 - [SQLBI Docs](https://docs.sqlbi.com/dax-formatter/): the user documentation of DAX Formatter.
-- [Client API](https://github.com/sql-bi/DaxFormatter/blob/master/docs/design/client-api.md): the behavior of the client in detail.
-- [REST API](https://github.com/sql-bi/DaxFormatter/blob/master/docs/design/rest-api.md): the contract of the service that the client calls.
 
 ## Feedback
 

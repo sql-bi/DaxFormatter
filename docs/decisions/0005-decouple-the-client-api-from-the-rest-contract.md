@@ -35,7 +35,7 @@ Chosen option: "A new API on a model of its own", because the work that every ca
 * Good, because a caller passes its objects and reads results: the header line, the match by index and the outcome check are no longer written in each tool.
 * Good, because a call with thousands of texts no longer depends on one request ([sql-bi/DaxFormatter#40](https://github.com/sql-bi/DaxFormatter/issues/40)).
 * Good, because the TypeScript and Python clients get a model to port, with test vectors that don't depend on a language.
-* Bad, because every application on 1.x must change its code to move to 2.0; the package readme has a migration table.
+* Bad, because every application on 1.x must change its code to move to 2.0.
 * Bad, because the client now knows some DAX: where strings, names and comments start and end, and what a function body looks like. A change of the DAX syntax there reaches the client.
 * Bad, because `Expression` depends on how the service writes its answer: the client sends a header line, expects it back, and removes it with the indentation that the service adds under a function header. A different answer is a failure, never a wrong text, and the live tests pin the answers.
 * Bad, because the client can't work around three limits of the service, which it returns as syntax errors ([`client-api.md`](../design/client-api.md#limits-of-the-service)).
