@@ -175,7 +175,9 @@ Without an `HttpClient`, all the clients share one that lives as long as the pro
 var client = new DaxFormatterClient(httpClient);
 ```
 
-The client never changes or disposes an `HttpClient` it is given, and ignores its `BaseAddress`. If its `Timeout` is shorter than `RequestTimeout`, the shorter one wins. With `IHttpClientFactory`, register the client as a typed client: `services.AddHttpClient<DaxFormatterClient>()`.
+The client never changes or disposes an `HttpClient` it is given, and ignores its `BaseAddress`. If its `Timeout` is shorter than `RequestTimeout`, the shorter one wins. With `IHttpClientFactory`, register the client as a typed client with a factory, because more than one of its constructors takes an `HttpClient`: `services.AddHttpClient<DaxFormatterClient, DaxFormatterClient>(httpClient => new DaxFormatterClient(httpClient))`.
+
+On .NET Framework the shared `HttpClient` opens at most [`ServicePointManager.DefaultConnectionLimit`](https://learn.microsoft.com/dotnet/api/system.net.servicepointmanager.defaultconnectionlimit) connections to the service, which is 2 unless the application changes it. Raise that limit, or pass your own `HttpClient`, before you raise `MaxConcurrentRequests` or run several calls at the same time: a request that waits for a connection uses up its `RequestTimeout`.
 
 To replace the client in the tests of your application, derive from it and override `FormatAsync` and the `FormatBatchAsync` that takes strings: both are virtual, the one that takes items calls the one that takes strings, and the parameterless constructor does no work. `DaxFormatResult.Success` and `DaxFormatResult.Failure` create the results.
 
@@ -204,6 +206,7 @@ What else changes:
 - The formatted text has no final line break.
 - For `DaxKind.Expression`, the position of an error refers to your text, not to the text with `[x] :=` before it.
 - A call with many texts no longer fails for its size: the client splits it.
+- `FormatBatchAsync(texts, null)` doesn't compile, because a literal `null` fits both the options and the text selector of the other overload: leave the argument out, or write `options: null`.
 - 2.0 formats DAX only. In 1.x, `FormatAsync(string)` and `FormatAsync(DaxFormatterSingleRequest)` also formatted MDX.
 - The package no longer has a `net8.0` target: applications on .NET 8 and 9 use the .NET Standard 2.0 one.
 
