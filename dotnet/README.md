@@ -4,6 +4,8 @@
 
 ## Install
 
+The package targets .NET Standard 2.0 and .NET 10.
+
 ```bash
 dotnet add package Dax.Formatter
 ```
