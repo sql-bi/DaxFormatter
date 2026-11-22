@@ -17,24 +17,24 @@ public sealed class DaxModelInfo
     public string? DatabaseName { get; set; }
 
     /// <summary>
-    /// Gets or sets the kind of server. <see cref="DaxServerTypes"/> has the values the service knows.
+    /// Gets or sets the kind of server.
     /// </summary>
-    public string? ServerType { get; set; }
+    public DaxServerType? ServerType { get; set; }
 
     /// <summary>
-    /// Gets or sets the mode of the Analysis Services server, such as <c>Tabular</c>.
+    /// Gets or sets the mode of the Analysis Services server.
     /// </summary>
-    public string? ServerMode { get; set; }
+    public DaxServerMode? ServerMode { get; set; }
 
     /// <summary>
-    /// Gets or sets the edition of the Analysis Services server, such as <c>Enterprise64</c>.
+    /// Gets or sets the edition of the Analysis Services server.
     /// </summary>
-    public string? ServerEdition { get; set; }
+    public DaxServerEdition? ServerEdition { get; set; }
 
     /// <summary>
-    /// Gets or sets where the server runs, such as <c>OnPremise</c> or <c>Azure</c>.
+    /// Gets or sets where the server runs.
     /// </summary>
-    public string? ServerLocation { get; set; }
+    public DaxServerLocation? ServerLocation { get; set; }
 
     /// <summary>
     /// Gets or sets the version of the server, such as <c>16.0.143.21</c>.

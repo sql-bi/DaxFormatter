@@ -112,7 +112,7 @@ var options = new DaxFormatOptions
     SeparatorStyle = DaxSeparatorStyle.SemicolonAndComma,
     ModelInfo = new DaxModelInfo
     {
-        ServerType = DaxServerTypes.PowerBIDesktop,
+        ServerType = DaxServerType.PowerBIDesktop,
         DatabaseName = "Contoso",
     },
 };

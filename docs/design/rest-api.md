@@ -66,9 +66,9 @@ Here `serverName` is the hash of `MyServer`.
 
 ## Enums
 
-`serverType`, `serverMode`, `serverEdition` and `serverLocation` are strings. The TypeScript port has an enum for each; the .NET client takes any string, and has the values of `serverType` as the constants of `DaxServerTypes`.
+`serverType`, `serverMode`, `serverEdition` and `serverLocation` are strings, which the service stores as they come. Both clients have an enum for each. For `serverMode`, `serverEdition` and `serverLocation` the .NET enums `DaxServerMode`, `DaxServerEdition` and `DaxServerLocation` send the name of the member, which is the name in the Analysis Services enums `ServerMode`, `ServerEdition` and `ServerLocation`. The TypeScript port doesn't have `StandardDeveloper` and `StandardDeveloper64`.
 
-| `DaxServerTypes` constant, TypeScript `ServerType` member | `serverType` |
+| .NET `DaxServerType` member, TypeScript `ServerType` member | `serverType` |
 |---|---|
 | `AnalysisServices` | `SSAS` |
 | `PowerBIDesktop` | `PBI Desktop` |
@@ -82,7 +82,7 @@ Here `serverName` is the hash of `MyServer`.
 | Field | Values |
 |---|---|
 | `serverMode` | `Multidimensional`, `SharePoint`, `Tabular`, `Default` |
-| `serverEdition` | `Standard`, `Standard64`, `Enterprise`, `Enterprise64`, `Developer`, `Developer64`, `Evaluation`, `Evaluation64`, `LocalCube`, `LocalCube64`, `BusinessIntelligence`, `BusinessIntelligence64`, `EnterpriseCore`, `EnterpriseCore64` |
+| `serverEdition` | `Standard`, `Standard64`, `Enterprise`, `Enterprise64`, `Developer`, `Developer64`, `Evaluation`, `Evaluation64`, `LocalCube`, `LocalCube64`, `BusinessIntelligence`, `BusinessIntelligence64`, `EnterpriseCore`, `EnterpriseCore64`, `StandardDeveloper`, `StandardDeveloper64` |
 | `serverLocation` | `OnPremise`, `Azure` |
 
 ## Response

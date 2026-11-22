@@ -58,27 +58,52 @@ enum Dax.Formatter.DaxLineStyle
     LongLine = 0
     ShortLine = 1
 sealed class Dax.Formatter.DaxModelInfo
+    Dax.Formatter.DaxServerEdition? ServerEdition { get; set; }
+    Dax.Formatter.DaxServerLocation? ServerLocation { get; set; }
+    Dax.Formatter.DaxServerMode? ServerMode { get; set; }
+    Dax.Formatter.DaxServerType? ServerType { get; set; }
     System.Int32? CompatibilityLevel { get; set; }
     System.String DatabaseName { get; set; }
-    System.String ServerEdition { get; set; }
-    System.String ServerLocation { get; set; }
-    System.String ServerMode { get; set; }
     System.String ServerName { get; set; }
-    System.String ServerType { get; set; }
     System.String ServerVersion { get; set; }
     constructor()
 enum Dax.Formatter.DaxSeparatorStyle
     CommaAndPoint = 0
     SemicolonAndComma = 1
-static class Dax.Formatter.DaxServerTypes
-    const System.String AnalysisServices = "SSAS"
-    const System.String AzureAnalysisServices = "AzureAS"
-    const System.String Offline = "Offline"
-    const System.String PowerBIDesktop = "PBI Desktop"
-    const System.String PowerBIReportServer = "PBI Report Server"
-    const System.String PowerBIService = "PBI Service"
-    const System.String PowerPivot = "PowerPivot"
-    const System.String Ssdt = "SSDT"
+enum Dax.Formatter.DaxServerEdition
+    BusinessIntelligence = 10
+    BusinessIntelligence64 = 11
+    Developer = 4
+    Developer64 = 5
+    Enterprise = 2
+    Enterprise64 = 3
+    EnterpriseCore = 12
+    EnterpriseCore64 = 13
+    Evaluation = 6
+    Evaluation64 = 7
+    LocalCube = 8
+    LocalCube64 = 9
+    Standard = 0
+    Standard64 = 1
+    StandardDeveloper = 14
+    StandardDeveloper64 = 15
+enum Dax.Formatter.DaxServerLocation
+    Azure = 1
+    OnPremise = 0
+enum Dax.Formatter.DaxServerMode
+    Default = 3
+    Multidimensional = 0
+    SharePoint = 1
+    Tabular = 2
+enum Dax.Formatter.DaxServerType
+    AnalysisServices = 0
+    AzureAnalysisServices = 5
+    Offline = 7
+    PowerBIDesktop = 1
+    PowerBIReportServer = 2
+    PowerBIService = 6
+    PowerPivot = 3
+    Ssdt = 4
 enum Dax.Formatter.DaxSpacingStyle
     NoSpaceAfterFunction = 1
     SpaceAfterFunction = 0
